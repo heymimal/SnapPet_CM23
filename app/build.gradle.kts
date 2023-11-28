@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.snappet"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.snappet"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+
+    //dependency for the navigation.
+    implementation ("androidx.navigation:navigation-compose:2.7.0-rc01")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
