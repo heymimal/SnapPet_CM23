@@ -2,16 +2,26 @@ package com.example.snappet
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -31,83 +41,89 @@ fun BottomNavigationBar() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar(
-                //backgroundColor = Color.Magenta
-            ) {
-                BottomNavigationItem().bottomNavigationItems().forEachIndexed { _, navigationItem ->
-                    NavigationBarItem(
-                        selected = navigationItem.route == currentDestination?.route,
-                        label = {
-                            Text(navigationItem.label)
-                        },
-                        icon = {
-                            Icon(
-                                navigationItem.icon,
-                                contentDescription = navigationItem.label
-                            )
-                        },
-                        onClick = {
-                            navController.navigate(navigationItem.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    ) {paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = Screens.Home.route,
-            modifier = Modifier.padding(paddingValues = paddingValues)) {
-            composable(Screens.Home.route) {
-
-            }
-            composable(Screens.Search.route) {
-
-            }
-            composable(Screens.Profile.route) {
-
-            }
-        }
+                Navigation(currentDestination = currentDestination, navController =navController)
+        }) {paddingValues ->
+        Text(text = "stuff", modifier = Modifier.padding(paddingValues = paddingValues))
         //Text(text = "Hello")
     }
 }
 
 @Composable
-fun Navegation(currentDestination : NavDestination?, navController: NavHostController){
+fun Navigation(currentDestination : NavDestination?, navController: NavHostController){
+    var selectedItem by remember { mutableIntStateOf(0) }
+    val items = listOf("Home","Map","Camera","Trophy","Profile")
+    val routes = listOf("route")
     NavigationBar(
-        //backgroundColor = Color.Magenta
+        contentColor = Color(239,139,9)
     ) {
-        BottomNavigationItem().bottomNavigationItems().forEachIndexed { _, navigationItem ->
-            NavigationBarItem(
-                selected = navigationItem.route == currentDestination?.route,
-                label = {
-                    Text(navigationItem.label)
-                },
-                icon = {
-                    Icon(
-                        navigationItem.icon,
-                        contentDescription = navigationItem.label
-                    )
-                },
-                onClick = {
-                    navController.navigate(navigationItem.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
-        }
+        NavigationBarItem(
+            selected = selectedItem == 0,
+            onClick = { selectedItem = 0 },
+            label = {
+                Text("Home")
+            },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.baseline_home_24),
+                    contentDescription = items[0],
+                )
+            }
+        )
+        NavigationBarItem(
+            selected = selectedItem == 1,
+            onClick = { selectedItem = 1 },
+            label = {
+                Text("Map")
+            },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.baseline_map_24),
+                    contentDescription = items[1]
+                )
+            }
+        )
+        NavigationBarItem(
+            selected = selectedItem == 2,
+            onClick = { selectedItem = 2 },
+            label = {
+                Text("Camera")
+            },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.baseline_photo_camera_24),
+                    contentDescription = items[2]
+                )
+            }
+        )
+        NavigationBarItem(
+            selected = selectedItem == 3,
+            onClick = { selectedItem = 3 },
+            label = {
+                Text("Trophy")
+            },
+            icon = {
+                Icon(
+                    painterResource(id = R.drawable.baseline_trophy_24),
+                    contentDescription = items[3]
+                )
+            }
+        )
+        NavigationBarItem(
+            selected = selectedItem == 4,
+            onClick = { selectedItem = 4 },
+            label = {
+                Text("Profile")
+            },
+            icon = {
+                Icon(
+                    Icons.Filled.AccountCircle,
+                    contentDescription = items[4]
+                )
+            }
+        )
     }
 }
+
 
 
 @Preview(showBackground = true)

@@ -72,7 +72,7 @@ fun Profiler(modifier: Modifier = Modifier) {
                         .requiredWidth(width = 50.dp)
                         .requiredHeight(height = 42.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.mapicon),
+                    painter = painterResource(id = R.drawable.baseline_map_24),
                     contentDescription = "map icon",
                     modifier = Modifier
                         .align(alignment = Alignment.TopStart)
@@ -80,7 +80,7 @@ fun Profiler(modifier: Modifier = Modifier) {
                             y = 7.dp)
                         .requiredSize(size = 50.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.profileicon),
+                    painter = painterResource(id = R.drawable.baseline_map_24),
                     contentDescription = "profile icon",
                     modifier = Modifier
                         .align(alignment = Alignment.TopStart)
@@ -88,7 +88,7 @@ fun Profiler(modifier: Modifier = Modifier) {
                             y = 7.dp)
                         .requiredSize(size = 50.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.cameraicon),
+                    painter = painterResource(id = R.drawable.baseline_photo_camera_24),
                     contentDescription = "Camera icon",
                     modifier = Modifier
                         .align(alignment = Alignment.TopStart)
@@ -188,7 +188,7 @@ fun Profiler(modifier: Modifier = Modifier) {
                 .requiredHeight(height = 40.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.trophyicon),
+                painter = painterResource(id = R.drawable.baseline_trophy_24),
                 contentDescription = "Trophy icon",
                 modifier = Modifier
                     .requiredWidth(width = 45.dp)
@@ -253,7 +253,7 @@ fun Profiler(modifier: Modifier = Modifier) {
                     .offset(x = 53.dp,
                         y = 5.dp))
             Image(
-                painter = painterResource(id = R.drawable.cameraicon),
+                painter = painterResource(id = R.drawable.baseline_photo_camera_24),
                 contentDescription = "Camera Icon",
                 modifier = Modifier
                     .requiredSize(size = 41.dp))
