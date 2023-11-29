@@ -1,27 +1,17 @@
 package com.example.snappet
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,7 +21,7 @@ import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar3() {
+fun editProfileNavBar() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -54,8 +44,31 @@ fun EditProfile(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxSize()
     ) {
-
         Text(
+            text = "Edit Profile",
+            color = Color.Black,
+            style = TextStyle(
+                fontSize = 25.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.TopCenter)
+                .offset(
+                    x = 0.dp,
+                    y = 29.dp
+                ))
+
+    }
+}
+
+@Preview
+@Composable
+private fun EditProfilePreview() {
+    editProfileNavBar()
+}
+
+
+
+/*
+Text(
             text = "Edit Profile",
             color = Color.Black,
             style = TextStyle(
@@ -268,11 +281,4 @@ fun EditProfile(modifier: Modifier = Modifier) {
                         y = 15.dp
                     ))
         }
-    }
-}
-
-@Preview
-@Composable
-private fun EditProfilePreview() {
-    BottomNavigationBar3()
-}
+ */
