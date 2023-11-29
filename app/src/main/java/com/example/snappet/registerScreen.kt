@@ -31,20 +31,7 @@ fun Register(modifier: Modifier = Modifier) {
             .background(color = Color.White)
     ) {
 
-        Box(
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(x = 0.dp,
-                    y = 738.dp)
-                .requiredWidth(width = 360.dp)
-                .requiredHeight(height = 62.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .requiredWidth(width = 360.dp)
-                    .requiredHeight(height = 62.dp)
-                    .background(color = Color(0xffe99517).copy(alpha = 0.77f)))
-        }
+
         Text(
             text = "Register",
             color = Color.Black,
