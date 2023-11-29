@@ -1,31 +1,35 @@
 package com.example.snappet
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,10 +55,130 @@ fun BottomNavigationBar5() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropDownMenu() {
+    val options = listOf("Dog", "Cat", "Elephant")
+    var expanded by remember { mutableStateOf(false) } //menu drop down aberto ou nao
+    var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TextField(
+            modifier = Modifier.menuAnchor(),
+            readOnly = true,
+            value = selectedOptionText,
+            onValueChange = {},
+            label = { Text("Animal on the photo") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption) },
+                    onClick = {
+                        selectedOptionText = selectionOption
+                        expanded = false
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun radioButton(){
+    val radioOptions = listOf("Entertainment", "Animal in need of Help")
+    var selectedOption by remember { mutableStateOf(radioOptions[0]) }
+
+    Column(
+        modifier = Modifier.padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        radioOptions.forEach { option ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = (option == selectedOption),
+                    onClick = { selectedOption = option }
+                )
+                Text(
+                    text = option,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun PhotoForms(modifier: Modifier = Modifier) {
-    Box(
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = "Photo Form",
+            color = Color.Black,
+            style = TextStyle(fontSize = 25.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
+                .offset(y = 29.dp)
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.imagemforms),
+            contentDescription = "image 11",
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(200.dp))
+
+        Spacer(modifier = Modifier.height(50.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ){
+            DropDownMenu()
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Context",
+            color = Color.Black,
+            style = TextStyle(fontSize = 25.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.Start)
+                .offset(y = 29.dp)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        radioButton()
+
+    }
+}
+
+@Preview
+@Composable
+private fun PhotoFormsPreview() {
+    BottomNavigationBar5()
+}
+
+/*
+Box(
         modifier = modifier.fillMaxSize()
     ) {
 
@@ -248,10 +372,4 @@ fun PhotoForms(modifier: Modifier = Modifier) {
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun PhotoFormsPreview() {
-    BottomNavigationBar5()
-}
+ */
