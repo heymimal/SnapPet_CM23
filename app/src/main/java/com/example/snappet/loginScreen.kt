@@ -37,20 +37,7 @@ fun Login(modifier: Modifier = Modifier) {
                     .requiredWidth(width = 360.dp)
                     .requiredHeight(height = 800.dp)
                     .background(color = Color.White))
-            Box(
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(x = 0.dp,
-                        y = 738.dp)
-                    .requiredWidth(width = 360.dp)
-                    .requiredHeight(height = 62.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .requiredWidth(width = 360.dp)
-                        .requiredHeight(height = 62.dp)
-                        .background(color = Color(0xffe99517).copy(alpha = 0.77f)))
-            }
+
         }
         Text(
             text = "Login",
@@ -59,13 +46,17 @@ fun Login(modifier: Modifier = Modifier) {
                 fontSize = 25.sp),
             modifier = Modifier
                 .align(alignment = Alignment.TopCenter)
-                .offset(x = (-18.5).dp,
-                    y = 109.dp))
+                .offset(
+                    x = (-18.5).dp,
+                    y = 109.dp
+                ))
         Box(
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 41.dp,
-                    y = 451.dp)
+                .offset(
+                    x = 41.dp,
+                    y = 451.dp
+                )
                 .requiredWidth(width = 277.dp)
                 .requiredHeight(height = 64.dp)
         ) {
@@ -77,8 +68,10 @@ fun Login(modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier
                     .align(alignment = Alignment.TopStart)
-                    .offset(x = 13.dp,
-                        y = 13.dp)
+                    .offset(
+                        x = 13.dp,
+                        y = 13.dp
+                    )
                     .requiredWidth(width = 243.dp)
                     .requiredHeight(height = 38.dp)
             ) {
@@ -89,8 +82,10 @@ fun Login(modifier: Modifier = Modifier) {
                         fontSize = 20.sp),
                     modifier = Modifier
                         .align(alignment = Alignment.TopStart)
-                        .offset(x = 56.dp,
-                            y = 7.dp))
+                        .offset(
+                            x = 56.dp,
+                            y = 7.dp
+                        ))
                 Image(
                     painter = painterResource(id = R.drawable.google_icon),
                     contentDescription = "image 3",
@@ -101,8 +96,10 @@ fun Login(modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 41.dp,
-                    y = 263.dp)
+                .offset(
+                    x = 41.dp,
+                    y = 263.dp
+                )
                 .requiredWidth(width = 277.dp)
                 .requiredHeight(height = 64.dp)
         ) {
@@ -114,8 +111,10 @@ fun Login(modifier: Modifier = Modifier) {
             Box(
                 modifier = Modifier
                     .align(alignment = Alignment.TopStart)
-                    .offset(x = 10.dp,
-                        y = 7.dp)
+                    .offset(
+                        x = 10.dp,
+                        y = 7.dp
+                    )
                     .requiredWidth(width = 237.dp)
                     .requiredHeight(height = 50.dp)
             ) {
@@ -126,8 +125,10 @@ fun Login(modifier: Modifier = Modifier) {
                         fontSize = 20.sp),
                     modifier = Modifier
                         .align(alignment = Alignment.TopStart)
-                        .offset(x = 68.dp,
-                            y = 13.dp))
+                        .offset(
+                            x = 68.dp,
+                            y = 13.dp
+                        ))
                 Image(
                     painter = painterResource(id = R.drawable.email_icon),
                     contentDescription = "image 4",
@@ -138,8 +139,10 @@ fun Login(modifier: Modifier = Modifier) {
         Box(
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
-                .offset(x = 26.dp,
-                    y = 640.dp)
+                .offset(
+                    x = 26.dp,
+                    y = 640.dp
+                )
                 .requiredWidth(width = 84.dp)
                 .requiredHeight(height = 52.dp)
         ) {
@@ -156,13 +159,15 @@ fun Login(modifier: Modifier = Modifier) {
                     fontSize = 20.sp),
                 modifier = Modifier
                     .align(alignment = Alignment.TopStart)
-                    .offset(x = 19.dp,
-                        y = 14.dp))
+                    .offset(
+                        x = 19.dp,
+                        y = 14.dp
+                    ))
         }
     }
 }
 
-@Preview(widthDp = 360, heightDp = 800)
+@Preview
 @Composable
 private fun LoginPreview() {
     Login(Modifier)
