@@ -1,14 +1,15 @@
 package com.example.snappet
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +17,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,10 +47,64 @@ fun BottomNavigationBar8() {
 
 @Composable
 fun Trophies(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top
     ) {
-        Box(
+        Text(
+            text = "Missions and Trophies",
+            color = Color.Black,
+            style = TextStyle(fontSize = 25.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
+                .offset(y = 29.dp)
+        )
+
+        Spacer(modifier = Modifier.height(150.dp))
+
+        Mission(name = "Take 10 photos!", progress = 7, total = 10)
+        Mission(name = "Take 10 cat photos!", progress = 3, total = 10)
+        Mission(name = "Take 10 dog photos!", progress = 2, total = 10)
+        Mission(name = "Take 50 photos!", progress = 7, total = 50)
+    }
+}
+
+@Composable
+fun Mission(name: String, progress: Int, total: Int) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(text = name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LinearProgressIndicator(
+            progress = progress.toFloat() / total.toFloat(),
+            modifier = Modifier.fillMaxWidth(),
+            color = if (progress == total) Color.Green else Color.Blue
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(text = "$progress/$total")
+    }
+
+    Spacer(modifier = Modifier.height(30.dp))
+
+}
+
+@Preview
+@Composable
+private fun TrophiesPreview() {
+    BottomNavigationBar8()
+}
+
+/*
+Box(
             modifier = Modifier
                 .requiredWidth(width = 360.dp)
                 .requiredHeight(height = 800.dp)
@@ -204,11 +259,4 @@ fun Trophies(modifier: Modifier = Modifier) {
                         y = 89.dp
                     ))
         }
-    }
-}
-
-@Preview
-@Composable
-private fun TrophiesPreview() {
-    BottomNavigationBar8()
-}
+ */
