@@ -54,9 +54,6 @@ fun Login(modifier: Modifier = Modifier) {
         OptionsButton(text = "Sign In With Google", imageId = R.drawable.google_icon)
         Spacer(modifier = Modifier.height(16.dp))
 
-        //ELE NAO ME TA A DEIXAR USAR IMAGENS QUE FIZ DOWNLOAD EU AGORA?????
-        OptionsButton(text = "Sign In With Facebook", imageId = R.drawable.google_icon)
-        Spacer(modifier = Modifier.height(16.dp))
     }
 
     Box(

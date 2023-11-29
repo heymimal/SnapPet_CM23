@@ -1,21 +1,11 @@
 package com.example.snappet
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -26,28 +16,21 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.snappet.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavigationBar() {
     val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-                Navigation(currentDestination = currentDestination, navController =navController)
+                Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
 
@@ -56,7 +39,7 @@ fun BottomNavigationBar() {
 }
 
 @Composable
-fun Navigation(currentDestination : NavDestination?, navController: NavHostController){
+fun Navigation(navController: NavController){
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home","Map","Camera","Trophy","Profile")
     val routes = listOf("route")
@@ -65,7 +48,8 @@ fun Navigation(currentDestination : NavDestination?, navController: NavHostContr
     ) {
         NavigationBarItem(
             selected = selectedItem == 0,
-            onClick = { selectedItem = 0 },
+            onClick = { selectedItem = 0
+                navController.navigate(Screens.Home.route)},
             label = {
                 Text("Home")
             },
@@ -104,7 +88,8 @@ fun Navigation(currentDestination : NavDestination?, navController: NavHostContr
         )
         NavigationBarItem(
             selected = selectedItem == 3,
-            onClick = { selectedItem = 3 },
+            onClick = { selectedItem = 3
+                navController.navigate(Screens.Trophies.route)},
             label = {
                 Text("Trophy")
             },
@@ -130,47 +115,6 @@ fun Navigation(currentDestination : NavDestination?, navController: NavHostContr
         )
     }
 }
-
-@Composable
-fun CardWithImageAndText1(imageVector: ImageVector, text: String) {
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
-        modifier = Modifier
-            .width(120.dp)
-            .height(160.dp)
-            .padding(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(shape = MaterialTheme.shapes.medium)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = text,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-
-
-
 
 @Preview(showBackground = true)
 @Composable

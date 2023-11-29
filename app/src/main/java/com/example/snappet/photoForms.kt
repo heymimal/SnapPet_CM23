@@ -2,6 +2,7 @@ package com.example.snappet
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -33,7 +38,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 
@@ -41,12 +45,10 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun BottomNavigationBar5() {
     val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Navigation(currentDestination = currentDestination, navController =navController)
+            Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
         PhotoForms()
@@ -164,10 +166,54 @@ fun PhotoForms(modifier: Modifier = Modifier) {
                 .offset(y = 29.dp)
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         radioButton()
 
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ){
+        Button(
+            onClick = { /*TODO*/ },
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+            modifier = Modifier
+                .align(alignment = Alignment.TopStart)
+                .offset(
+                    x = 26.dp,
+                    y = 680.dp
+                )
+                .height(50.dp)
+                .width(100.dp)
+
+        )
+        {
+            Text(text = "Back", style = TextStyle(fontSize = 20.sp))
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ){
+        Button(
+            onClick = { /*TODO*/ },
+            shape = RoundedCornerShape(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+            modifier = Modifier
+                .align(alignment = Alignment.TopStart)
+                .offset(
+                    x = 246.dp,
+                    y = 680.dp
+                )
+                .height(50.dp)
+                .width(100.dp)
+
+        )
+        {
+            Text(text = "Next", style = TextStyle(fontSize = 20.sp))
+        }
     }
 }
 
