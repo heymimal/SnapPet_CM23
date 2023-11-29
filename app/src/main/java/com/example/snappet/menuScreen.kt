@@ -131,10 +131,18 @@ fun ThreeByThreeGrid() {
             }
         }
 
-        // Third Row: Add your own content here if needed
         item {
-            // Add your own cards or leave it empty
+            Column {
+                Text("Cats", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    item { CardWithImageAndText(Icons.Default.Person, "Peacock1") }
+                    item { CardWithImageAndText(Icons.Default.Phone, "Dog2") }
+                    item { CardWithImageAndText(Icons.Default.Place, "Dog3") }
+                }
+            }
         }
+
+
     }
 }
 
