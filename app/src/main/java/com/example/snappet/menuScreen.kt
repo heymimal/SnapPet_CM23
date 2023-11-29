@@ -17,9 +17,12 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,6 +31,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BottomNavigationBar1() {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            Navigation(currentDestination = currentDestination, navController =navController)
+        }) {paddingValues ->
+        Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
+        ThreeByThreeGrid1()
+
+        //Text(text = "Hello")
+    }
+}
 
 @Composable
 fun CardWithImageAndText(imageVector: ImageVector, text: String) {
@@ -66,8 +89,9 @@ fun CardWithImageAndText(imageVector: ImageVector, text: String) {
     }
 }
 
+
 @Composable
-fun ThreeByThreeGrid() {
+fun ThreeByThreeGrid1() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -147,11 +171,8 @@ fun ThreeByThreeGrid() {
 }
 
 
-
-
-
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun ThreeByThreeGridPreview() {
-    ThreeByThreeGrid()
+fun Preview1(){
+    BottomNavigationBar1()
 }
