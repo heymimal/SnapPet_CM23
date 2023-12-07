@@ -24,8 +24,8 @@ fun NavGraph(navController : NavHostController) {
             MapActivity()
             //TestActivity()
         }
-        composable("camera_route") {
-
+        composable(route = Screens.Camera.route) {
+            CameraActivity()
         }
         composable(route = Screens.Trophies.route) {
             Trophies_nav(navController)

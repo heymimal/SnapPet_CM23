@@ -84,7 +84,10 @@ fun Navigation(navController: NavController){
         )
         NavigationBarItem(
             selected = selectedItem == 2,
-            onClick = { selectedItem = 2 },
+            onClick = { selectedItem = 2
+                      val intent = Intent(context, CameraActivity::class.java)
+                        context.startActivity(intent)
+                      },
             label = {
                 Text("Camera")
             },
