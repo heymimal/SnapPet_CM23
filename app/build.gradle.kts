@@ -74,6 +74,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     val camerax_version = "1.2.2"
     implementation ("androidx.camera:camera-core:${camerax_version}")
