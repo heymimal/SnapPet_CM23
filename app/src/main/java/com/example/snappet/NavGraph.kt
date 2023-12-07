@@ -5,6 +5,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.snappet.navigation.Screens
+import com.example.snappet.screens.Trophies_nav
+import com.example.snappet.screens.menuBottomNav
 
 @Composable
 fun NavGraph(navController : NavHostController) {
@@ -17,10 +19,13 @@ fun NavGraph(navController : NavHostController) {
 
             menuBottomNav(navController)
         }
-        composable("map_route") {
+        composable(route = Screens.Map.route) {
+            //map_nav(navController)
+            MapActivity()
+            //TestActivity()
         }
-        composable("camera_route") {
-
+        composable(route = Screens.Camera.route) {
+            CameraActivity()
         }
         composable(route = Screens.Trophies.route) {
             Trophies_nav(navController)

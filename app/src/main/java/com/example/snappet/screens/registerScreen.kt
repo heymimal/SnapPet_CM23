@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
