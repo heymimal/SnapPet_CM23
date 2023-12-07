@@ -6,5 +6,4 @@ sealed class Screens(val route:String){
     object Profile : Screens("profile_route")
     object Trophies: Screens("trophies_route")
 
-
 }

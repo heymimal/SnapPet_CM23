@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -25,6 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import com.example.snappet.Navigation
+import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

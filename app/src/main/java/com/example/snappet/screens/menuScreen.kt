@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -30,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.snappet.Navigation
+import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,10 +165,3 @@ fun ThreeByThreeGrid1() {
 
     }
 }
-
-
-/*@Preview(showBackground = true)
-@Composable
-fun Preview1(){
-    menuBottomNav()
-}*/

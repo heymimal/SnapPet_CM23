@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.snappet.navigation.Screens
@@ -49,7 +48,8 @@ fun Navigation(navController: NavController){
         NavigationBarItem(
             selected = selectedItem == 0,
             onClick = { selectedItem = 0
-                navController.navigate(Screens.Home.route)},
+                navController.navigate(Screens.Home.route)
+                      },
             label = {
                 Text("Home")
             },
@@ -62,7 +62,10 @@ fun Navigation(navController: NavController){
         )
         NavigationBarItem(
             selected = selectedItem == 1,
-            onClick = { selectedItem = 1 },
+            onClick = { selectedItem = 1
+                      navController.navigate(Screens.Map.route)
+                //navController.navigate("activity_route")
+                      },
             label = {
                 Text("Map")
             },
@@ -114,10 +117,4 @@ fun Navigation(navController: NavController){
             }
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview(){
-    BottomNavigationBar()
 }

@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.snappet.Navigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
