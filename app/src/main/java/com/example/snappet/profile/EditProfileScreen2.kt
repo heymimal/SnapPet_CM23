@@ -39,7 +39,6 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.snappet.Navigation
 import com.example.snappet.R
-import com.example.snappet.Trophies
 import com.example.snappet.sign_In.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)

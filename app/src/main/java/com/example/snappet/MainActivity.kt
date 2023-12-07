@@ -1,6 +1,5 @@
 package com.example.snappet
 
-import ProfileScreen
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -11,29 +10,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.snappet.navigation.Screens
-import com.example.snappet.profile.EditProfileScreen2
 import com.example.snappet.profile.EditProfileScreen2_nav
+import com.example.snappet.screens.Trophies_nav
+import com.example.snappet.screens.menuBottomNav
 import com.example.snappet.sign_In.GoogleAuthUiClient
 import com.example.snappet.sign_In.LoginScreen2
-import com.example.snappet.sign_In.SignInScreen
 import com.example.snappet.sign_In.SignInViewModel
 import com.example.snappet.ui.theme.SnapPetTheme
-import kotlinx.coroutines.launch
 import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {

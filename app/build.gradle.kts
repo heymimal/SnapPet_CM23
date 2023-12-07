@@ -60,7 +60,7 @@ android {
 dependencies {
 
     //Firebase
-    implementation ("com.google.firebase:firebase-auth-ktx:21.1.0")
+    //implementation ("com.google.firebase:firebase-auth-ktx:21.1.0")
     implementation ("com.google.android.gms:play-services-auth:20.4.1")
     //Lifecycle
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
@@ -69,7 +69,7 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     //Coil compose para carregar profile imagens
     implementation ("io.coil-kt:coil-compose:2.2.2")
-    //implementation("com.google.firebase:firebase-auth:22.3.0")
+    implementation("com.google.firebase:firebase-auth:22.3.0")
 
     //-----------------Adicionei o que esta encima-------------------
 
@@ -111,3 +111,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+
+
+
