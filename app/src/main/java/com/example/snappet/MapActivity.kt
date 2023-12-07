@@ -61,7 +61,7 @@ class MapActivity : AppCompatActivity() {
                             CameraPosition.Builder().target(userLatLng).zoom(15.0f).build()
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
 
-                        addMarker(userLatLng, "Your location", "You're here")
+                        addMarker(userLatLng, "Your location", "You're here!")
                     }
                 }
             } else {
