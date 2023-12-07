@@ -9,13 +9,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapActivity : AppCompatActivity() {
 
-    //@-23.5868031,-46.6847268
-    //Av. Brig. Faria Lima, 3477 - 18º Andar - Itaim Bibi, São Paulo - SP, 04538-133, Brasil
-
-
-    //@-23.5894588,-46.6732638
-    //Av. República do Líbano, 1157 - Ibirapuera, São Paulo - SP, 04502-001, Brasil
-
     private val places = arrayListOf(
         Place("Google", LatLng(-23.5868031,-46.6847268), "Av. Brig. Faria Lima, 3477 - 18º Andar - Itaim Bibi, São Paulo - SP", 4.8f),
         Place("Parque", LatLng(-23.5894588,-46.6732638), "Av. República do Líbano, 1157 - Ibirapuera, São Paulo - SP", 4.9f)
