@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -121,7 +120,7 @@ fun EditProfileScreen2(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            Row(
+            /*Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     //horizontalArrangement = Arrangement.SpaceBetween,
                     .padding(start = 0.dp, end = 16.dp),
@@ -167,6 +166,44 @@ fun EditProfileScreen2(
                     Text(text = "Logout")
                 }
             }
+*/
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                    .padding(start = 0.dp, end = 16.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Button(
+                    onClick = { /* Ação do botão Update */ },
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    Text(text = "Update")
+                }
+
+                if (userData?.profilePictureUrl != null) {
+                    AsyncImage(
+                        model = userData.profilePictureUrl,
+                        // descrição da imagem
+                        contentDescription = "Profile picture",
+                        // o tamanho que a imagem vai ter
+                        modifier = Modifier
+                            .size(120.dp)
+                            // clipar a imagem para uma forma circular
+                            .clip(CircleShape),
+                        // faz crop da imagem (retira porções indesejadas da imagem)
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Button(
+                    onClick = onSignOut,
+                    modifier = Modifier.padding(start = 16.dp).width(250.dp)
+
+                ) {
+                    Text(text = "Logout")
+                }
+            }
+
 
             Spacer(modifier = Modifier.height(50.dp))
 

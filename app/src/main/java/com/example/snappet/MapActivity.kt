@@ -21,9 +21,9 @@ class MapActivity : AppCompatActivity() {
     //a ideia seria estes places serem armazenados numa BD. Quando alguém adicionasse uma foto nova
     //a localizacao era adicionada à BD, e a localização assinalada no mapa.
     private val places = arrayListOf(
-        Place("Google", LatLng(-23.5868031,-46.6847268), "Av. Brig. Faria Lima, 3477 - 18º Andar - Itaim Bibi, São Paulo - SP", 4.8f, "outra info precisa"),
-        Place("Parque", LatLng(-23.5894588,-46.6732638), "Av. República do Líbano, 1157 - Ibirapuera, São Paulo - SP", 4.9f, "outra info precisa"),
-        Place("Faculdade de Ciências Lisboa", LatLng(38.7565253,-9.1579553), "Campo Grande 016, 1749-016 Lisboa", 4.9f, "outra info precisa")
+        Place("Google", LatLng(-23.5868031,-46.6847268), "Av. Brig. Faria Lima, 3477 - 18º Andar - Itaim Bibi, São Paulo - SP", 15, "outra info precisa"),
+        Place("Parque", LatLng(-23.5894588,-46.6732638), "Av. República do Líbano, 1157 - Ibirapuera, São Paulo - SP", 20, "outra info precisa"),
+        Place("Faculdade de Ciências Lisboa", LatLng(38.7565253,-9.1579553), "Campo Grande 016, 1749-016 Lisboa", 30, "outra info precisa")
         )
 
     companion object{
@@ -108,6 +108,6 @@ data class Place(
     val name: String,
     val latLng: LatLng,
     val address: String,
-    val rating : Float,
+    val likes : Int,
     val info: String
 )
