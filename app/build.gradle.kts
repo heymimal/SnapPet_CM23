@@ -70,6 +70,7 @@ dependencies {
     //Coil compose para carregar profile imagens
     implementation ("io.coil-kt:coil-compose:2.2.2")
     implementation("com.google.firebase:firebase-auth:22.3.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
 
     //-----------------Adicionei o que esta encima-------------------
 
@@ -93,6 +94,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
 
     val camerax_version = "1.2.2"
     implementation ("androidx.camera:camera-core:${camerax_version}")

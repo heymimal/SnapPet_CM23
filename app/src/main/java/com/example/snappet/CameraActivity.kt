@@ -20,6 +20,9 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
 import com.example.snappet.databinding.ActivityCameraBinding
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -34,6 +37,10 @@ class CameraActivity : AppCompatActivity(){
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
+
+    val storage = Firebase.storage
+    val storageRef = storage.reference
+
 
     private val activityResultLauncher =
         registerForActivityResult(
@@ -95,6 +102,7 @@ class CameraActivity : AppCompatActivity(){
                 contentValues)
             .build()
 
+
         // Set up image capture listener, which is triggered after photo has
         // been taken
         imageCapture.takePicture(
@@ -107,13 +115,61 @@ class CameraActivity : AppCompatActivity(){
 
                 override fun
                         onImageSaved(output: ImageCapture.OutputFileResults){
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
+                    //val msg = "Photo capture succeeded: ${output.savedUri}"
+                    //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                    //Log.d(TAG, msg)
+
+                    val localUri = output.savedUri
+
+                    val currentUser = Firebase.auth.currentUser
+
+                    if(currentUser != null){
+                        val userId = currentUser.uid
+                        val userName = currentUser.displayName
+
+                        // Create a folder name based on the user's ID or display name
+                        val folderName = if (!userName.isNullOrBlank()) userName else userId
+
+                        // Update the folder path where the image will be stored
+                        val folderPath = "images/$folderName/"
+
+                        // Upload the image to Firebase Storage
+                        val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
+
+                        val storageReference = storageRef.child(storageFileNameUser)
+                        val uploadTask1 = localUri?.let { storageReference.putFile(it) }
+
+                        uploadTask1?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(baseContext, "Photo uploaded to Firebase Storage", Toast.LENGTH_SHORT).show()
+                                Log.d(TAG, "Photo uploaded to Firebase Storage.")
+                            } else {
+                                Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
+                                Log.e(TAG, "Failed to upload photo", task.exception)
+                            }
+                        }
+                    }
+
+                    // Upload the image to Firebase Storage
+                    val storageFileName = "images/${System.currentTimeMillis()}.jpg"
+
+                    val storageReference = storageRef.child(storageFileName)
+                    val uploadTask = localUri?.let { storageReference.putFile(it) }
+
+                    uploadTask?.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(baseContext, "Photo uploaded to Firebase Storage", Toast.LENGTH_SHORT).show()
+                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
+                        } else {
+                            Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
+                            Log.e(TAG, "Failed to upload photo", task.exception)
+                        }
+                    }
                 }
             }
         )
     }
+
 
     private fun captureVideo() {}
 

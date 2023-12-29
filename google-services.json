@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "458151190592",
+    "project_id": "snappetlogin",
+    "storage_bucket": "snappetlogin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458151190592:android:99c953f5aaabb936473fa5",
+        "android_client_info": {
+          "package_name": "com.example.snappet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "458151190592-ge8pv3f6abs24i4q024tfklmm995aph8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.snappet",
+            "certificate_hash": "9fd75f63058ad64158ec8e46750a2ee80bb8bb21"
+          }
+        },
+        {
+          "client_id": "458151190592-qa8htc70do0ckhqji8t3vl2ocg08eqod.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.snappet",
+            "certificate_hash": "9f6285ff57489fa308b1f7b98493f4fc83c29b2d"
+          }
+        },
+        {
+          "client_id": "458151190592-vnd7dhdimmli3i6u08n48h9mrj53lpds.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.snappet",
+            "certificate_hash": "4da61a8ee25bbea5141a46e90b83913b259c35c6"
+          }
+        },
+        {
+          "client_id": "458151190592-p7dc82msjutqecp9p5p06libutj0o59o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK9OcgXUNytGdx7iGrqUUjLVLawYRTnOk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "458151190592-p7dc82msjutqecp9p5p06libutj0o59o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
