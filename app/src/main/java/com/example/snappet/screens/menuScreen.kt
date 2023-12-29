@@ -48,6 +48,7 @@ fun menuBottomNav(navController: NavController) {
     }
 }
 
+
 @Composable
 fun CardWithImageAndText(imageVector: ImageVector, text: String) {
     ElevatedCard(
@@ -85,9 +86,9 @@ fun CardWithImageAndText(imageVector: ImageVector, text: String) {
     }
 }
 
-
 @Composable
 fun ThreeByThreeGrid1() {
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -111,9 +112,9 @@ fun ThreeByThreeGrid1() {
             Column {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Cat1") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Dog1") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
+                    //item { CardWithImageAndText(Icons.Default.Person, "Cat1") }
+                    //item { CardWithImageAndText(Icons.Default.Phone, "Dog1") }
+                    //item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
                 }
             }
         }
@@ -165,3 +166,5 @@ fun ThreeByThreeGrid1() {
 
     }
 }
+
+data class ImageData(val path: String, val name: String)

@@ -72,6 +72,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.3.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
 
+
     //-----------------Adicionei o que esta encima-------------------
 
     //dependency for the navigation.
@@ -94,6 +95,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.firebase:firebase-database:20.3.0")
 
 
     val camerax_version = "1.2.2"
@@ -107,6 +109,10 @@ dependencies {
 
     implementation("dev.chrisbanes.accompanist:accompanist-glide:0.4.2")
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.2")
+    implementation ("com.google.android.gms:play-services-tasks:17.2.2")
+
+
 
 
     testImplementation("junit:junit:4.13.2")

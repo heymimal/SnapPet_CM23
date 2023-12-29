@@ -23,6 +23,7 @@ import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
 import com.example.snappet.databinding.ActivityCameraBinding
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.text.SimpleDateFormat
@@ -42,6 +43,9 @@ class CameraActivity : AppCompatActivity(){
 
     val storage = Firebase.storage
     val storageRef = storage.reference
+
+    val database = Firebase.database
+    val databaseReference = database.reference
 
 
     private val activityResultLauncher =
@@ -125,59 +129,61 @@ class CameraActivity : AppCompatActivity(){
 
                     if (localUri != null) {
                         uploadImageStorage(localUri)
+
+                        uploadImageToRealtimeDatabase(localUri.toString())
                     }
-
-                    /*val currentUser = Firebase.auth.currentUser
-
-                    if(currentUser != null){
-                        val userId = currentUser.uid
-                        val userName = currentUser.displayName
-
-                        // Create a folder name based on the user's ID or display name
-                        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-                        // Update the folder path where the image will be stored
-                        val folderPath = "images/$folderName/"
-
-                        // Upload the image to Firebase Storage
-                        val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-                        val storageReference = storageRef.child(storageFileNameUser)
-                        val uploadTask1 = localUri?.let { storageReference.putFile(it) }
-
-                        uploadTask1?.addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Toast.makeText(baseContext, "Photo uploaded to Firebase Storage", Toast.LENGTH_SHORT).show()
-                                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                            } else {
-                                Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
-                                Log.e(TAG, "Failed to upload photo", task.exception)
-                            }
-                        }
-                    }*/
-
-                    // Upload the image to Firebase Storage
-                   /* val storageFileName = "images/${System.currentTimeMillis()}.jpg"
-
-                    val storageReference = storageRef.child(storageFileName)
-                    val uploadTask = localUri?.let { storageReference.putFile(it) }
-
-                    uploadTask?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(baseContext, "Photo uploaded to Firebase Storage", Toast.LENGTH_SHORT).show()
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-                            Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }*/
                 }
             }
         )
     }
 
+    private fun uploadImageToRealtimeDatabase(imageUrl: String) {
+        val currentUser = Firebase.auth.currentUser
+        currentUser?.let {
+            val userId = it.uid
+            val userName = it.displayName
+
+            // Create a folder name based on the user's ID or display name
+            val folderName = if (!userName.isNullOrBlank()) userName else userId
+
+            // Update the path where the image URL will be stored in the database
+            val imagePath = "images/$folderName/"
+
+            // Construct the data to be uploaded
+            val data = hashMapOf(
+                "imageUrl" to imageUrl
+            )
+
+            // Reference to the database path
+            val databasePath = databaseReference.child(imagePath)
+
+            // Push the data to the database
+            val databaseKey = databasePath.push().key
+            databaseKey?.let { key ->
+                databasePath.child(key).setValue(data)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(
+                                baseContext,
+                                "Data uploaded to Realtime Database",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            Log.d(TAG, "Data uploaded to Realtime Database.")
+                        } else {
+                            Toast.makeText(
+                                baseContext,
+                                "Failed to upload data to Realtime Database",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            Log.e(TAG, "Failed to upload data to Realtime Database", task.exception)
+                        }
+                    }
+            }
+        }
+    }
+
+
     private fun uploadImageStorage(localUri: Uri){
-        //val localUri = output.savedUri
 
         val currentUser = Firebase.auth.currentUser
 
@@ -239,7 +245,11 @@ class CameraActivity : AppCompatActivity(){
         if (requestCode == PICK_IMAGES_REQUEST_CODE && resultCode == RESULT_OK) {
             // Handle the selected images
             val selectedImageUri: Uri? = data?.data
-            selectedImageUri?.let { uploadImageStorage(it) }
+            selectedImageUri?.let {
+                uploadImageStorage(it)
+
+                uploadImageToRealtimeDatabase(it.toString())
+            }
         }
     }
 
