@@ -2,7 +2,9 @@ package com.example.snappet
 
 import android.Manifest
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -75,7 +77,7 @@ class CameraActivity : AppCompatActivity(){
 
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
+        viewBinding.videoCaptureButton.setOnClickListener { loadPhoto() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
@@ -121,7 +123,11 @@ class CameraActivity : AppCompatActivity(){
 
                     val localUri = output.savedUri
 
-                    val currentUser = Firebase.auth.currentUser
+                    if (localUri != null) {
+                        uploadImageStorage(localUri)
+                    }
+
+                    /*val currentUser = Firebase.auth.currentUser
 
                     if(currentUser != null){
                         val userId = currentUser.uid
@@ -148,10 +154,10 @@ class CameraActivity : AppCompatActivity(){
                                 Log.e(TAG, "Failed to upload photo", task.exception)
                             }
                         }
-                    }
+                    }*/
 
                     // Upload the image to Firebase Storage
-                    val storageFileName = "images/${System.currentTimeMillis()}.jpg"
+                   /* val storageFileName = "images/${System.currentTimeMillis()}.jpg"
 
                     val storageReference = storageRef.child(storageFileName)
                     val uploadTask = localUri?.let { storageReference.putFile(it) }
@@ -164,14 +170,78 @@ class CameraActivity : AppCompatActivity(){
                             Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
                             Log.e(TAG, "Failed to upload photo", task.exception)
                         }
-                    }
+                    }*/
                 }
             }
         )
     }
 
+    private fun uploadImageStorage(localUri: Uri){
+        //val localUri = output.savedUri
 
-    private fun captureVideo() {}
+        val currentUser = Firebase.auth.currentUser
+
+        if(currentUser != null){
+            val userId = currentUser.uid
+            val userName = currentUser.displayName
+
+            // Create a folder name based on the user's ID or display name
+            val folderName = if (!userName.isNullOrBlank()) userName else userId
+
+            // Update the folder path where the image will be stored
+            val folderPath = "images/$folderName/"
+
+            // Upload the image to Firebase Storage
+            val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
+
+            val storageReference = storageRef.child(storageFileNameUser)
+            val uploadTask1 = localUri?.let { storageReference.putFile(it) }
+
+            uploadTask1?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(baseContext, "Photo uploaded to Firebase Storage", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "Photo uploaded to Firebase Storage.")
+                } else {
+                    Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, "Failed to upload photo", task.exception)
+                }
+            }
+
+            // Upload the image to Firebase Storage
+            val storageFileName = "images/${System.currentTimeMillis()}.jpg"
+
+            val storageReference1 = storageRef.child(storageFileName)
+            val uploadTask = localUri?.let { storageReference1.putFile(it) }
+
+            uploadTask?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(baseContext, "Photo uploaded to Firebase Storage", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "Photo uploaded to Firebase Storage.")
+                } else {
+                    Toast.makeText(baseContext, "Failed to upload photo", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, "Failed to upload photo", task.exception)
+                }
+            }
+        }
+    }
+
+    private fun loadPhoto(){
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+
+        // Start the image picker activity
+        startActivityForResult(intent, PICK_IMAGES_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGES_REQUEST_CODE && resultCode == RESULT_OK) {
+            // Handle the selected images
+            val selectedImageUri: Uri? = data?.data
+            selectedImageUri?.let { uploadImageStorage(it) }
+        }
+    }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -224,6 +294,7 @@ class CameraActivity : AppCompatActivity(){
     companion object {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val PICK_IMAGES_REQUEST_CODE = 123
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
                 Manifest.permission.CAMERA,
