@@ -7,31 +7,47 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.snappet.navigation.Screens
 import com.example.snappet.profile.EditProfileScreen2_nav
 import com.example.snappet.screens.Trophies_nav
+import com.example.snappet.screens.loginStreakNav
 import com.example.snappet.screens.menuBottomNav
 import com.example.snappet.sign_In.GoogleAuthUiClient
 import com.example.snappet.sign_In.LoginScreen2
 import com.example.snappet.sign_In.SignInViewModel
+import com.example.snappet.sign_In.UserData
 import com.example.snappet.ui.theme.SnapPetTheme
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
-
+import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 
 class MainActivity : ComponentActivity() {
+
+    //private val profileViewModel by viewModels<ProfileViewModel>()
 
     //criamos aqui o nosso cliente aqui
     private val googleAuthUiClient by lazy {
@@ -85,7 +101,8 @@ class MainActivity : ComponentActivity() {
 
                                     //navegamos para o nosso profileScreen
                                     //navController.navigate("profile")
-                                    navController.navigate(route = Screens.Home.route)
+                                    //navController.navigate(route = Screens.Home.route)
+                                    navController.navigate(route = Screens.Streak.route)
                                 }
                             }
 
@@ -119,7 +136,8 @@ class MainActivity : ComponentActivity() {
 
 
                                     //navController.navigate("profile")
-                                    navController.navigate(route = Screens.Home.route)
+                                    //navController.navigate(route = Screens.Home.route)
+                                    navController.navigate(route = Screens.Streak.route)
 
                                     //queremos fazer reset do state do view model
                                     //para depois começarmos com um state novo (o user tem que fazer
@@ -146,12 +164,73 @@ class MainActivity : ComponentActivity() {
 
                         //agora é para o profile
                         composable("profile"){
+                            val profileViewModel: ProfileViewModel = viewModel()
+                            val database = Firebase.database
+                            var userData = googleAuthUiClient.getSignedInUser()
+                            LaunchedEffect(Unit) {
+                                if (userData != null) {
+                                    profileViewModel.fetchUserData(userData.userId)
+                                }
+                            }
+                            val userDataState by profileViewModel.userData.observeAsState()
+                            // Check the current value of userDataState whenever it changes
+                            println("Curent userDataState: $userDataState")
+                            EditProfileScreen2_nav(profileViewModel,navController,
+                                //userData = googleAuthUiClient.getSignedInUser(),
+                                userData,
+                                //o segundo parametro de entrada do ecrã do profile eh
+                                //enviarmos a função que faz logOut
+                                onSignOut = {
+                                    lifecycleScope.launch {
+                                        googleAuthUiClient.singOut()
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Signed out",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+
+                                        //faz voltarmos para o ecrã anterior (do login)
+                                        //VER ISTO!!!
+                                        //navController.popBackStack()
+                                        navController.navigate("sign_in")
+                                    }
+                                }
+                            )
+                            /*
+                            val reference = database.getReference ("Users (Quim)")
+
+                            val thisUserRef = userData?.let { it1 -> reference.child(it1.userId) }
+                            if (thisUserRef != null) {
+                                thisUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            // Retrieve the email from the dataSnapshot
+                                            val points = dataSnapshot.child("snaPoints").getValue(String::class.java)
+                                            if (points != null) {
+                                                // Use the retrieved email
+                                                userData = userData?.copy(snaPoints = points)!!
+                                                //println("AAAAAAAAAAAAAAAAAAAAAAAAAAA: ${userData?.snaPoints}")
+                                            }
+                                        }
+                                    }
+
+                                    override fun onCancelled(databaseError: DatabaseError) {
+                                        // Handle potential errors
+                                        println("Error: ${databaseError.message}")
+                                    }
+                                })
+                            }
+
+
+
+                            //println("BBBBBBBBBBBBBBBBBBBBBBBBBB: $a")
                             //vamos para o ecrã do Profile
                             //um dos parametros de entrada deste ecrã é o UserData, portanto
                             //vamos busca-lo ao googleAUthUiClient
                             //dantes tinha "ProfileScreen"
                             EditProfileScreen2_nav(navController,
-                                userData = googleAuthUiClient.getSignedInUser(),
+                                //userData = googleAuthUiClient.getSignedInUser(),
+                                userData,
                                 //o segundo parametro de entrada do ecrã do profile eh
                                 //enviarmos a função que faz logOut
                                 onSignOut = {
@@ -171,9 +250,49 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
 
+                             */
+
                         }
 
+                        //para ir para o Streak login screen
+                        composable(route = Screens.Streak.route){
+                            val database = Firebase.database
+                            val myReference = database.getReference ("Users (Quim)")
+                            var userData = googleAuthUiClient.getSignedInUser()
+                            if (userData != null) {
 
+                                val thisUserRef = myReference.child(userData!!.userId)
+                                thisUserRef.addListenerForSingleValueEvent(object :
+                                    ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                        //se a BD já tem este user não faz nada
+                                        if (dataSnapshot.exists()) {
+                                        } else {
+                                            //caso o user nao exista na BD ele é adicionado à mesma
+                                            thisUserRef.child("username").setValue(userData!!.username)
+                                            thisUserRef.child("profilePic").setValue(userData!!.profilePictureUrl)
+                                            //thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
+                                            thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
+                                        }
+                                    }
+                                    override fun onCancelled(databaseError: DatabaseError) {
+                                        // Handle potential errors
+                                        println("Error: ${databaseError.message}")
+                                    }
+                                })
+
+
+                                /*
+                                val thisUser = myReference.child(userData.userId)
+                                thisUser.child("profilePic").setValue(userData.profilePictureUrl)
+                                thisUser.child("username").setValue(userData.username)
+                                val thisUser2 = myReference.child("9999")
+                                thisUser2.child("profilePic").setValue(userData.profilePictureUrl)
+                                thisUser2.child("username").setValue(userData.username)
+                                */
+                            }
+                            loginStreakNav(navController)
+                        }
 
                         composable(route = Screens.Home.route) {
                             menuBottomNav(navController)

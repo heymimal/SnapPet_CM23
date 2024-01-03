@@ -59,6 +59,8 @@ android {
 
 dependencies {
 
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
+
     //Firebase
     //implementation ("com.google.firebase:firebase-auth-ktx:21.1.0")
     implementation ("com.google.android.gms:play-services-auth:20.4.1")
@@ -70,7 +72,8 @@ dependencies {
     //Coil compose para carregar profile imagens
     implementation ("io.coil-kt:coil-compose:2.2.2")
     implementation("com.google.firebase:firebase-auth:22.3.0")
-
+    //RealTime Database
+    implementation("com.google.firebase:firebase-database:20.3.0")
     //-----------------Adicionei o que esta encima-------------------
 
     //dependency for the navigation.
@@ -93,6 +96,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.7.5")
 
     val camerax_version = "1.2.2"
     implementation ("androidx.camera:camera-core:${camerax_version}")

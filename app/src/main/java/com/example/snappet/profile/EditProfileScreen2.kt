@@ -1,5 +1,6 @@
 package com.example.snappet.profile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,36 +40,46 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.snappet.Navigation
+import com.example.snappet.ProfileViewModel
 import com.example.snappet.R
 import com.example.snappet.sign_In.UserData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen2_nav(navController : NavController,
+fun EditProfileScreen2_nav(profileViewModel: ProfileViewModel,navController : NavController,
                           userData: UserData?,
     //queremos ter um lambeda quando ele fizer sign out
     //ele recebe esta função como paramentro de entrada
                           onSignOut: () -> Unit
                           ) {
+    val userDataState by profileViewModel.userData.observeAsState()
+    // Check the current value of userDataState whenever it changes
+    //println("userDataState: $userDataState")
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
-        EditProfileScreen2(userData, onSignOut)
+        EditProfileScreen2(userDataState, userData, onSignOut)
 
         //Text(text = "Hello")
     }
 }
 
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 //para este Screen não precisamos de um view model pois ele não
 // contém nenhum estado nem nada que "mude" ao longo do tempo
 //só mostra user data estática
 fun EditProfileScreen2(
+    final : UserData?,
     userData: UserData?,
     //queremos ter um lambeda quando ele fizer sign out
     //ele recebe esta função como paramentro de entrada
@@ -115,6 +127,19 @@ fun EditProfileScreen2(
                     //por negrito no texto
                     fontWeight = FontWeight.SemiBold
                 )
+
+                if (final != null) {
+                    Text(
+                        //mostra os pontos
+                        text = "SnapPoints: "+final.snaPoints,
+                        //o texto vai ser centrado
+                        textAlign = TextAlign.Center,
+                        //tamanho do texto
+                        fontSize = 20.sp,
+                        //por negrito no texto
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
                 //espacinho depois do username
                 Spacer(modifier = Modifier.height(16.dp))
             }
