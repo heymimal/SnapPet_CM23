@@ -260,7 +260,8 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.Streak.route){
                             val loginStreakViewModel: LoginStreakViewModel = viewModel()
                             var updatedPoints = 0
-                            var testeLoginStreak = -1
+                            var testeLoginStreak = 1
+                            var usersLastLogin = ""
 
                             val database = Firebase.database
                             val myReference = database.getReference ("Users (Quim)")
@@ -284,12 +285,13 @@ class MainActivity : ComponentActivity() {
                                             thisUserRef.child("username").setValue(userData!!.username)
                                             thisUserRef.child("profilePic").setValue(userData!!.profilePictureUrl)
                                             //thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
-                                            thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
-                                            thisUserRef.child("LoginStreak").setValue(0)
+                                            //thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
+                                            thisUserRef.child("snaPoints").setValue("5")
+                                            thisUserRef.child("LoginStreak").setValue(1)
 
                                             //buscar a data corrente
-                                            val currentDate = LocalDate.now(ZoneId.systemDefault()).minusDays(1)
-                                            //val currentDate = LocalDate.now(ZoneId.systemDefault())
+                                            //val currentDate = LocalDate.now(ZoneId.systemDefault()).minusDays(1)
+                                            val currentDate = LocalDate.now(ZoneId.systemDefault())
                                             //dividie dia, mes e ano
                                             val dayOfMonth = currentDate.dayOfMonth
                                             val monthValue = currentDate.monthValue
@@ -322,6 +324,8 @@ class MainActivity : ComponentActivity() {
                                 val loginStreakDataState by loginStreakViewModel.loginStreakData.observeAsState()
                                 //testeLoginStreak = loginStreakDataState!!
                                 val snaPointsDataState by loginStreakViewModel.snaPointsData.observeAsState()
+                                val userLastLoginDataState by loginStreakViewModel.lastLoginData.observeAsState()
+                                usersLastLogin = userLastLoginDataState.toString()
                                 val daysInfo = listOf(
                                     DayInfo("Day: 1", 5),
                                     DayInfo("Day: 2", 5),
@@ -345,11 +349,13 @@ class MainActivity : ComponentActivity() {
 
                                     testeLoginStreak = loginStreakDataState as Int
 
-                                    val isBeforeToday = isDateBeforePresentDate(dateString)
+                                    val isBeforeToday = isDateBeforePresentDate(usersLastLogin)
 
                                     //TESTA ISTO DOS DIAS!
                                     //if (!isBeforeToday) {
-                                    //    loginStreakNav(loginStreakViewModel, navController, snaPointsDataState?.toIntOrNull() ?: 0, testeLoginStreak)
+                                        //println("********************+$dateString")
+                                        //println("####################+$usersLastLogin")
+                                        //loginStreakNav(loginStreakViewModel, navController, snaPointsDataState?.toIntOrNull() ?: 0, testeLoginStreak)
                                     //}else {
 
                                         // Increment by one
@@ -359,8 +365,9 @@ class MainActivity : ComponentActivity() {
                                         if (testeLoginStreak >= 8) {
                                             testeLoginStreak = 1
                                         }
-                                        val pointsToAdd =
-                                            daysInfo.getOrNull(testeLoginStreak!! - 1)?.points ?: 0
+
+
+                                        val pointsToAdd = daysInfo.getOrNull(testeLoginStreak!! - 1)?.points ?: 0
                                         val currentPoints = snaPointsDataState?.toIntOrNull() ?: 0
                                         updatedPoints = currentPoints + pointsToAdd
 
@@ -392,7 +399,7 @@ class MainActivity : ComponentActivity() {
                                             updatedPoints,
                                             testeLoginStreak
                                         )
-                                    //este eh o fim do TESTE!}
+                                    //}
                                 } else {
                                     // Display a loading indicator or handle the null state here
                                 }

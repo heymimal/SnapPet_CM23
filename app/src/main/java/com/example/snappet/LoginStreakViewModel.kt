@@ -11,9 +11,11 @@ import androidx.lifecycle.ViewModel
 class LoginStreakViewModel : ViewModel() {
     private val _loginStreakData = MutableLiveData<Int?>()
     private val _snaPointsData = MutableLiveData<String?>()
+    private val _lastLoginData = MutableLiveData<String?>()
 
     val loginStreakData: LiveData<Int?> = _loginStreakData
     val snaPointsData: LiveData<String?> = _snaPointsData
+    val lastLoginData: LiveData<String?> = _lastLoginData
 
     fun fetchData(userId: String) {
         val reference = Firebase.database.getReference("Users (Quim)").child(userId)
@@ -22,6 +24,7 @@ class LoginStreakViewModel : ViewModel() {
                 if (dataSnapshot.exists()) {
                     val loginStreak = dataSnapshot.child("LoginStreak").getValue(Int::class.java)
                     val snaPoints = dataSnapshot.child("snaPoints").getValue(String::class.java)
+                    val lastLogin = dataSnapshot.child("LastLogin").getValue(String::class.java)
 
                     loginStreak?.let {
                         _loginStreakData.value = it
@@ -29,6 +32,10 @@ class LoginStreakViewModel : ViewModel() {
 
                     snaPoints?.let {
                         _snaPointsData.value = it
+                    }
+
+                    lastLogin?.let {
+                        _lastLoginData.value = it
                     }
                 }
             }
