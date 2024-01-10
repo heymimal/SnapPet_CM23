@@ -13,7 +13,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.snappet"
-        minSdk = 24
+        //minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -58,6 +59,9 @@ android {
 }
 
 dependencies {
+
+    //ThreeTenABP (used to get dates)
+    implementation ("com.jakewharton.threetenabp:threetenabp:1.3.0")
 
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 

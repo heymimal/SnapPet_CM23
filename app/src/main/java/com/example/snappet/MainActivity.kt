@@ -7,18 +7,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,20 +27,21 @@ import com.example.snappet.screens.menuBottomNav
 import com.example.snappet.sign_In.GoogleAuthUiClient
 import com.example.snappet.sign_In.LoginScreen2
 import com.example.snappet.sign_In.SignInViewModel
-import com.example.snappet.sign_In.UserData
 import com.example.snappet.ui.theme.SnapPetTheme
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.snappet.screens.DayInfo
+import com.jakewharton.threetenabp.AndroidThreeTen
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
 
 class MainActivity : ComponentActivity() {
 
@@ -59,6 +57,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //inicializa o ThreeTenABP (para obter as datas)
+        AndroidThreeTen.init(this)
+
         val context = this
         setContent {
             SnapPetTheme {
@@ -256,9 +258,19 @@ class MainActivity : ComponentActivity() {
 
                         //para ir para o Streak login screen
                         composable(route = Screens.Streak.route){
+                            val loginStreakViewModel: LoginStreakViewModel = viewModel()
+                            var updatedPoints = 0
+                            var testeLoginStreak = -1
+
                             val database = Firebase.database
                             val myReference = database.getReference ("Users (Quim)")
                             var userData = googleAuthUiClient.getSignedInUser()
+                            LaunchedEffect(Unit) {
+                                val userData = googleAuthUiClient.getSignedInUser()
+                                if (userData != null) {
+                                    loginStreakViewModel.fetchData(userData.userId)
+                                }
+                            }
                             if (userData != null) {
 
                                 val thisUserRef = myReference.child(userData!!.userId)
@@ -273,6 +285,20 @@ class MainActivity : ComponentActivity() {
                                             thisUserRef.child("profilePic").setValue(userData!!.profilePictureUrl)
                                             //thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
                                             thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
+                                            thisUserRef.child("LoginStreak").setValue(0)
+
+                                            //buscar a data corrente
+                                            val currentDate = LocalDate.now(ZoneId.systemDefault()).minusDays(1)
+                                            //val currentDate = LocalDate.now(ZoneId.systemDefault())
+                                            //dividie dia, mes e ano
+                                            val dayOfMonth = currentDate.dayOfMonth
+                                            val monthValue = currentDate.monthValue
+                                            val year = currentDate.year
+
+                                            //guardar o dia, mes e ano na RealTimeDataBase (dentro do user)
+                                            val dateString = "$dayOfMonth $monthValue $year"
+                                            thisUserRef.child("LastLogin").setValue(dateString)
+                                            //thisUserRef.child("LastLogin").setValue("1 1 1990")
                                         }
                                     }
                                     override fun onCancelled(databaseError: DatabaseError) {
@@ -290,8 +316,90 @@ class MainActivity : ComponentActivity() {
                                 thisUser2.child("profilePic").setValue(userData.profilePictureUrl)
                                 thisUser2.child("username").setValue(userData.username)
                                 */
+
+
+
+                                val loginStreakDataState by loginStreakViewModel.loginStreakData.observeAsState()
+                                //testeLoginStreak = loginStreakDataState!!
+                                val snaPointsDataState by loginStreakViewModel.snaPointsData.observeAsState()
+                                val daysInfo = listOf(
+                                    DayInfo("Day: 1", 5),
+                                    DayInfo("Day: 2", 5),
+                                    DayInfo("Day: 3", 5),
+                                    DayInfo("Day: 4", 10),
+                                    DayInfo("Day: 5", 10),
+                                    DayInfo("Day: 6", 10),
+                                    DayInfo("Day: 7", 25)
+                                )
+
+                                if (loginStreakDataState != null) {
+
+                                    //buscar a data corrente
+                                    val currentDate = LocalDate.now(ZoneId.systemDefault())
+                                    //dividie dia, mes e ano
+                                    val dayOfMonth = currentDate.dayOfMonth
+                                    val monthValue = currentDate.monthValue
+                                    val year = currentDate.year
+                                    //guardar o dia, mes e ano na RealTimeDataBase (dentro do user)
+                                    val dateString = "$dayOfMonth $monthValue $year"
+
+                                    testeLoginStreak = loginStreakDataState as Int
+
+                                    val isBeforeToday = isDateBeforePresentDate(dateString)
+
+                                    //TESTA ISTO DOS DIAS!
+                                    //if (!isBeforeToday) {
+                                    //    loginStreakNav(loginStreakViewModel, navController, snaPointsDataState?.toIntOrNull() ?: 0, testeLoginStreak)
+                                    //}else {
+
+                                        // Increment by one
+                                        testeLoginStreak++
+
+                                        // Check if the value is 8 or above, then reset to 0
+                                        if (testeLoginStreak >= 8) {
+                                            testeLoginStreak = 1
+                                        }
+                                        val pointsToAdd =
+                                            daysInfo.getOrNull(testeLoginStreak!! - 1)?.points ?: 0
+                                        val currentPoints = snaPointsDataState?.toIntOrNull() ?: 0
+                                        updatedPoints = currentPoints + pointsToAdd
+
+                                        //buscar a data corrente
+
+
+                                        thisUserRef.updateChildren(
+                                            mapOf(
+                                                "LastLogin" to dateString,
+                                                "snaPoints" to updatedPoints.toString(),
+                                                "LoginStreak" to testeLoginStreak,
+                                                "username" to (userData?.username ?: ""),
+                                                "profilePic" to (userData?.profilePictureUrl ?: "")
+                                            )
+                                        ).addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                // Update successful
+                                                println("User data updated successfully")
+                                            } else {
+                                                // Update failed
+                                                println("Error updating user data: ${task.exception}")
+                                            }
+                                        }
+
+                                        // Call the composable function here, passing the updatedPoints
+                                        loginStreakNav(
+                                            loginStreakViewModel,
+                                            navController,
+                                            updatedPoints,
+                                            testeLoginStreak
+                                        )
+                                    //este eh o fim do TESTE!}
+                                } else {
+                                    // Display a loading indicator or handle the null state here
+                                }
+
+
                             }
-                            loginStreakNav(navController)
+                            loginStreakNav(loginStreakViewModel,navController,updatedPoints,testeLoginStreak)
                         }
 
                         composable(route = Screens.Home.route) {
@@ -318,4 +426,16 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    //metodo para comparar 1 data com a data do momento
+    //retorna false se a dateString for "hoje"
+    //terona true se a dateString tiver acontecido antes de hoje
+    fun isDateBeforePresentDate(dateString: String): Boolean {
+        val formatter = DateTimeFormatter.ofPattern("d M yyyy")
+        val providedDate = LocalDate.parse(dateString, formatter)
+        val currentDate = LocalDate.now()
+
+        return providedDate.isBefore(currentDate)
+    }
+
 }
