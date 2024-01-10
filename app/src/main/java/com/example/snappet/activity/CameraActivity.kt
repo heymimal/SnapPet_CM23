@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.activity
 
 import android.Manifest
 import android.content.ContentValues
@@ -9,9 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
 import android.widget.Toast
-import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -19,16 +17,12 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.snappet.R
 import com.example.snappet.databinding.ActivityCameraBinding
-import com.example.snappet.navigation.Screens
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -53,11 +47,6 @@ class CameraActivity : AppCompatActivity(){
 
     private lateinit var  navController : NavHostController
 
-    object NavigationHolder {
-        var navController : NavController? = null
-    }
-
-
     private val activityResultLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions())
@@ -77,6 +66,10 @@ class CameraActivity : AppCompatActivity(){
             }
         }
 
+    override fun onRetainCustomNonConfigurationInstance(): Any {
+        return navController
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,9 +79,22 @@ class CameraActivity : AppCompatActivity(){
 
         val composeView: ComposeView = findViewById(R.id.composeView)
 
+        Log.d(TAG,composeView.toString())
+
+
+        Log.d(TAG,"BEFORE composeView")
+
         composeView.setContent {
+            Log.d(TAG,"INSIDE composeView")
             navController = rememberNavController()
+            navController = lastCustomNonConfigurationInstance as? NavHostController ?: rememberNavController()
+            Log.d(TAG,navController.toString())
         }
+
+
+        Log.d(TAG,"AFTER composeView")
+
+        //Log.d(TAG,navController.toString())
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -102,6 +108,7 @@ class CameraActivity : AppCompatActivity(){
         viewBinding.videoCaptureButton.setOnClickListener { loadPhoto() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
 
     }
 
@@ -137,31 +144,28 @@ class CameraActivity : AppCompatActivity(){
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
-
                 override fun
                         onImageSaved(output: ImageCapture.OutputFileResults){
+
                     //val msg = "Photo capture succeeded: ${output.savedUri}"
                     //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     //Log.d(TAG, msg)
 
-                    val localUri = output.savedUri
+                    Log.d(TAG,navController.toString())
+                    navController.navigate("profile")
 
-                    if (localUri != null) {
+
+
+                    //val localUri = output.savedUri
+
+                    //if (localUri != null) {
                         //uploadImageStorage(localUri)
 
                         //uploadImageToRealtimeDatabase(localUri.toString())
 
 
-                        print("Going inside setContent")
-
-                        print("After set content")
-
-
-                        navController.navigate(Screens.PhotoForm.route)
-
-
                         // change
-                    }
+                    //}
                 }
             }
         )

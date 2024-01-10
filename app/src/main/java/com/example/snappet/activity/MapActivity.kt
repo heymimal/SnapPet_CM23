@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.activity
 
 import android.content.pm.PackageManager
 import android.location.Location
@@ -6,6 +6,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.snappet.util.MarkerInfoAdapter
+import com.example.snappet.R
+import com.example.snappet.util.BitmapHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -85,7 +88,8 @@ class MapActivity : AppCompatActivity() {
                 .snippet(snippet)
                 .icon(
                     //BitmapHelper.vectorToBitmap(this, R.drawable.smartphone_call, ContextCompat.getColor(this, R.color.black))
-                    BitmapHelper.vectorToBitmap(this, R.drawable.smartphone_call, ContextCompat.getColor(this, R.color.black), 70, 70)
+                    BitmapHelper.vectorToBitmap(this,
+                        R.drawable.smartphone_call, ContextCompat.getColor(this, R.color.black), 70, 70)
                 )
         )
         marker?.tag = "YourLocationTag" // You can set a tag to identify this marker if needed

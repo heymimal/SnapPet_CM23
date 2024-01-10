@@ -1,9 +1,11 @@
-package com.example.snappet
+package com.example.snappet.util
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import com.example.snappet.R
+import com.example.snappet.activity.Place
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 

@@ -21,11 +21,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.snappet.Navigation
+import com.example.snappet.navigation.Navigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Trophies_nav(navController : NavController) {
+fun TrophiesNav(navController : NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {

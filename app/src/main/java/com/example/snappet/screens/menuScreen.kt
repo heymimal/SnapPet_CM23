@@ -30,12 +30,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.snappet.Navigation
+import com.example.snappet.navigation.Navigation
 import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun menuBottomNav(navController: NavController) {
+fun HomeMenu(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {

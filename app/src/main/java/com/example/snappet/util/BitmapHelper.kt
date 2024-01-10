@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.util
 
 import android.content.Context
 import android.graphics.Bitmap

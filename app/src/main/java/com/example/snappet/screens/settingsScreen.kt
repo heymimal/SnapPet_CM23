@@ -29,13 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.Navigation
+import com.example.snappet.navigation.Navigation
 import com.example.snappet.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar7() {
+fun SettingsScreen() {
     val navController = rememberNavController()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -133,142 +133,5 @@ fun SettingsButton(text: String, imageId: Int) {
 @Preview
 @Composable
 private fun SettingsPreview() {
-    BottomNavigationBar7()
+    SettingsScreen()
 }
-
-/*
-Box(
-            modifier = Modifier.fillMaxSize())
-
-
-        Text(
-            text = "Settings",
-            color = Color.Black,
-            style = TextStyle(
-                fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.TopCenter)
-                .offset(
-                    x = 0.dp,
-                    y = 29.dp
-                ))
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffd9d9d9)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 28.dp,
-                    y = 386.dp
-                )
-                .requiredWidth(width = 308.dp)
-                .requiredHeight(height = 61.dp)){ }
-        Text(
-            text = "Report Problem",
-            color = Color.Black,
-            style = TextStyle(
-                fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 45.dp,
-                    y = 402.dp
-                ))
-        Image(
-            painter = painterResource(id = R.drawable.report_problem_icon),
-            contentDescription = "image 10",
-            modifier = Modifier
-                .align(alignment = Alignment.CenterStart)
-                .offset(
-                    x = 275.dp,
-                    y = 16.dp
-                )
-                .requiredSize(size = 50.dp))
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffd9d9d9)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 28.dp,
-                    y = 266.dp
-                )
-                .requiredWidth(width = 308.dp)
-                .requiredHeight(height = 61.dp)){ }
-        Text(
-            text = "Customer Support",
-            color = Color.Black,
-            style = TextStyle(
-                fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 44.dp,
-                    y = 281.dp
-                ))
-        Image(
-            painter = painterResource(id = R.drawable.customer_support_icon),
-            contentDescription = "image 9",
-            modifier = Modifier
-                .align(alignment = Alignment.CenterStart)
-                .offset(
-                    x = 279.dp,
-                    y = (-104).dp
-                )
-                .requiredSize(size = 50.dp))
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffd9d9d9)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 26.dp,
-                    y = 146.dp
-                )
-                .requiredWidth(width = 308.dp)
-                .requiredHeight(height = 61.dp)){ }
-        Text(
-            text = "Change Language",
-            color = Color.Black,
-            style = TextStyle(
-                fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 44.dp,
-                    y = 161.dp
-                ))
-        Image(
-            painter = painterResource(id = R.drawable.language_icon),
-            contentDescription = "image 8",
-            modifier = Modifier
-                .align(alignment = Alignment.CenterStart)
-                .offset(
-                    x = 275.dp,
-                    y = (-224).dp
-                )
-                .requiredSize(size = 50.dp))
-        Button(
-            onClick = { },
-            shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 26.dp,
-                    y = 640.dp
-                )
-                .requiredWidth(width = 84.dp)
-                .requiredHeight(height = 52.dp)){ }
-        Text(
-            text = "Back",
-            color = Color.Black,
-            style = TextStyle(
-                fontSize = 20.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 43.dp,
-                    y = 654.dp
-                ))
- */

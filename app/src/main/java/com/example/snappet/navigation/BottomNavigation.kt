@@ -1,4 +1,4 @@
-package com.example.snappet
+package com.example.snappet.navigation
 
 import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,7 +22,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.navigation.Screens
+import com.example.snappet.activity.CameraActivity
+import com.example.snappet.activity.MapActivity
+import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,7 +119,7 @@ fun Navigation(navController: NavController){
             selected = selectedItem == 4,
             onClick = { selectedItem = 4
                 //acrescentei isto para navegar para o profile
-                navController.navigate(Screens.PhotoForm.route)},
+                navController.navigate(Screens.Profile.route)},
             label = {
                 Text("Profile")
             },
