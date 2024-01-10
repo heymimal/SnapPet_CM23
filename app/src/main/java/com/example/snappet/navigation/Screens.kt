@@ -11,4 +11,6 @@ sealed class Screens(val route:String){
 
     object Camera: Screens("camera_route")
 
+    object PhotoForm : Screens("photo_form")
+
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -57,13 +58,7 @@ class MainActivity : ComponentActivity() {
                     //menuBottomNav()
                     //NavGraph(navController)
 
-
-
-
-
-
-
-                    //vai ospedar todos os nossos ecrãns diferentes
+                    //vai hospedar todos os nossos ecras diferentes
                     //recebe o navController e o "sign_in" routh
                     //tal como no navGraph que o Ricardo fez
                     NavHost(navController = navController, startDestination = "sign_in" ){
@@ -172,9 +167,6 @@ class MainActivity : ComponentActivity() {
                             )
 
                         }
-
-
-
                         composable(route = Screens.Home.route) {
                             menuBottomNav(navController)
                         }
@@ -187,14 +179,10 @@ class MainActivity : ComponentActivity() {
                             Trophies_nav(navController)
                         }
 
+                        composable(route = Screens.PhotoForm.route){
+                            SnapPetPreviewPhoto(navController)
+                        }
                     }
-
-
-
-
-
-
-
                 }
             }
         }

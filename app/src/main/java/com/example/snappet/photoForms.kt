@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -33,27 +32,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.snappet.data.Photo
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar5() {
-    val navController = rememberNavController()
+fun SnapPetPreviewPhoto(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             Navigation(navController =navController)
         }) {paddingValues ->
+        Text(text = " ", modifier = Modifier.padding(paddingValues))
         PhotoForms()
-
-        //Text(text = "Hello")
     }
 }
 
@@ -63,9 +62,11 @@ fun radioButton(){
     val radioOptions = listOf("Entertainment", "Needs Help")
     var selectedOption by remember { mutableStateOf(radioOptions[0]) }
 
-    Column(
-        modifier = Modifier.padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Row(
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .fillMaxWidth(),
+        verticalAlignment =  Alignment.CenterVertically
     ) {
         radioOptions.forEach { option ->
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -76,7 +77,7 @@ fun radioButton(){
                 Text(
                     text = option,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(end = 20.dp)
                 )
             }
         }
@@ -104,25 +105,44 @@ fun PhotoForms(modifier: Modifier = Modifier) {
             style = TextStyle(fontSize = 25.sp),
             modifier = Modifier
                 .align(alignment = Alignment.CenterHorizontally)
-                .offset(y = 29.dp)
         )
-        Spacer(modifier = Modifier.height(30.dp))
-        Image(
-            painter = painterResource(id = R.drawable.imagemforms),
-            contentDescription = "image 11",
+        Spacer(modifier = Modifier.height(10.dp))
+        Box(
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(200.dp))
+                .fillMaxWidth()
+                .height(250.dp)
 
-        Spacer(modifier = Modifier.height(50.dp))
+        ) {
+            //TODO change image to image loaded from camera
+            Image(
+                painter = painterResource(id = R.drawable.imagemforms),
+                contentDescription = "Taken Photo",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Animal Type",
+            color = Color.Black,
+            style = TextStyle(fontSize = 20.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.Start)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
-        ){
+        ) {
             val options = listOf("Dog", "Cat", "Bird")
             var expanded by remember { mutableStateOf(false) } //menu drop down aberto ou nao
             var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -155,23 +175,36 @@ fun PhotoForms(modifier: Modifier = Modifier) {
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = "Context",
             color = Color.Black,
-            style = TextStyle(fontSize = 25.sp),
+            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
                 .align(alignment = Alignment.Start)
-                .offset(y = 29.dp)
         )
-
-        Spacer(modifier = Modifier.height(30.dp))
 
         radioButton()
 
-    }
+        Text(
+            text = "Description",
+            color = Color.Black,
+            style = TextStyle(fontSize = 20.sp),
+            modifier = Modifier.align(alignment = Alignment.Start)
+        )
+        Spacer(modifier = Modifier.height(15.dp))
 
+        var ttext by remember { mutableStateOf("Hello") }
+
+        TextField(
+            value = ttext,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onValueChange = { ttext = it },
+            label = { Text("Description") }
+        )
+    }
+    // Back Page -> Takes new photo, deletes old photo
     Box(
         modifier = Modifier.fillMaxSize()
     ){
@@ -193,7 +226,7 @@ fun PhotoForms(modifier: Modifier = Modifier) {
             Text(text = "Back", style = TextStyle(fontSize = 20.sp))
         }
     }
-
+    // NEXT PAGE
     Box(
         modifier = Modifier.fillMaxSize()
     ){
@@ -216,9 +249,9 @@ fun PhotoForms(modifier: Modifier = Modifier) {
         }
     }
 }
-
+/*
 @Preview
 @Composable
 private fun PhotoFormsPreview() {
-    BottomNavigationBar5()
-}
+    SnapPetPreviewPhoto(null)
+}*/

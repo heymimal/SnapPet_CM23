@@ -9,7 +9,9 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -20,8 +22,13 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.snappet.databinding.ActivityCameraBinding
+import com.example.snappet.navigation.Screens
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -36,9 +43,6 @@ class CameraActivity : AppCompatActivity(){
 
     private var imageCapture: ImageCapture? = null
 
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
-
     private lateinit var cameraExecutor: ExecutorService
 
     val storage = Firebase.storage
@@ -46,6 +50,12 @@ class CameraActivity : AppCompatActivity(){
 
     val database = Firebase.database
     val databaseReference = database.reference
+
+    private lateinit var  navController : NavHostController
+
+    object NavigationHolder {
+        var navController : NavController? = null
+    }
 
 
     private val activityResultLauncher =
@@ -69,8 +79,16 @@ class CameraActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        val composeView: ComposeView = findViewById(R.id.composeView)
+
+        composeView.setContent {
+            navController = rememberNavController()
+        }
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -84,6 +102,7 @@ class CameraActivity : AppCompatActivity(){
         viewBinding.videoCaptureButton.setOnClickListener { loadPhoto() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
     }
 
     private fun takePhoto() {
@@ -97,7 +116,7 @@ class CameraActivity : AppCompatActivity(){
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/SnapPet")
             }
         }
 
@@ -128,9 +147,20 @@ class CameraActivity : AppCompatActivity(){
                     val localUri = output.savedUri
 
                     if (localUri != null) {
-                        uploadImageStorage(localUri)
+                        //uploadImageStorage(localUri)
 
-                        uploadImageToRealtimeDatabase(localUri.toString())
+                        //uploadImageToRealtimeDatabase(localUri.toString())
+
+
+                        print("Going inside setContent")
+
+                        print("After set content")
+
+
+                        navController.navigate(Screens.PhotoForm.route)
+
+
+                        // change
                     }
                 }
             }

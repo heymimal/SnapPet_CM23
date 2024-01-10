@@ -86,6 +86,7 @@ fun Navigation(navController: NavController){
             selected = selectedItem == 2,
             onClick = { selectedItem = 2
                       val intent = Intent(context, CameraActivity::class.java)
+
                         context.startActivity(intent)
                       },
             label = {
@@ -116,7 +117,7 @@ fun Navigation(navController: NavController){
             selected = selectedItem == 4,
             onClick = { selectedItem = 4
                 //acrescentei isto para navegar para o profile
-                navController.navigate("profile")},
+                navController.navigate(Screens.PhotoForm.route)},
             label = {
                 Text("Profile")
             },
