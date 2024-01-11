@@ -33,12 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Navigation
 
@@ -52,7 +51,7 @@ fun SnapPetPreviewPhoto(navController: NavHostController) {
             Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = " ", modifier = Modifier.padding(paddingValues))
-        PhotoForms()
+        //PhotoForms()
     }
 }
 
@@ -87,7 +86,7 @@ fun radioButton(){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForms(modifier: Modifier = Modifier) {
+fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, capturedPhoto: capturedPhoto) {
     var photo: Photo = Photo()
 
     // TODO
@@ -115,7 +114,8 @@ fun PhotoForms(modifier: Modifier = Modifier) {
         ) {
             //TODO change image to image loaded from camera
             Image(
-                painter = painterResource(id = R.drawable.imagemforms),
+                //painter = painterResource(id = R.drawable.imagemforms),
+                painter = rememberImagePainter(capturedPhoto.imageUri),
                 contentDescription = "Taken Photo",
                 modifier = Modifier
                     .fillMaxSize()
@@ -209,7 +209,7 @@ fun PhotoForms(modifier: Modifier = Modifier) {
         modifier = Modifier.fillMaxSize()
     ){
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigate("camera")},
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
             modifier = Modifier

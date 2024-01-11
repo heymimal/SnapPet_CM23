@@ -2,8 +2,6 @@ package com.example.snappet
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -14,40 +12,34 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.example.snappet.activity.CameraActivity
 import com.example.snappet.navigation.Screens
 import com.example.snappet.profile.ProfileScreen
-import com.example.snappet.screens.TrophiesNav
 import com.example.snappet.screens.HomeMenu
+import com.example.snappet.screens.TrophiesNav
 import com.example.snappet.sign_In.GoogleAuthUiClient
 import com.example.snappet.sign_In.LoginScreen
 import com.example.snappet.sign_In.SignInViewModel
@@ -69,7 +61,6 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
-
 
     private fun onSignout(navController: NavHostController){
         lifecycleScope.launch {
@@ -168,7 +159,7 @@ class MainActivity : ComponentActivity() {
                             )}
 
                         composable("Camera"){
-                            AppContent()
+                            AppContent(navController)
                         }
                         composable(route = Screens.Home.route) {
                             HomeMenu(navController)
@@ -176,9 +167,30 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.Trophies.route) {
                             TrophiesNav(navController)
                         }
-                        composable(route = Screens.PhotoForm.route){
+                        /*composable(route = Screens.PhotoForm.route){
                             SnapPetPreviewPhoto(navController)
+                        }*/
+
+                        /*composable(route = "${Screens.PhotoForm.route}/{capturedImageUri}"){
+                            val uri = Uri.parse(it.arguments?.getString("capturedImageUri") ?: "")
+                            val capturedPhoto = capturedPhoto(imageUri = uri)
+                            PhotoForms(modifier = Modifier, capturedPhoto)
+                        }*/
+
+                        /*composable(route = Screens.PhotoForm.route+ "?capturedImageUri={capturedImageUri}"){ navBackStack ->
+                            //extracting the argument
+                            val uri = Uri.parse(navBackStack.arguments?.getString("capturedImageUri") ?: "")
+                            val capturedPhoto = capturedPhoto(imageUri = uri)
+                            PhotoForms(modifier = Modifier, capturedPhoto)
+                        }*/
+
+                        composable(route = "photo_form_screen/{capturedImageUri}") { navBackStack ->
+                            // Extracting the argument
+                            val uri = Uri.parse(navBackStack.arguments?.getString("capturedImageUri") ?: "")
+                            val capturedPhoto = capturedPhoto(imageUri = uri)
+                            PhotoForms(modifier = Modifier, navController, capturedPhoto)
                         }
+
                     }
                 }
             }
@@ -189,7 +201,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun AppContent() {
+fun AppContent(navController: NavHostController) {
 
     val context = LocalContext.current
     val file = context.createImageFile()
@@ -219,7 +231,46 @@ fun AppContent() {
         }
     }
 
-    Column(
+    DisposableEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.CAMERA)
+
+        onDispose {
+            // Clean up if needed
+        }
+    }
+
+    if (capturedImageUri.path?.isNotEmpty() == true) {
+        Image(
+            modifier = Modifier
+                .padding(16.dp, 8.dp),
+            painter = rememberImagePainter(capturedImageUri),
+            contentDescription = null
+        )
+    }
+
+    Log.d(TAG, "TESTEEEEE")
+
+    //navController.navigate(Screens.PhotoForm.route);
+    //navController.navigate(route = "${Screens.PhotoForm.route}/${capturedImageUri}")
+
+    Log.d(TAG, navController.toString())
+
+    navController.navigate("photo_form_screen/{capturedImageUri}")
+}
+
+fun Context.createImageFile(): File {
+    // Create an image file name
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+    val imageFileName = "JPEG_" + timeStamp + "_"
+    val image = File.createTempFile(
+        imageFileName, /* prefix */
+        ".jpg", /* suffix */
+        externalCacheDir      /* directory */
+    )
+    return image
+}
+
+/*Column(
         Modifier
             .fillMaxSize()
             .padding(10.dp),
@@ -237,29 +288,4 @@ fun AppContent() {
         }) {
             Text(text = "Capture Image From Camera")
         }
-    }
-
-    if (capturedImageUri.path?.isNotEmpty() == true) {
-        Image(
-            modifier = Modifier
-                .padding(16.dp, 8.dp),
-            painter = rememberImagePainter(capturedImageUri),
-            contentDescription = null
-        )
-    }
-
-
-}
-
-fun Context.createImageFile(): File {
-    // Create an image file name
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
-    val image = File.createTempFile(
-        imageFileName, /* prefix */
-        ".jpg", /* suffix */
-        externalCacheDir      /* directory */
-    )
-    return image
-}
-
+    }*/
