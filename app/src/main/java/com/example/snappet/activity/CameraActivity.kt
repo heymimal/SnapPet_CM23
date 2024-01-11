@@ -1,5 +1,6 @@
 package com.example.snappet.activity
 
+
 import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
@@ -20,9 +21,14 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.snappet.MainActivity
 import com.example.snappet.R
+import com.example.snappet.SnapPetPreviewPhoto
 import com.example.snappet.databinding.ActivityCameraBinding
+import com.example.snappet.navigation.Screens
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -45,7 +51,9 @@ class CameraActivity : AppCompatActivity(){
     val database = Firebase.database
     val databaseReference = database.reference
 
-    private lateinit var  navController : NavHostController
+    private lateinit var navController : NavHostController
+
+    private lateinit var composeView: ComposeView
 
     private val activityResultLauncher =
         registerForActivityResult(
@@ -66,10 +74,6 @@ class CameraActivity : AppCompatActivity(){
             }
         }
 
-    override fun onRetainCustomNonConfigurationInstance(): Any {
-        return navController
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,22 +81,23 @@ class CameraActivity : AppCompatActivity(){
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val composeView: ComposeView = findViewById(R.id.composeView)
+        composeView = findViewById(R.id.composeView)
 
-        Log.d(TAG,composeView.toString())
+        //Log.d(TAG,composeView.toString())
 
 
-        Log.d(TAG,"BEFORE composeView")
+        //Log.d(TAG,"BEFORE composeView")
 
         composeView.setContent {
-            Log.d(TAG,"INSIDE composeView")
             navController = rememberNavController()
-            navController = lastCustomNonConfigurationInstance as? NavHostController ?: rememberNavController()
-            Log.d(TAG,navController.toString())
+            //activateNav(navController = navController)
         }
+        Log.d(TAG,"INSIDE composeView")
+        //navController =
+        //Log.d(TAG,navController.toString())
 
 
-        Log.d(TAG,"AFTER composeView")
+        //Log.d(TAG,"AFTER composeView")
 
         //Log.d(TAG,navController.toString())
 
@@ -151,8 +156,9 @@ class CameraActivity : AppCompatActivity(){
                     //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     //Log.d(TAG, msg)
 
-                    Log.d(TAG,navController.toString())
-                    navController.navigate("profile")
+                    //Log.d(TAG,navController.toString())
+                    navController.navigate(Screens.PhotoForm.route)
+                            //Log.d(TAG,navController.visibleEntries.toString())
 
 
 

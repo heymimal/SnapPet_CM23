@@ -1,5 +1,10 @@
 package com.example.snappet
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -8,20 +13,37 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.activity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.annotation.ExperimentalCoilApi
+import coil.compose.rememberImagePainter
+import com.example.snappet.activity.CameraActivity
 import com.example.snappet.navigation.Screens
 import com.example.snappet.profile.ProfileScreen
 import com.example.snappet.screens.TrophiesNav
@@ -33,12 +55,11 @@ import com.example.snappet.ui.theme.SnapPetTheme
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Objects
 
-
-
-//class SharedViewModel : ViewModel() {
-    //val navController = rememberNavController()
-//}
 
 class MainActivity : ComponentActivity() {
 
@@ -48,6 +69,7 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+
 
     private fun onSignout(navController: NavHostController){
         lifecycleScope.launch {
@@ -125,7 +147,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val context = this
         setContent {
             SnapPetTheme {
 
@@ -140,10 +161,15 @@ class MainActivity : ComponentActivity() {
                             SignIn(navController)
                         }
                         composable(Screens.Profile.route){
+                            Log.d(TAG,"ge")
                             ProfileScreen(navController,
                                 userData = googleAuthUiClient.getSignedInUser(), //user data stored in googleAuthClient
                                 onSignOut = {onSignout(navController)}
                             )}
+
+                        composable("Camera"){
+                            AppContent()
+                        }
                         composable(route = Screens.Home.route) {
                             HomeMenu(navController)
                         }
@@ -159,3 +185,81 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+fun AppContent() {
+
+    val context = LocalContext.current
+    val file = context.createImageFile()
+    val authority = "com.example.snappet.provider"
+    val uri = FileProvider.getUriForFile(
+        Objects.requireNonNull(context),
+        authority, file
+    )
+
+    var capturedImageUri by remember {
+        mutableStateOf<Uri>(Uri.EMPTY)
+    }
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
+            capturedImageUri = uri
+        }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        if (it) {
+            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
+            cameraLauncher.launch(uri)
+        } else {
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = {
+            val permissionCheckResult =
+                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                cameraLauncher.launch(uri)
+            } else {
+                // Request a permission
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }) {
+            Text(text = "Capture Image From Camera")
+        }
+    }
+
+    if (capturedImageUri.path?.isNotEmpty() == true) {
+        Image(
+            modifier = Modifier
+                .padding(16.dp, 8.dp),
+            painter = rememberImagePainter(capturedImageUri),
+            contentDescription = null
+        )
+    }
+
+
+}
+
+fun Context.createImageFile(): File {
+    // Create an image file name
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+    val imageFileName = "JPEG_" + timeStamp + "_"
+    val image = File.createTempFile(
+        imageFileName, /* prefix */
+        ".jpg", /* suffix */
+        externalCacheDir      /* directory */
+    )
+    return image
+}
+
