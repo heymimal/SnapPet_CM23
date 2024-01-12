@@ -1,9 +1,13 @@
 package com.example.snappet
 
 import android.Manifest
-import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -48,9 +52,13 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 
 
 class MainActivity : ComponentActivity() {
@@ -185,7 +193,7 @@ class MainActivity : ComponentActivity() {
                                 Log.d(TAG, "SCHEME É NULL MANO")
                             }*/
 
-                            PhotoForms(modifier = Modifier, navController, uri)
+                            //PhotoForms(modifier = Modifier, navController, uri)
                         }
 
                     }
@@ -201,34 +209,58 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppContent(navController: NavHostController) {
 
+    lateinit var currentImagePath: String
+    lateinit var strUri: String
+    //var uri: Uri
+    var takenPicture by remember { mutableStateOf<Bitmap?>(null) }
+    var takenPictureRotated: Bitmap? = null
+
+    //  val imageBitmap = remember(takenPicture) { takenPicture!!.asImageBitmap() }
     val context = LocalContext.current
-    val file = context.createImageFile()
     val authority = "com.example.snappet.provider"
-    val uri = FileProvider.getUriForFile(
+
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+    val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    val file = File.createTempFile(
+        "Snappet_$timeStamp",
+        ".jpg", /* suffix */
+        storageDir   /* directory */
+    ).apply { currentImagePath = absolutePath }
+    var uri = FileProvider.getUriForFile(
         Objects.requireNonNull(context),
-        authority, file
+        authority,
+        file
     )
-    var capturedImageUri by remember {
-        mutableStateOf<Uri>(Uri.EMPTY)
-    }
-
-    val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-            capturedImageUri = uri
+    val getCameraImage =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                strUri = uri.toString()
+                val matrix = Matrix()
+                matrix.postRotate(90F)
+                takenPicture = BitmapFactory.decodeFile(currentImagePath)
+                val picture = takenPicture
+                // Rotate the picture taken
+                takenPictureRotated = Bitmap.createBitmap(
+                    picture!!,
+                    0,
+                    0,
+                    picture.width,
+                    picture.height,
+                    matrix,
+                    true
+                )
+            }
         }
-
-
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
         if (it) {
             Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            cameraLauncher.launch(uri)
+            getCameraImage.launch(uri)
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
     }
-
     DisposableEffect(Unit) {
         permissionLauncher.launch(Manifest.permission.CAMERA)
 
@@ -236,72 +268,20 @@ fun AppContent(navController: NavHostController) {
             // Clean up if needed
         }
     }
+    if (takenPicture != null) {
+        Log.d(TAG, "not null")
+        val imageBitmap = remember(takenPicture) { takenPicture!!.asImageBitmap() }
 
-    if (capturedImageUri.path?.isNotEmpty() == true) {
-        Log.d(TAG, "VERIFICACAO")
-        Log.d(TAG, capturedImageUri.path?.isNotEmpty().toString())
         Image(
-            modifier = Modifier
-                .padding(16.dp, 8.dp),
-            painter = rememberImagePainter(capturedImageUri),
-            contentDescription = null
+            bitmap = imageBitmap,
+            contentDescription = "description",
+            modifier = Modifier.padding(16.dp, 8.dp)
         )
+    } else {
+        Log.d(TAG,"SHIT IS null")
     }
-
-    Log.d(TAG, "TESTE DE NULO IMG URI NO MAIN ACTIVITY")
-    Log.d(TAG, capturedImageUri.toString())
-    
-    PhotoForms(navController = navController, imageUri = capturedImageUri)
-
-    Log.d(TAG, "TESTEEEEE")
-
-    //navController.navigate(Screens.PhotoForm.route);
-    //navController.navigate(route = "${Screens.PhotoForm.route}/${capturedImageUri}")
-
-    Log.d(TAG, navController.toString())
-
-    //navController.navigate("photo_form_screen/{capturedImageUri}")
 }
 
 
 
 
-fun Context.createImageFile(): File {
-    // Create an image file name
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
-    val image = File.createTempFile(
-        imageFileName, /* prefix */
-        ".jpg", /* suffix */
-        externalCacheDir      /* directory */
-    )
-    return image
-}
-
-
-
-
-
-
-
-
-
-/*Column(
-        Modifier
-            .fillMaxSize()
-            .padding(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(onClick = {
-            val permissionCheckResult =
-                ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                cameraLauncher.launch(uri)
-            } else {
-                // Request a permission
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }) {
-            Text(text = "Capture Image From Camera")
-        }
-    }*/

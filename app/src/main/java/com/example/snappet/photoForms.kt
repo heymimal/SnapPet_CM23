@@ -49,6 +49,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import java.io.File
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +96,7 @@ fun radioButton(){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, imageUri: Uri) {
+fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, imageUri: Uri, file: File) {
     var photo: Photo = Photo(imageUri)
 
 
@@ -143,9 +144,6 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
             Log.d(TAG, "Trying to load image from Uri: $imageUri")
             Image(
                 //painter = painterResource(id = R.drawable.imagemforms),
-
-
-
                 painter = rememberImagePainter(imageUri),
                 contentDescription = "Taken Photo",
                 modifier = Modifier
