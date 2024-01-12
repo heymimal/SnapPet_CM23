@@ -34,12 +34,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
+import androidx.navigation.compose.rememberNavController
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Navigation
 import com.google.firebase.appcheck.internal.util.Logger.TAG
@@ -49,7 +50,24 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import java.io.File
+
+
+//@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap){
+    //var navController = rememberNavController()
+    Column {
+        Text(text = "Como")
+        Text(text = "COMO CARAGO")
+        Image(
+            bitmap = imageBitmap,
+            contentDescription = "description",
+            modifier = Modifier.padding(16.dp, 8.dp)
+        )
+    }
+    Text(text = "Pouco     BACANO!!!!!!!", color = androidx.compose.ui.graphics.Color.White)
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +79,7 @@ fun SnapPetPreviewPhoto(navController: NavHostController) {
             Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = " ", modifier = Modifier.padding(paddingValues))
-        //PhotoForms()
+        PhotoForms(Modifier,navController, imageUri = Uri.EMPTY, imageBitmap = null)
     }
 }
 
@@ -96,15 +114,11 @@ fun radioButton(){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, imageUri: Uri, file: File) {
+fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, imageUri: Uri, imageBitmap: ImageBitmap?) {
     var photo: Photo = Photo(imageUri)
 
-
-    Log.d(TAG, "TESTE DE NULO IMG URI")
-    Log.d(TAG, imageUri.toString())
-
-    Log.d(TAG, "VERIFICACAO PHOTO FORMS")
-    Log.d(TAG, imageUri.path?.isNotEmpty().toString())
+    //Log.d(TAG, "VERIFICACAO PHOTO FORMS")
+    //Log.d(TAG, imageUri.path?.isNotEmpty().toString())
 
     val storage = Firebase.storage
     val storageRef = storage.reference
@@ -142,15 +156,14 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
                 return
             }
             Log.d(TAG, "Trying to load image from Uri: $imageUri")
-            Image(
-                //painter = painterResource(id = R.drawable.imagemforms),
-                painter = rememberImagePainter(imageUri),
+            /*Image(
+                bitmap = imageBitmap,
                 contentDescription = "Taken Photo",
                 modifier = Modifier
                     .fillMaxSize()
                     .align(Alignment.Center),
                 contentScale = ContentScale.Crop
-            )
+            )*/
         }
 
         Spacer(modifier = Modifier.height(20.dp))

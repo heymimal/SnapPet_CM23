@@ -3,6 +3,7 @@ package com.example.snappet
 import android.Manifest
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
@@ -18,14 +19,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,6 +64,7 @@ import java.util.Date
 import java.util.Objects
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.example.snappet.navigation.Navigation
 
 
 class MainActivity : ComponentActivity() {
@@ -168,8 +174,6 @@ class MainActivity : ComponentActivity() {
 
                         composable("Camera"){
                             AppContent(navController)
-
-
                         }
                         composable(route = Screens.Home.route) {
                             HomeMenu(navController)
@@ -177,15 +181,14 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.Trophies.route) {
                             TrophiesNav(navController)
                         }
-                        /*composable(route = Screens.PhotoForm.route){
-                            SnapPetPreviewPhoto(navController)
-                        }*/
 
-                        composable(route = "photo_form_screen/{capturedImageUri}") { navBackStack ->
+                        composable(route = "photo_form_screen") { navBackStack ->
                             // Extracting the argument
                             //val uri = Uri.parse(navBackStack.arguments?.getString("capturedImageUri") ?: "")
-                            val uriString = navBackStack.arguments?.getString("capturedImageUri")?:""
-                            val uri = Uri.parse(uriString);
+                            //val uriString = navBackStack.arguments?.getString("capturedImageUri")?:""
+                            //val uri = Uri.parse(uriString);
+
+                            SnapPetPreviewPhoto(navController = navController)
 
                             //val capturedPhoto = CapturedPhoto(imageUri = uri)
 
@@ -202,86 +205,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-fun AppContent(navController: NavHostController) {
-
-    lateinit var currentImagePath: String
-    lateinit var strUri: String
-    //var uri: Uri
-    var takenPicture by remember { mutableStateOf<Bitmap?>(null) }
-    var takenPictureRotated: Bitmap? = null
-
-    //  val imageBitmap = remember(takenPicture) { takenPicture!!.asImageBitmap() }
-    val context = LocalContext.current
-    val authority = "com.example.snappet.provider"
-
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-    val file = File.createTempFile(
-        "Snappet_$timeStamp",
-        ".jpg", /* suffix */
-        storageDir   /* directory */
-    ).apply { currentImagePath = absolutePath }
-    var uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        authority,
-        file
-    )
-    val getCameraImage =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-            if (success) {
-                strUri = uri.toString()
-                val matrix = Matrix()
-                matrix.postRotate(90F)
-                takenPicture = BitmapFactory.decodeFile(currentImagePath)
-                val picture = takenPicture
-                // Rotate the picture taken
-                takenPictureRotated = Bitmap.createBitmap(
-                    picture!!,
-                    0,
-                    0,
-                    picture.width,
-                    picture.height,
-                    matrix,
-                    true
-                )
-            }
-        }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        if (it) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            getCameraImage.launch(uri)
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-    DisposableEffect(Unit) {
-        permissionLauncher.launch(Manifest.permission.CAMERA)
-
-        onDispose {
-            // Clean up if needed
-        }
-    }
-    if (takenPicture != null) {
-        Log.d(TAG, "not null")
-        val imageBitmap = remember(takenPicture) { takenPicture!!.asImageBitmap() }
-
-        Image(
-            bitmap = imageBitmap,
-            contentDescription = "description",
-            modifier = Modifier.padding(16.dp, 8.dp)
-        )
-    } else {
-        Log.d(TAG,"SHIT IS null")
-    }
-}
-
-
-
-
