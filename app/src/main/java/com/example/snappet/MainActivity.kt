@@ -160,6 +160,8 @@ class MainActivity : ComponentActivity() {
 
                         composable("Camera"){
                             AppContent(navController)
+
+
                         }
                         composable(route = Screens.Home.route) {
                             HomeMenu(navController)
@@ -171,24 +173,25 @@ class MainActivity : ComponentActivity() {
                             SnapPetPreviewPhoto(navController)
                         }*/
 
-                        /*composable(route = "${Screens.PhotoForm.route}/{capturedImageUri}"){
-                            val uri = Uri.parse(it.arguments?.getString("capturedImageUri") ?: "")
-                            val capturedPhoto = capturedPhoto(imageUri = uri)
-                            PhotoForms(modifier = Modifier, capturedPhoto)
-                        }*/
-
-                        /*composable(route = Screens.PhotoForm.route+ "?capturedImageUri={capturedImageUri}"){ navBackStack ->
-                            //extracting the argument
-                            val uri = Uri.parse(navBackStack.arguments?.getString("capturedImageUri") ?: "")
-                            val capturedPhoto = capturedPhoto(imageUri = uri)
-                            PhotoForms(modifier = Modifier, capturedPhoto)
-                        }*/
-
                         composable(route = "photo_form_screen/{capturedImageUri}") { navBackStack ->
                             // Extracting the argument
-                            val uri = Uri.parse(navBackStack.arguments?.getString("capturedImageUri") ?: "")
-                            val capturedPhoto = capturedPhoto(imageUri = uri)
-                            PhotoForms(modifier = Modifier, navController, capturedPhoto)
+                            //val uri = Uri.parse(navBackStack.arguments?.getString("capturedImageUri") ?: "")
+                            val uriString = navBackStack.arguments?.getString("capturedImageUri")?:""
+                            val uri = Uri.parse(uriString);
+
+                            /*if(uri!= null){
+                                Log.d(TAG, "URI NÃO É NULL")
+                            }else{
+                                Log.d(TAG, "URI É NULL")
+                            }*/
+
+                            val capturedPhoto = CapturedPhoto(imageUri = uri)
+
+                            if(capturedPhoto.imageUri.scheme == null){
+                                Log.d(TAG, "SCHEME É NULL MANO")
+                            }
+
+                            PhotoForms(modifier = Modifier, navController, uri)
                         }
 
                     }
@@ -197,6 +200,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 
 @OptIn(ExperimentalCoilApi::class)
@@ -210,7 +214,6 @@ fun AppContent(navController: NavHostController) {
         Objects.requireNonNull(context),
         authority, file
     )
-
     var capturedImageUri by remember {
         mutableStateOf<Uri>(Uri.EMPTY)
     }
@@ -219,6 +222,7 @@ fun AppContent(navController: NavHostController) {
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
             capturedImageUri = uri
         }
+
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -247,6 +251,8 @@ fun AppContent(navController: NavHostController) {
             contentDescription = null
         )
     }
+    
+    PhotoForms(navController = navController, imageUri = capturedImageUri)
 
     Log.d(TAG, "TESTEEEEE")
 
@@ -255,8 +261,11 @@ fun AppContent(navController: NavHostController) {
 
     Log.d(TAG, navController.toString())
 
-    navController.navigate("photo_form_screen/{capturedImageUri}")
+    //navController.navigate("photo_form_screen/{capturedImageUri}")
 }
+
+
+
 
 fun Context.createImageFile(): File {
     // Create an image file name
@@ -269,6 +278,14 @@ fun Context.createImageFile(): File {
     )
     return image
 }
+
+
+
+
+
+
+
+
 
 /*Column(
         Modifier
