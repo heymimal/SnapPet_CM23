@@ -179,17 +179,11 @@ class MainActivity : ComponentActivity() {
                             val uriString = navBackStack.arguments?.getString("capturedImageUri")?:""
                             val uri = Uri.parse(uriString);
 
-                            /*if(uri!= null){
-                                Log.d(TAG, "URI NÃO É NULL")
-                            }else{
-                                Log.d(TAG, "URI É NULL")
-                            }*/
+                            //val capturedPhoto = CapturedPhoto(imageUri = uri)
 
-                            val capturedPhoto = CapturedPhoto(imageUri = uri)
-
-                            if(capturedPhoto.imageUri.scheme == null){
+                            /*if(capturedPhoto.imageUri.scheme == null){
                                 Log.d(TAG, "SCHEME É NULL MANO")
-                            }
+                            }*/
 
                             PhotoForms(modifier = Modifier, navController, uri)
                         }
@@ -244,6 +238,8 @@ fun AppContent(navController: NavHostController) {
     }
 
     if (capturedImageUri.path?.isNotEmpty() == true) {
+        Log.d(TAG, "VERIFICACAO")
+        Log.d(TAG, capturedImageUri.path?.isNotEmpty().toString())
         Image(
             modifier = Modifier
                 .padding(16.dp, 8.dp),
@@ -251,6 +247,9 @@ fun AppContent(navController: NavHostController) {
             contentDescription = null
         )
     }
+
+    Log.d(TAG, "TESTE DE NULO IMG URI NO MAIN ACTIVITY")
+    Log.d(TAG, capturedImageUri.toString())
     
     PhotoForms(navController = navController, imageUri = capturedImageUri)
 

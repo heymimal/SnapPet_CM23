@@ -96,8 +96,14 @@ fun radioButton(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, imageUri: Uri) {
-    var photo: Photo = Photo()
+    var photo: Photo = Photo(imageUri)
 
+
+    Log.d(TAG, "TESTE DE NULO IMG URI")
+    Log.d(TAG, imageUri.toString())
+
+    Log.d(TAG, "VERIFICACAO PHOTO FORMS")
+    Log.d(TAG, imageUri.path?.isNotEmpty().toString())
 
     val storage = Firebase.storage
     val storageRef = storage.reference
@@ -130,8 +136,15 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
 
         ) {
             //TODO change image to image loaded from camera
+            if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
+                Log.e(TAG, "NULO")
+                return
+            }
+            Log.d(TAG, "Trying to load image from Uri: $imageUri")
             Image(
                 //painter = painterResource(id = R.drawable.imagemforms),
+
+
 
                 painter = rememberImagePainter(imageUri),
                 contentDescription = "Taken Photo",
@@ -187,10 +200,16 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
                                 expanded = false
                                 photo.type = selectedOptionText
                             },
+
+
                         )
                     }
                 }
             }
+
+            Log.d(TAG, "E AQUI??")
+            Log.d(TAG, selectedOptionText)
+            Log.d(TAG, photo.type)
         }
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -244,12 +263,15 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
             Text(text = "Back", style = TextStyle(fontSize = 20.sp))
         }
     }
+
     // NEXT PAGE
     Box(
         modifier = Modifier.fillMaxSize()
     ){
         Button(
             onClick = { /*TODO*/
+                        Log.d(TAG, "TIPO DA FOTO")
+                        Log.d(TAG, photo.type);
                         uploadImageStorage(imageUri, storageRef);
                         uploadImageToRealtimeDatabase(imageUri.toString(), databaseReference)
                       },
@@ -272,6 +294,14 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
 }
 
 private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
+
+    if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
+        Log.e(TAG, "Uri inválido ou nulo")
+        return
+    }
+
+    Log.d(TAG, "Path do Uri: ${imageUri.path}")
+
     val currentUser = Firebase.auth.currentUser
     if(currentUser != null){
         val userId = currentUser.uid
