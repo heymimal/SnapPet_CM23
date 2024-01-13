@@ -108,7 +108,8 @@ fun CameraClass(navController: NavController) {
         Log.d(Logger.TAG, "not null")
         val imageBitmap = rememberUpdatedState(takenPicture!!).value.asImageBitmap()
         Log.d(Logger.TAG,"URI é: $uri")
-        Column(
+        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file)
+       /*Column(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
@@ -124,7 +125,7 @@ fun CameraClass(navController: NavController) {
                 Text("Save")
             }
             }
-        }
+        */}
 
 }
 
@@ -149,29 +150,5 @@ fun CameraClass(navController: NavController) {
 /*  Log.d(Logger.TAG,"Image is null")
 }*/
 // Function to save the image to a specific folder in the device's media store
-private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File) {
-    val folderName = "Snappet"
-
-    val contentValues = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, "${file.name}")
-        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.WIDTH, bitmap.width)
-        put(MediaStore.Images.Media.HEIGHT, bitmap.height)
-        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-        put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + folderName)
-    }
-
-    val contentResolver = context.contentResolver
-    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-    uri?.let { imageUri ->
-        contentResolver.openOutputStream(imageUri)?.use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-            Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
-        }
-    }
-}
-
 
 

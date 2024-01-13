@@ -24,7 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.activity.CameraActivity
+//import com.example.snappet.activity.CameraActivity
 import com.example.snappet.activity.MapActivity
 import com.example.snappet.R
 import com.google.firebase.appcheck.internal.util.Logger.TAG

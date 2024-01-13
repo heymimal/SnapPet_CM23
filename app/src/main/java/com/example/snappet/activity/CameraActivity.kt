@@ -26,7 +26,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.snappet.MainActivity
 import com.example.snappet.R
-import com.example.snappet.SnapPetPreviewPhoto
 import com.example.snappet.databinding.ActivityCameraBinding
 import com.example.snappet.navigation.Screens
 import com.google.firebase.auth.ktx.auth
@@ -37,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
+/*
 class CameraActivity : AppCompatActivity(){
     private lateinit var viewBinding: ActivityCameraBinding
 
@@ -355,4 +354,4 @@ class CameraActivity : AppCompatActivity(){
                 }
             }.toTypedArray()
     }
-}
+}*/

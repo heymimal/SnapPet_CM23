@@ -1,8 +1,13 @@
 package com.example.snappet
 
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,14 +58,17 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
+import java.io.File
 
 
 //@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap){
+fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File){
 
     val storage = Firebase.storage
     val storageRef = storage.reference
+
+    val context = LocalContext.current
 
     val database = Firebase.database
     val databaseReference = database.reference
@@ -83,7 +92,8 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap){
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
-                uploadImageToStorage1(fileName, imageBitmap);
+                saveImageToMediaStore(takenPicture,context,file)
+                uploadImageToStorage(fileName, imageBitmap);
             },
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
@@ -106,7 +116,7 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap){
 }
 
 // Function to upload the image to Firebase Storage
-private fun uploadImageToStorage1(fileName: String, imageBitmap: ImageBitmap) {
+private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)
 
@@ -148,16 +158,27 @@ private fun uploadImageToStorage1(fileName: String, imageBitmap: ImageBitmap) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SnapPetPreviewPhoto(navController: NavHostController) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            Navigation(navController =navController)
-        }) {paddingValues ->
-        Text(text = " ", modifier = Modifier.padding(paddingValues))
-        PhotoForms(Modifier,navController, imageUri = Uri.EMPTY, imageBitmap = null)
+private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File) {
+    val folderName = "Snappet"
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "${file.name}")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.WIDTH, bitmap.width)
+        put(MediaStore.Images.Media.HEIGHT, bitmap.height)
+        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + folderName)
+    }
+
+    val contentResolver = context.contentResolver
+    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+    uri?.let { imageUri ->
+        contentResolver.openOutputStream(imageUri)?.use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
+        }
     }
 }
 
