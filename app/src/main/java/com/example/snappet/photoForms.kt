@@ -111,28 +111,41 @@ private fun uploadImageToStorage1(fileName: String, imageBitmap: ImageBitmap) {
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)
 
-    // Convert ImageBitmap to byte array
-    val byteArrayOutputStream = ByteArrayOutputStream()
+    val currentUser = Firebase.auth.currentUser
+    val userUid = currentUser?.uid
 
-    // Convert ImageBitmap to Bitmap (asAndroidBitmap)
-    val androidBitmap = imageBitmap.asAndroidBitmap()
+    if(userUid!= null){
+        val userFolderRef = storage.reference.child("user_images_storage/$userUid")
 
-    // Encode the Bitmap as JPEG
-    androidBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        // Create a unique filename for the image in the user's folder
+        val filePath = "$fileName.jpg"
+        val imageRef = userFolderRef.child(filePath)
 
-    val data = byteArrayOutputStream.toByteArray()
+        // Convert ImageBitmap to byte array
+        val byteArrayOutputStream = ByteArrayOutputStream()
 
-    // Upload the image to Firebase Storage
-    val uploadTask: UploadTask = storageRef.putBytes(data)
+        // Convert ImageBitmap to Bitmap (asAndroidBitmap)
+        val androidBitmap = imageBitmap.asAndroidBitmap()
 
-    uploadTask.addOnSuccessListener { taskSnapshot ->
-        // Image upload success, you can retrieve the download URL if needed
-        val downloadUrl = taskSnapshot.metadata?.reference?.downloadUrl
-        // You can use the downloadUrl for further processing or store it in your database
-    }.addOnFailureListener { exception ->
-        // Handle the failure case, e.g., show an error message
-        Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
+        // Encode the Bitmap as JPEG
+        androidBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        val data = byteArrayOutputStream.toByteArray()
+
+        // Upload the image to Firebase Storage
+        val uploadTask: UploadTask = imageRef.putBytes(data)
+
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            // Image upload success, you can retrieve the download URL if needed
+            val downloadUrl = taskSnapshot.metadata?.reference?.downloadUrl
+            // You can use the downloadUrl for further processing or store it in your database
+        }.addOnFailureListener { exception ->
+            // Handle the failure case, e.g., show an error message
+            Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
+        }
     }
+
+
 }
 
 
@@ -177,7 +190,7 @@ fun radioButton(){
     }
 }
 
-private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
+/*private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
 
     if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
         Log.e(TAG, "Uri inválido ou nulo")
@@ -228,7 +241,7 @@ private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
             }
         }
     }
-}
+}*/
 
 private fun uploadImageToRealtimeDatabase(imageUrl: String, databaseReference: DatabaseReference) {
     val currentUser = Firebase.auth.currentUser
@@ -446,7 +459,7 @@ fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, 
             onClick = { /*TODO*/
                         Log.d(TAG, "TIPO DA FOTO")
                         Log.d(TAG, photo.type);
-                        uploadImageStorage(imageUri, storageRef);
+                        //uploadImageStorage(imageUri, storageRef);
                         uploadImageToRealtimeDatabase(imageUri.toString(), databaseReference)
                       },
             shape = RoundedCornerShape(50.dp),
