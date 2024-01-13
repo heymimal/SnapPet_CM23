@@ -29,10 +29,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.example.snappet.navigation.Navigation
 import com.example.snappet.R
+import com.example.snappet.navigation.Navigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,9 +111,9 @@ fun ThreeByThreeGrid1() {
             Column {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    //item { CardWithImageAndText(Icons.Default.Person, "Cat1") }
-                    //item { CardWithImageAndText(Icons.Default.Phone, "Dog1") }
-                    //item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
+                    item { CardWithImageAndText(Icons.Default.Person, "Cat1") }
+                    item { CardWithImageAndText(Icons.Default.Phone, "Dog1") }
+                    item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
                 }
             }
         }

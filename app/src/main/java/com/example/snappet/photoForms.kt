@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -74,7 +73,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     }
 
     var descriptionPhoto by remember{
-        mutableStateOf<String?>("n")
+        mutableStateOf<String?>("Dog")
     }
 
     val storage = Firebase.storage
@@ -82,8 +81,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
     val context = LocalContext.current
 
-    val database = Firebase.database
-    val databaseReference = database.reference
+
     //var navController = rememberNavController()
 
     Log.d(TAG, "URI");
@@ -245,6 +243,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
                 saveImageToMediaStore(takenPicture,context,file)
                 uploadImageToStorage(fileName, imageBitmap);
+                uploadPhotoToDatabase(photo)
             },
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
@@ -262,16 +261,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             Text(text = "Upload", style = TextStyle(fontSize = 20.sp))
         }
     }
-
-
-
-
-
-
-
-
-
-
 
 }
 
@@ -316,6 +305,51 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
 
 
 }
+
+private fun uploadPhotoToDatabase(photo: Photo) {
+    val currentUser = Firebase.auth.currentUser
+    val database = Firebase.database
+    val databaseReference = database.reference
+
+    currentUser?.let {
+        val userId = it.uid
+        val userName = it.displayName
+
+        // Create a folder name based on the user's ID or display name
+        val folderName = if (!userName.isNullOrBlank()) userName else userId
+
+        // Update the path where the photo data will be stored in the database
+        //val photoPath = "photoData/$folderName/"
+
+        // Update the path where the image URL will be stored in the database
+        val imagePath = "imagesTest/$folderName/"
+
+        val data = hashMapOf(
+            "imageUrl" to photo.imageUri.toString(),
+            "animal" to photo.animalType,
+            "context" to photo.contextPhoto,
+            "description" to photo.description
+        )
+
+        // Reference to the database path
+        val databasePath = databaseReference.child(imagePath)
+
+        // Push the photo data to the database
+        val databaseKey = databasePath.push().key
+        databaseKey?.let { key ->
+            //databasePath.child(key).setValue(photo)
+            databasePath.child(key).setValue(data)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Photo data uploaded to Realtime Database.")
+                    } else {
+                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
+                    }
+                }
+        }
+    }
+}
+
 
 
 private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File) {
@@ -453,40 +487,7 @@ fun radioButton(onOptionSelected: (String) -> Unit) {
     }
 }*/
 
-private fun uploadImageToRealtimeDatabase(imageUrl: String, databaseReference: DatabaseReference) {
-    val currentUser = Firebase.auth.currentUser
-    currentUser?.let {
-        val userId = it.uid
-        val userName = it.displayName
 
-        // Create a folder name based on the user's ID or display name
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        // Update the path where the image URL will be stored in the database
-        val imagePath = "images/$folderName/"
-
-        // Construct the data to be uploaded
-        val data = hashMapOf(
-            "imageUrl" to imageUrl
-        )
-
-        // Reference to the database path
-        val databasePath = databaseReference.child(imagePath)
-
-        // Push the data to the database
-        val databaseKey = databasePath.push().key
-        databaseKey?.let { key ->
-            databasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Data uploaded to Realtime Database.")
-                    } else {
-                        Log.e(TAG, "Failed to upload data to Realtime Database", task.exception)
-                    }
-                }
-        }
-    }
-}
 
 
 
