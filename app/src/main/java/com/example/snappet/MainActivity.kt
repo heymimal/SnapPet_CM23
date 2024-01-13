@@ -45,8 +45,6 @@ import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
 
-    //private val profileViewModel by viewModels<ProfileViewModel>()
-
     //criamos aqui o nosso cliente aqui
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
@@ -75,12 +73,6 @@ class MainActivity : ComponentActivity() {
                     //menuBottomNav()
                     //NavGraph(navController)
 
-
-
-
-
-
-
                     //vai ospedar todos os nossos ecrãns diferentes
                     //recebe o navController e o "sign_in" routh
                     //tal como no navGraph que o Ricardo fez
@@ -100,7 +92,6 @@ class MainActivity : ComponentActivity() {
                             LaunchedEffect(key1 = Unit){
                                 //se houver um user signed in então o isto não devolve null
                                 if(googleAuthUiClient.getSignedInUser() != null){
-
                                     //navegamos para o nosso profileScreen
                                     //navController.navigate("profile")
                                     //navController.navigate(route = Screens.Home.route)
@@ -136,11 +127,9 @@ class MainActivity : ComponentActivity() {
                                     //queremos navegar para o Home Screen
                                     //e claro temos que passar a routh para onde queremos navegar
 
-
                                     //navController.navigate("profile")
                                     //navController.navigate(route = Screens.Home.route)
                                     navController.navigate(route = Screens.Streak.route)
-
                                     //queremos fazer reset do state do view model
                                     //para depois começarmos com um state novo (o user tem que fazer
                                     // login outra vez)
@@ -190,70 +179,12 @@ class MainActivity : ComponentActivity() {
                                             "Signed out",
                                             Toast.LENGTH_LONG
                                         ).show()
-
                                         //faz voltarmos para o ecrã anterior (do login)
-                                        //VER ISTO!!!
                                         //navController.popBackStack()
                                         navController.navigate("sign_in")
                                     }
                                 }
                             )
-                            /*
-                            val reference = database.getReference ("Users (Quim)")
-
-                            val thisUserRef = userData?.let { it1 -> reference.child(it1.userId) }
-                            if (thisUserRef != null) {
-                                thisUserRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                        if (dataSnapshot.exists()) {
-                                            // Retrieve the email from the dataSnapshot
-                                            val points = dataSnapshot.child("snaPoints").getValue(String::class.java)
-                                            if (points != null) {
-                                                // Use the retrieved email
-                                                userData = userData?.copy(snaPoints = points)!!
-                                                //println("AAAAAAAAAAAAAAAAAAAAAAAAAAA: ${userData?.snaPoints}")
-                                            }
-                                        }
-                                    }
-
-                                    override fun onCancelled(databaseError: DatabaseError) {
-                                        // Handle potential errors
-                                        println("Error: ${databaseError.message}")
-                                    }
-                                })
-                            }
-
-
-
-                            //println("BBBBBBBBBBBBBBBBBBBBBBBBBB: $a")
-                            //vamos para o ecrã do Profile
-                            //um dos parametros de entrada deste ecrã é o UserData, portanto
-                            //vamos busca-lo ao googleAUthUiClient
-                            //dantes tinha "ProfileScreen"
-                            EditProfileScreen2_nav(navController,
-                                //userData = googleAuthUiClient.getSignedInUser(),
-                                userData,
-                                //o segundo parametro de entrada do ecrã do profile eh
-                                //enviarmos a função que faz logOut
-                                onSignOut = {
-                                    lifecycleScope.launch {
-                                        googleAuthUiClient.singOut()
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Signed out",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                        //faz voltarmos para o ecrã anterior (do login)
-                                        //VER ISTO!!!
-                                        //navController.popBackStack()
-                                        navController.navigate("sign_in")
-                                    }
-                                }
-                            )
-
-                             */
-
                         }
 
                         //para ir para o Streak login screen
@@ -262,7 +193,6 @@ class MainActivity : ComponentActivity() {
                             var updatedPoints = 0
                             var testeLoginStreak = 1
                             var usersLastLogin = ""
-
                             val database = Firebase.database
                             val myReference = database.getReference ("Users (Quim)")
                             var userData = googleAuthUiClient.getSignedInUser()
@@ -273,7 +203,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             if (userData != null) {
-
                                 val thisUserRef = myReference.child(userData!!.userId)
                                 thisUserRef.addListenerForSingleValueEvent(object :
                                     ValueEventListener {
@@ -288,7 +217,6 @@ class MainActivity : ComponentActivity() {
                                             //thisUserRef.child("snaPoints").setValue(userData!!.snaPoints)
                                             thisUserRef.child("snaPoints").setValue("5")
                                             thisUserRef.child("LoginStreak").setValue(1)
-
                                             //buscar a data corrente
                                             //val currentDate = LocalDate.now(ZoneId.systemDefault()).minusDays(1)
                                             val currentDate = LocalDate.now(ZoneId.systemDefault())
@@ -296,7 +224,6 @@ class MainActivity : ComponentActivity() {
                                             val dayOfMonth = currentDate.dayOfMonth
                                             val monthValue = currentDate.monthValue
                                             val year = currentDate.year
-
                                             //guardar o dia, mes e ano na RealTimeDataBase (dentro do user)
                                             val dateString = "$dayOfMonth $monthValue $year"
                                             thisUserRef.child("LastLogin").setValue(dateString)
@@ -308,19 +235,6 @@ class MainActivity : ComponentActivity() {
                                         println("Error: ${databaseError.message}")
                                     }
                                 })
-
-
-                                /*
-                                val thisUser = myReference.child(userData.userId)
-                                thisUser.child("profilePic").setValue(userData.profilePictureUrl)
-                                thisUser.child("username").setValue(userData.username)
-                                val thisUser2 = myReference.child("9999")
-                                thisUser2.child("profilePic").setValue(userData.profilePictureUrl)
-                                thisUser2.child("username").setValue(userData.username)
-                                */
-
-
-
                                 val loginStreakDataState by loginStreakViewModel.loginStreakData.observeAsState()
                                 //testeLoginStreak = loginStreakDataState!!
                                 val snaPointsDataState by loginStreakViewModel.snaPointsData.observeAsState()
@@ -335,9 +249,7 @@ class MainActivity : ComponentActivity() {
                                     DayInfo("Day: 6", 10),
                                     DayInfo("Day: 7", 25)
                                 )
-
                                 if (loginStreakDataState != null) {
-
                                     //buscar a data corrente
                                     val currentDate = LocalDate.now(ZoneId.systemDefault())
                                     //dividie dia, mes e ano
@@ -346,33 +258,20 @@ class MainActivity : ComponentActivity() {
                                     val year = currentDate.year
                                     //guardar o dia, mes e ano na RealTimeDataBase (dentro do user)
                                     val dateString = "$dayOfMonth $monthValue $year"
-
                                     testeLoginStreak = loginStreakDataState as Int
-
                                     val isBeforeToday = isDateBeforePresentDate(usersLastLogin)
-
-                                    //TESTA ISTO DOS DIAS!
-                                    //if (!isBeforeToday) {
-                                        //println("********************+$dateString")
-                                        //println("####################+$usersLastLogin")
-                                        //loginStreakNav(loginStreakViewModel, navController, snaPointsDataState?.toIntOrNull() ?: 0, testeLoginStreak)
-                                    //}else {
-
+                                    if (!isBeforeToday) {
+                                        loginStreakNav(loginStreakViewModel, navController, snaPointsDataState?.toIntOrNull() ?: 0, testeLoginStreak)
+                                    }else {
                                         // Increment by one
                                         testeLoginStreak++
-
                                         // Check if the value is 8 or above, then reset to 0
                                         if (testeLoginStreak >= 8) {
                                             testeLoginStreak = 1
                                         }
-
-
                                         val pointsToAdd = daysInfo.getOrNull(testeLoginStreak!! - 1)?.points ?: 0
                                         val currentPoints = snaPointsDataState?.toIntOrNull() ?: 0
                                         updatedPoints = currentPoints + pointsToAdd
-
-                                        //buscar a data corrente
-
 
                                         thisUserRef.updateChildren(
                                             mapOf(
@@ -391,7 +290,6 @@ class MainActivity : ComponentActivity() {
                                                 println("Error updating user data: ${task.exception}")
                                             }
                                         }
-
                                         // Call the composable function here, passing the updatedPoints
                                         loginStreakNav(
                                             loginStreakViewModel,
@@ -399,12 +297,10 @@ class MainActivity : ComponentActivity() {
                                             updatedPoints,
                                             testeLoginStreak
                                         )
-                                    //}
+                                    }
                                 } else {
                                     // Display a loading indicator or handle the null state here
                                 }
-
-
                             }
                             loginStreakNav(loginStreakViewModel,navController,updatedPoints,testeLoginStreak)
                         }
@@ -420,15 +316,7 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.Trophies.route) {
                             Trophies_nav(navController)
                         }
-
                     }
-
-
-
-
-
-
-
                 }
             }
         }
@@ -441,7 +329,6 @@ class MainActivity : ComponentActivity() {
         val formatter = DateTimeFormatter.ofPattern("d M yyyy")
         val providedDate = LocalDate.parse(dateString, formatter)
         val currentDate = LocalDate.now()
-
         return providedDate.isBefore(currentDate)
     }
 
