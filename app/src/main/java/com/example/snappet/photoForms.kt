@@ -69,6 +69,14 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         mutableStateOf<String?>("n")
     }
 
+    var contextPhotoType by remember{
+        mutableStateOf<String?>("Entertainment")
+    }
+
+    var descriptionPhoto by remember{
+        mutableStateOf<String?>("n")
+    }
+
     val storage = Firebase.storage
     val storageRef = storage.reference
 
@@ -185,7 +193,13 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 .align(alignment = Alignment.Start)
         )
 
-        radioButton()
+        radioButton { selectedOption ->
+            // Atualizar a variável contextPhotoType com a opção selecionada
+            contextPhotoType = selectedOption
+        }
+
+        Log.d(TAG, "TESTE DO CONTEXTO");
+        Log.d(TAG, contextPhotoType!!);
 
         Text(
             text = "Description",
@@ -195,7 +209,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         )
         Spacer(modifier = Modifier.height(15.dp))
 
-        var ttext by remember { mutableStateOf("Hello") }
+        var ttext by remember { mutableStateOf("Describe the Photo...") }
 
         TextField(
             value = ttext,
@@ -203,6 +217,8 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             onValueChange = { ttext = it },
             label = { Text("Description") }
         )
+
+        descriptionPhoto = ttext
 
     }
 
@@ -212,11 +228,19 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
-                var photo = Photo(uri, photoType!!)
+                var photo = Photo(uri, photoType!!, contextPhotoType!!, descriptionPhoto!!)
 
                 Log.d(TAG, "TIPOS DA FOTOS SEI LA")
                 Log.d(TAG, photo.imageUri.toString())
                 Log.d(TAG, photo.animalType)
+
+                Log.d(TAG, "CONTEXTO DAS FOTOS SEI LA")
+                Log.d(TAG, photo.imageUri.toString())
+                Log.d(TAG, photo.contextPhoto)
+
+                Log.d(TAG, "DESCRICAO DAS FOTOS SEI LA")
+                Log.d(TAG, photo.imageUri.toString())
+                Log.d(TAG, photo.description)
 
 
                 saveImageToMediaStore(takenPicture,context,file)
@@ -319,7 +343,7 @@ private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File) 
 }
 
 
-@Composable
+/*@Composable
 fun radioButton(){
     val radioOptions = listOf("Entertainment", "Needs Help")
     var selectedOption by remember { mutableStateOf(radioOptions[0]) }
@@ -335,6 +359,36 @@ fun radioButton(){
                 RadioButton(
                     selected = (option == selectedOption),
                     onClick = { selectedOption = option }
+                )
+                Text(
+                    text = option,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(end = 20.dp)
+                )
+            }
+        }
+    }
+}*/
+
+@Composable
+fun radioButton(onOptionSelected: (String) -> Unit) {
+    val radioOptions = listOf("Entertainment", "Needs Help")
+    var selectedOption by remember { mutableStateOf(radioOptions[0]) }
+
+    Row(
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        radioOptions.forEach { option ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = (option == selectedOption),
+                    onClick = {
+                        selectedOption = option
+                        onOptionSelected(selectedOption)
+                    }
                 )
                 Text(
                     text = option,
