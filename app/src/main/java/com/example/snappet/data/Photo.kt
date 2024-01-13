@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Photo(
     val imageUri: Uri,
-    var type: String = "",
+    var animalType : String = "",
     //var id: String = "",
     //var description:String  = "",
     //var localSrc: String = "",

@@ -45,7 +45,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.snappet.data.Photo
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
@@ -60,8 +59,15 @@ import java.io.File
 
 
 //@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File){
+fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File){
+
+    var photo = Photo(uri);
+
+    var photoType by remember {
+        mutableStateOf<String?>("n")
+    }
 
     val storage = Firebase.storage
     val storageRef = storage.reference
@@ -75,21 +81,144 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: F
     Log.d(TAG, "URI");
     Log.d(TAG, uri.toString());
 
-    Column {
-        Text(text = "Como")
-        Text(text = "COMO CARAGO")
-        Image(
-            bitmap = imageBitmap,
-            contentDescription = "description",
-            modifier = Modifier.padding(16.dp, 8.dp)
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = "Photo Form",
+            color = Color.Black,
+            style = TextStyle(fontSize = 25.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
         )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+        ){
+            Image(
+                bitmap = imageBitmap,
+                contentDescription = "description",
+                modifier = Modifier
+                    //.padding(16.dp, 8.dp)
+                    //.size(200.dp).align(Alignment.TopCenter)
+                    //.align(Alignment.CenterHorizontally)
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Animal Type",
+            color = Color.Black,
+            style = TextStyle(fontSize = 20.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.Start)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            val options = listOf("Dog", "Cat", "Bird")
+            var expanded by remember { mutableStateOf(false) } //menu drop down aberto ou nao
+            var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+            ) {
+                TextField(
+                    modifier = Modifier.menuAnchor(),
+                    readOnly = true,
+                    value = selectedOptionText,
+                    onValueChange = {},
+                    label = { Text("Animal") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    options.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption) },
+                            onClick = {
+                                selectedOptionText = selectionOption
+                                expanded = false
+                                photoType = selectedOptionText
+
+                                Log.d(TAG, "TESTEEEEEEEEEEE")
+                                Log.d(TAG, selectedOptionText)
+                                Log.d(TAG, photoType!!)
+                            },
+
+
+                            )
+                    }
+                }
+            }
+            Log.d(TAG, "TESTE")
+            Log.d(TAG, selectedOptionText)
+            Log.d(TAG, photoType!!)
+
+
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Text(
+            text = "Context",
+            color = Color.Black,
+            style = TextStyle(fontSize = 20.sp),
+            modifier = Modifier
+                .align(alignment = Alignment.Start)
+        )
+
+        radioButton()
+
+        Text(
+            text = "Description",
+            color = Color.Black,
+            style = TextStyle(fontSize = 20.sp),
+            modifier = Modifier.align(alignment = Alignment.Start)
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+
+        var ttext by remember { mutableStateOf("Hello") }
+
+        TextField(
+            value = ttext,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onValueChange = { ttext = it },
+            label = { Text("Description") }
+        )
+
     }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ){
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
+                var photo = Photo(uri, photoType!!)
+
+                Log.d(TAG, "TIPOS DA FOTOS SEI LA")
+                Log.d(TAG, photo.imageUri.toString())
+                Log.d(TAG, photo.animalType)
+
+
                 saveImageToMediaStore(takenPicture,context,file)
                 uploadImageToStorage(fileName, imageBitmap);
             },
@@ -110,7 +239,16 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: F
         }
     }
 
-    Text(text = "Pouco     BACANO!!!!!!!", color = androidx.compose.ui.graphics.Color.White)
+
+
+
+
+
+
+
+
+
+
 }
 
 // Function to upload the image to Firebase Storage
@@ -303,200 +441,6 @@ private fun uploadImageToRealtimeDatabase(imageUrl: String, databaseReference: D
 
 
 
-
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PhotoForms(modifier: Modifier = Modifier, navController: NavHostController, imageUri: Uri, imageBitmap: ImageBitmap?) {
-    var photo: Photo = Photo(imageUri)
-
-    //Log.d(TAG, "VERIFICACAO PHOTO FORMS")
-    //Log.d(TAG, imageUri.path?.isNotEmpty().toString())
-
-    val storage = Firebase.storage
-    val storageRef = storage.reference
-
-    val database = Firebase.database
-    val databaseReference = database.reference
-
-    // TODO
-    // either receives the link directly or gets the latest photo available
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "Photo Form",
-            color = Color.Black,
-            style = TextStyle(fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-
-        ) {
-            //TODO change image to image loaded from camera
-            if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
-                Log.e(TAG, "NULO")
-                return
-            }
-            Log.d(TAG, "Trying to load image from Uri: $imageUri")
-            /*Image(
-                bitmap = imageBitmap,
-                contentDescription = "Taken Photo",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.Center),
-                contentScale = ContentScale.Crop
-            )*/
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Animal Type",
-            color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.Start)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            val options = listOf("Dog", "Cat", "Bird")
-            var expanded by remember { mutableStateOf(false) } //menu drop down aberto ou nao
-            var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
-
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-            ) {
-                TextField(
-                    modifier = Modifier.menuAnchor(),
-                    readOnly = true,
-                    value = selectedOptionText,
-                    onValueChange = {},
-                    label = { Text("Animal") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                ) {
-                    options.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption) },
-                            onClick = {
-                                selectedOptionText = selectionOption
-                                expanded = false
-                                photo.type = selectedOptionText
-                            },
-
-
-                        )
-                    }
-                }
-            }
-
-            Log.d(TAG, "E AQUI??")
-            Log.d(TAG, selectedOptionText)
-            Log.d(TAG, photo.type)
-        }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-            text = "Context",
-            color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.Start)
-        )
-
-        radioButton()
-
-        Text(
-            text = "Description",
-            color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
-            modifier = Modifier.align(alignment = Alignment.Start)
-        )
-        Spacer(modifier = Modifier.height(15.dp))
-
-        var ttext by remember { mutableStateOf("Hello") }
-
-        TextField(
-            value = ttext,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onValueChange = { ttext = it },
-            label = { Text("Description") }
-        )
-    }
-    // Back Page -> Takes new photo, deletes old photo
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-        Button(
-            onClick = { navController.navigate("camera")},
-            shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 26.dp,
-                    y = 680.dp
-                )
-                .height(50.dp)
-                .width(100.dp)
-
-        )
-        {
-            Text(text = "Back", style = TextStyle(fontSize = 20.sp))
-        }
-    }
-
-    // NEXT PAGE
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-        Button(
-            onClick = { /*TODO*/
-                        Log.d(TAG, "TIPO DA FOTO")
-                        Log.d(TAG, photo.type);
-                        //uploadImageStorage(imageUri, storageRef);
-                        uploadImageToRealtimeDatabase(imageUri.toString(), databaseReference)
-                      },
-            shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 246.dp,
-                    y = 680.dp
-                )
-                .height(50.dp)
-                .width(100.dp)
-
-        )
-        {
-            Text(text = "Next", style = TextStyle(fontSize = 20.sp))
-        }
-    }
-}
 
 
 
