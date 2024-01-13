@@ -65,7 +65,7 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap){
             modifier = Modifier.padding(16.dp, 8.dp)
         )
     }
-    Text(text = "Pouco     BACANO!!!!!!!", color = androidx.compose.ui.graphics.Color.White)
+
 }
 
 
