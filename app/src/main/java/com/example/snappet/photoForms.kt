@@ -77,7 +77,6 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap){
             modifier = Modifier.padding(16.dp, 8.dp)
         )
     }
-
     Box(
         modifier = Modifier.fillMaxSize()
     ){

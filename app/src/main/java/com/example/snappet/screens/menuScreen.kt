@@ -42,10 +42,9 @@ fun HomeMenu(navController: NavHostController) {
         bottomBar = {
             Navigation(navController =navController)
         }) {paddingValues ->
-        Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
+        Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
         ThreeByThreeGrid1()
 
-        //Text(text = "Hello")
     }
 }
 
