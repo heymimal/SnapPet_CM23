@@ -29,7 +29,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -48,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.snappet.data.Photo
-import com.example.snappet.navigation.Navigation
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
@@ -104,11 +102,11 @@ fun PhotoForm(uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: F
                     y = 680.dp
                 )
                 .height(50.dp)
-                .width(100.dp)
+                .width(150.dp)
 
         )
         {
-            Text(text = "Next", style = TextStyle(fontSize = 20.sp))
+            Text(text = "Upload", style = TextStyle(fontSize = 20.sp))
         }
     }
 
