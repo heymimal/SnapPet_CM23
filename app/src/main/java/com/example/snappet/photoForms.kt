@@ -128,7 +128,7 @@ private fun uploadImageToStorage1(fileName: String, imageBitmap: ImageBitmap) {
         val androidBitmap = imageBitmap.asAndroidBitmap()
 
         // Encode the Bitmap as JPEG
-        androidBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        androidBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
 
         val data = byteArrayOutputStream.toByteArray()
 
