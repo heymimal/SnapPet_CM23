@@ -65,7 +65,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     var photo = Photo(uri);
 
     var photoType by remember {
-        mutableStateOf<String?>("n")
+        mutableStateOf<String?>("Dog")
     }
 
     var contextPhotoType by remember{
@@ -73,7 +73,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     }
 
     var descriptionPhoto by remember{
-        mutableStateOf<String?>("Dog")
+        mutableStateOf<String?>("n")
     }
 
     val storage = Firebase.storage
@@ -321,8 +321,12 @@ private fun uploadPhotoToDatabase(photo: Photo) {
         // Update the path where the photo data will be stored in the database
         //val photoPath = "photoData/$folderName/"
 
+        val allFolder = "allImages"
+
         // Update the path where the image URL will be stored in the database
         val imagePath = "imagesTest/$folderName/"
+
+        val allImagesPath = "imagesTest/$allFolder/"
 
         val data = hashMapOf(
             "imageUrl" to photo.imageUri.toString(),
@@ -334,6 +338,8 @@ private fun uploadPhotoToDatabase(photo: Photo) {
         // Reference to the database path
         val databasePath = databaseReference.child(imagePath)
 
+        val allImagesDatabasePath = databaseReference.child(allImagesPath)
+
         // Push the photo data to the database
         val databaseKey = databasePath.push().key
         databaseKey?.let { key ->
@@ -342,6 +348,18 @@ private fun uploadPhotoToDatabase(photo: Photo) {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "Photo data uploaded to Realtime Database.")
+                    } else {
+                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
+                    }
+                }
+        }
+
+        val allImagesdatabaseKey = allImagesDatabasePath.push().key
+        allImagesdatabaseKey?.let { key ->
+            allImagesDatabasePath.child(key).setValue(data)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Photo data uploaded to Realtime Database to all images folder.")
                     } else {
                         Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
                     }
