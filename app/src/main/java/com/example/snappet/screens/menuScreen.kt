@@ -155,6 +155,7 @@ fun ThreeByThreeGrid1(recentPhotos: List<Photo>) {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
                 Log.d(TAG, "TAMANHO")
                 Log.d(TAG, recentPhotos.size.toString())
+                Log.d(TAG, LoadRecentPhotos(databaseReference)?.size.toString())
                 LazyRow {
                     LoadRecentPhotos(databaseReference)?.forEach { photo ->
                         Log.d(TAG, "TESTAR SEI LA ")
@@ -308,6 +309,8 @@ fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>? {
 
         }
 
+        Log.d(TAG, "tamanho da photosList")
+        Log.d(TAG, photosList.size.toString())
         // Retorna a lista de fotos
         photosList
     }
