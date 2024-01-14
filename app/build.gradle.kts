@@ -70,7 +70,7 @@ dependencies {
     //Navigation
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     //Coil compose para carregar profile imagens
-    implementation ("io.coil-kt:coil-compose:2.2.2")
+    implementation ("io.coil-kt:coil-compose:2.4.0")
     implementation("com.google.firebase:firebase-auth:22.3.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
 
@@ -121,7 +121,6 @@ dependencies {
 
 
     implementation("dev.chrisbanes.accompanist:accompanist-glide:0.4.2")
-    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.2")
     implementation ("com.google.android.gms:play-services-tasks:17.2.2")
 

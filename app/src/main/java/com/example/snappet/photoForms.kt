@@ -226,8 +226,13 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
-                var photo = Photo(uri, photoType!!, contextPhotoType!!, descriptionPhoto!!)
 
+
+
+
+
+                var savedUri = saveImageToMediaStore(takenPicture,context,file)
+                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!)
                 Log.d(TAG, "TIPOS DA FOTOS SEI LA")
                 Log.d(TAG, photo.imageUri.toString())
                 Log.d(TAG, photo.animalType)
@@ -239,9 +244,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 Log.d(TAG, "DESCRICAO DAS FOTOS SEI LA")
                 Log.d(TAG, photo.imageUri.toString())
                 Log.d(TAG, photo.description)
-
-
-                saveImageToMediaStore(takenPicture,context,file)
                 uploadImageToStorage(fileName, imageBitmap);
                 uploadPhotoToDatabase(photo)
             },
@@ -370,7 +372,7 @@ private fun uploadPhotoToDatabase(photo: Photo) {
 
 
 
-private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File) {
+private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File): Uri? {
     val folderName = "Snappet"
 
     val contentValues = ContentValues().apply {
@@ -390,8 +392,15 @@ private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File) 
         contentResolver.openOutputStream(imageUri)?.use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
+            Log.d(TAG, "VAMOS TESTAR");
+            Log.d(TAG, imageUri.toString())
         }
+
+        return imageUri
     }
+
+    return null
+
 }
 
 
