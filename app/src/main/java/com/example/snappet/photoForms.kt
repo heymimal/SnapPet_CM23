@@ -264,7 +264,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
 }
 
-// Function to upload the image to Firebase Storage
+
 private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)

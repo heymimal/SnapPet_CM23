@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Navigation
 import com.google.firebase.database.DataSnapshot
@@ -41,6 +41,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.coroutineScope
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,10 +54,17 @@ fun HomeMenu(navController: NavHostController) {
 
     var recentPhotos by remember { mutableStateOf<List<Photo>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        // Chame LoadRecentPhotos em uma coroutine
+    /*LaunchedEffect(Unit) {
         LoadRecentPhotos(databaseReference)?.let {
             recentPhotos = it
+        }
+    }*/
+
+    LaunchedEffect(Unit) {
+        coroutineScope {
+            LoadRecentPhotos(databaseReference)?.let {
+                recentPhotos = it
+            }
         }
     }
 
@@ -93,9 +103,12 @@ fun CardWithImageAndText(photo: Photo, text: String) {
                     .size(48.dp)
                     .clip(shape = MaterialTheme.shapes.medium)
             )*/
+            Log.d("ImageURL", photo.imageUri.toString())
 
             Image(
-                painter = rememberImagePainter(photo.imageUri),
+                //painter = rememberImagePainter(photo.imageUri),
+
+                painter = rememberAsyncImagePainter(photo.imageUri),
                 contentDescription = null,
                 modifier = Modifier
                     .size(48.dp)
@@ -155,15 +168,16 @@ fun ThreeByThreeGrid1(recentPhotos: List<Photo>) {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
                 Log.d(TAG, "TAMANHO")
                 Log.d(TAG, recentPhotos.size.toString())
-                Log.d(TAG, LoadRecentPhotos(databaseReference)?.size.toString())
+                Log.d(TAG, databaseReference.toString())
+                //Log.d(TAG, LoadRecentPhotos(databaseReference)?.size.toString())
                 LazyRow {
-                    LoadRecentPhotos(databaseReference)?.forEach { photo ->
+                    recentPhotos.forEach { photo ->
                         Log.d(TAG, "TESTAR SEI LA ")
                         Log.d(TAG, photo.animalType)
                         Log.d(TAG, photo.contextPhoto)
                         Log.d(TAG, photo.description)
                         Log.d(TAG, photo.imageUri.toString())
-                        item { CardWithImageAndText(photo = photo, text = "s")}
+                        item { CardWithImageAndText(photo = photo, text = photo.animalType)}
                     }
                 }
             }
@@ -220,116 +234,45 @@ fun ThreeByThreeGrid1(recentPhotos: List<Photo>) {
 }
 
 
-/*fun LoadRecentPhotos(databaseReference: DatabaseReference) {
-    // Consulta para obter as últimas N fotos (ajuste N conforme necessário)
-    val query = databaseReference.child("imagesTest")
-        .limitToLast(3) // Obtenha as últimas 3 fotos, por exemplo
+suspend fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>? =
+    suspendCoroutine { continuation ->
+        val query = databaseReference.child("imagesTest").child("allImages")
+            .limitToLast(3)
 
-    // Esta função será chamada quando os dados forem recuperados
-    val onDataChange = object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            // Aqui, você processa os dados obtidos do banco de dados
-            val photosList = mutableListOf<Photo>()
+        val onDataChange = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val photosList = mutableListOf<Photo>()
 
-            dataSnapshot.children.forEach { photoSnapshot ->
-                val imageUrl = photoSnapshot.child("imageUrl").getValue(String::class.java)
-                val animalType = photoSnapshot.child("animal").getValue(String::class.java)
-                val contextPhoto = photoSnapshot.child("context").getValue(String::class.java)
-                val description = photoSnapshot.child("description").getValue(String::class.java)
+                dataSnapshot.children.forEach { photoSnapshot ->
+                    val imageUrl = photoSnapshot.child("imageUrl").getValue(String::class.java)
+                    val animalType = photoSnapshot.child("animal").getValue(String::class.java)
+                    val contextPhoto = photoSnapshot.child("context").getValue(String::class.java)
+                    val description = photoSnapshot.child("description").getValue(String::class.java)
 
-                // Crie um objeto Photo com os dados
-                val photo = Photo(
-                    imageUri = Uri.parse(imageUrl),
-                    animalType = animalType.orEmpty(),
-                    contextPhoto = contextPhoto.orEmpty(),
-                    description = description.orEmpty()
-                )
+                    if (imageUrl != null) {
+                        val photo = Photo(
+                            imageUri = Uri.parse(imageUrl),
+                            animalType = animalType.orEmpty(),
+                            contextPhoto = contextPhoto.orEmpty(),
+                            description = description.orEmpty()
+                        )
 
-                // Adicione a foto à lista
-                photosList.add(photo)
+                        photosList.add(photo)
+                    }
+                }
+
+                continuation.resume(photosList)
             }
 
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-            // Esta função será chamada se houver um erro na recuperação dos dados
-            // Trate o erro conforme necessário
-            // Aqui você pode exibir uma mensagem de erro, fazer log, etc.
-        }
-    }
-
-    // Adicione um ouvinte de dados à consulta
-    query.addListenerForSingleValueEvent(onDataChange)
-}*/
-
-
-fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>? {
-    // Consulta para obter as últimas N fotos (ajuste N conforme necessário)
-    val query = databaseReference.child("imagesTest").child("allImages")
-        .limitToLast(3) // Obtenha as últimas 3 fotos, por exemplo
-
-    // Esta função será chamada quando os dados forem recuperados
-    val onDataChange: (DataSnapshot) -> List<Photo> = { dataSnapshot ->
-        // Aqui, você processa os dados obtidos do banco de dados
-        val photosList = mutableListOf<Photo>()
-
-        dataSnapshot.children.forEach { photoSnapshot ->
-            val imageUrl = photoSnapshot.child("imageUrl").getValue(String::class.java)
-            val animalType = photoSnapshot.child("animal").getValue(String::class.java)
-            val contextPhoto = photoSnapshot.child("context").getValue(String::class.java)
-            val description = photoSnapshot.child("description").getValue(String::class.java)
-
-            if(imageUrl != null){
-                // Crie um objeto Photo com os dados
-                Log.d(TAG, "não é nulo lol")
-                //Log.d(TAG, imageUrl!!)
-                Log.d(TAG, animalType!!)
-                Log.d(TAG, contextPhoto!!)
-                Log.d(TAG, description!!)
-                val photo = Photo(
-                    imageUri = Uri.parse(imageUrl),
-                    animalType = animalType.orEmpty(),
-                    contextPhoto = contextPhoto.orEmpty(),
-                    description = description.orEmpty()
-
-                )
-
-                photosList.add(photo)
-            }else{
-                Log.d(TAG, "é nulo lol")
-                //Log.d(TAG, imageUrl!!)
-                Log.d(TAG, animalType!!)
-                Log.d(TAG, contextPhoto!!)
-                Log.d(TAG, description!!)
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "Error loading photos from database: ${databaseError.message}")
+                continuation.resume(null)
             }
-
-
-
-            // Adicione a foto à lista
-
         }
 
-        Log.d(TAG, "tamanho da photosList")
-        Log.d(TAG, photosList.size.toString())
-        // Retorna a lista de fotos
-        photosList
+        query.addListenerForSingleValueEvent(onDataChange)
     }
 
-    // Configurar o ouvinte para a consulta
-    query.addValueEventListener(object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            // Chama a função onDataChange quando os dados são alterados
-            onDataChange(dataSnapshot)
-        }
-
-        override fun onCancelled(databaseError: DatabaseError) {
-            // Lidar com erros, se necessário
-        }
-    })
-
-    // Retorna null por padrão (você pode ajustar isso conforme necessário)
-    return null
-}
 
 
 
