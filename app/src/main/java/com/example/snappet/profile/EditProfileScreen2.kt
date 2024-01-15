@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +47,7 @@ import com.example.snappet.sign_In.UserData
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.snappet.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,12 +67,12 @@ fun EditProfileScreen2_nav(profileViewModel: ProfileViewModel,navController : Na
             Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
-        EditProfileScreen2(userDataState, userData, onSignOut)
+        EditProfileScreen2(userDataState, userData, onSignOut,navController)
 
         //Text(text = "Hello")
     }
-}
 
+}
 
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,13 +85,9 @@ fun EditProfileScreen2(
     userData: UserData?,
     //queremos ter um lambeda quando ele fizer sign out
     //ele recebe esta função como paramentro de entrada
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    navController: NavController,
 ) {
-    val navController = rememberNavController()
-
-        //substitui isto
-        //EditProfile()
-        //por isto:------------------------------------------------------------------------------------
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,7 +96,7 @@ fun EditProfileScreen2(
         ) {
             Text(
                 text = "Edit Profile",
-                color = Color.Black,
+                color = Color.White, // Change to Color.White for white text
                 style = TextStyle(fontSize = 25.sp),
                 modifier = Modifier
                     .align(alignment = Alignment.CenterHorizontally)
@@ -147,49 +145,44 @@ fun EditProfileScreen2(
             Spacer(modifier = Modifier.height(15.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                    //horizontalArrangement = Arrangement.SpaceBetween,
-                    .padding(start = 0.dp, end = 16.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Start
-            ){
-                if(userData?.profilePictureUrl != null) {
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // User profile picture
+                if (userData?.profilePictureUrl != null) {
                     AsyncImage(
                         model = userData.profilePictureUrl,
-                        //descrição da imagem
                         contentDescription = "Profile picture",
-                        //o tamanho que a imagem vai ter
                         modifier = Modifier
                             .size(120.dp)
-                            //clipar a imagem para uma forma circular
                             .clip(CircleShape),
-                        //faz crop da imagem (retira porções indesejadas da imagem)
                         contentScale = ContentScale.Crop
                     )
                 }
-                //em vez desta imagem user o AsyncImage de cima), mas mantive as dimensões
-                /*Image(
-                    painter = painterResource(id = R.drawable.profilepic),
-                    contentDescription = null,
+
+                // Buttons (Update and Logout)
+                Column(
                     modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .padding(end = 16.dp)
-                )*/
+                        .padding(start = 16.dp),
 
-                Button(
-                    onClick = { /* Ação do botão Update */ },
-                    modifier = Modifier.padding(start = 16.dp)
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Update")
-                }
+                    Button(
+                        onClick = { /* Ação do botão Update */ },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp) // Adjust the spacing between buttons
+                    ) {
+                        Text(text = "Update")
+                    }
 
-                //Botão para logout
-                Button(
-                    onClick = onSignOut,
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(text = "Logout")
+                    Button(
+                        onClick = onSignOut,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Logout")
+                    }
                 }
             }
 
@@ -237,142 +230,23 @@ fun EditProfileScreen2(
             modifier = Modifier.fillMaxSize()
         ){
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(route = Screens.Leaderboard.route)
+                },
                 shape = RoundedCornerShape(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
                 modifier = Modifier
                     .align(alignment = Alignment.TopStart)
                     .offset(
-                        x = 246.dp,
+                        x = 200.dp,
                         y = 680.dp
                     )
                     .height(50.dp)
-                    .width(100.dp)
+                    .width(170.dp)
 
             )
             {
-                Text(text = "Next", style = TextStyle(fontSize = 20.sp))
+                Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
             }
         }
-        //até aqui:-------------------------------------------------------------------------------------
-
-        //Text(text = "Hello")
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditProfile(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "Edit Profile",
-            color = Color.Black,
-            style = TextStyle(fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .offset(y = 29.dp)
-        )
-
-        Spacer(modifier = Modifier.height(50.dp))
-
-
-        Text(
-            text = "Profile Image",
-            color = Color.Black,
-            fontWeight = FontWeight.Bold,
-            style = TextStyle(fontSize = 20.sp)
-        )
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            //horizontalArrangement = Arrangement.SpaceBetween,
-            .padding(start = 0.dp, end = 16.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Start
-        ){
-            Image(
-                painter = painterResource(id = R.drawable.profilepic),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .padding(end = 16.dp)
-            )
-
-            Button(
-                onClick = { /* Ação do botão Update */ },
-                modifier = Modifier.padding(start = 16.dp)
-            ) {
-                Text(text = "Update")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(50.dp))
-
-        TextField(
-            value = "",
-            onValueChange = {/*TODO*/},
-            label = {Text("Username")},
-            modifier = Modifier.fillMaxWidth())
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        TextField(
-            value = "",
-            onValueChange = {/*TODO*/},
-            label = {Text("Password")},
-            modifier = Modifier.fillMaxWidth())
-
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-        Button(
-            onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 26.dp,
-                    y = 680.dp
-                )
-                .height(50.dp)
-                .width(100.dp)
-
-        )
-        {
-            Text(text = "Back", style = TextStyle(fontSize = 20.sp))
-        }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ){
-        Button(
-            onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 246.dp,
-                    y = 680.dp
-                )
-                .height(50.dp)
-                .width(100.dp)
-
-        )
-        {
-            Text(text = "Next", style = TextStyle(fontSize = 20.sp))
-        }
-    }
 }

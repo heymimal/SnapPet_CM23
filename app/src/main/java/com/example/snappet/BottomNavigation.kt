@@ -116,7 +116,7 @@ fun Navigation(navController: NavController){
             selected = selectedItem == 4,
             onClick = { selectedItem = 4
                 //acrescentei isto para navegar para o profile
-                navController.navigate("profile")},
+                navController.navigate(Screens.Profile.route)},
             label = {
                 Text("Profile")
             },

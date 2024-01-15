@@ -37,6 +37,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.snappet.screens.DayInfo
+import com.example.snappet.screens.leaderboardNav
 import com.jakewharton.threetenabp.AndroidThreeTen
 import java.time.LocalDate
 import java.time.ZoneId
@@ -154,7 +155,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         //agora é para o profile
-                        composable("profile"){
+                        composable(Screens.Profile.route){
                             val profileViewModel: ProfileViewModel = viewModel()
                             val database = Firebase.database
                             var userData = googleAuthUiClient.getSignedInUser()
@@ -235,6 +236,66 @@ class MainActivity : ComponentActivity() {
                                         println("Error: ${databaseError.message}")
                                     }
                                 })
+
+                                //SO PARA TESTAR DEPOIS TIRAR ISTO!
+                                /*val thisUser2 = myReference.child("9999")
+                                thisUser2.child("username").setValue("tester2")
+                                thisUser2.child("snaPoints").setValue("100")
+                                val thisUser3 = myReference.child("9998")
+                                thisUser3.child("username").setValue("tester3")
+                                thisUser3.child("snaPoints").setValue("150")
+                                val thisUser4 = myReference.child("9997")
+                                thisUser4.child("username").setValue("tester4")
+                                thisUser4.child("snaPoints").setValue("200")
+                                val thisUser5 = myReference.child("9996")
+                                thisUser5.child("username").setValue("tester5")
+                                thisUser5.child("snaPoints").setValue("250")
+                                val thisUser6 = myReference.child("9995")
+                                thisUser6.child("username").setValue("tester6")
+                                thisUser6.child("snaPoints").setValue("260")
+                                val thisUser7 = myReference.child("9994")
+                                thisUser7.child("username").setValue("tester7")
+                                thisUser7.child("snaPoints").setValue("270")
+                                val thisUser8 = myReference.child("9993")
+                                thisUser8.child("username").setValue("tester8")
+                                thisUser8.child("snaPoints").setValue("280")
+                                val thisUser9 = myReference.child("9992")
+                                thisUser9.child("username").setValue("tester9")
+                                thisUser9.child("snaPoints").setValue("290")
+                                val thisUser10 = myReference.child("9991")
+                                thisUser10.child("username").setValue("tester10")
+                                thisUser10.child("snaPoints").setValue("300")
+                                val thisUser11 = myReference.child("9990")
+                                thisUser11.child("username").setValue("tester11")
+                                thisUser11.child("snaPoints").setValue("310")
+                                val thisUser12 = myReference.child("9989")
+                                thisUser12.child("username").setValue("tester12")
+                                thisUser12.child("snaPoints").setValue("320")
+                                val thisUser13 = myReference.child("9988")
+                                thisUser13.child("username").setValue("tester13")
+                                thisUser13.child("snaPoints").setValue("330")
+                                val thisUser14 = myReference.child("9987")
+                                thisUser14.child("username").setValue("tester14")
+                                thisUser14.child("snaPoints").setValue("340")
+                                val thisUser15 = myReference.child("9986")
+                                thisUser15.child("username").setValue("tester15")
+                                thisUser15.child("snaPoints").setValue("350")
+                                val thisUser16 = myReference.child("9985")
+                                thisUser16.child("username").setValue("tester16")
+                                thisUser16.child("snaPoints").setValue("360")
+                                val thisUser17 = myReference.child("9984")
+                                thisUser17.child("username").setValue("tester17")
+                                thisUser17.child("snaPoints").setValue("370")
+                                val thisUser18 = myReference.child("9983")
+                                thisUser18.child("username").setValue("tester18")
+                                thisUser18.child("snaPoints").setValue("380")
+                                val thisUser19 = myReference.child("9982")
+                                thisUser19.child("username").setValue("tester19")
+                                thisUser19.child("snaPoints").setValue("390")
+                                val thisUser20 = myReference.child("9981")
+                                thisUser20.child("username").setValue("tester20")
+                                thisUser20.child("snaPoints").setValue("390")*/
+
                                 val loginStreakDataState by loginStreakViewModel.loginStreakData.observeAsState()
                                 //testeLoginStreak = loginStreakDataState!!
                                 val snaPointsDataState by loginStreakViewModel.snaPointsData.observeAsState()
@@ -290,6 +351,7 @@ class MainActivity : ComponentActivity() {
                                                 println("Error updating user data: ${task.exception}")
                                             }
                                         }
+
                                         // Call the composable function here, passing the updatedPoints
                                         loginStreakNav(
                                             loginStreakViewModel,
@@ -305,13 +367,24 @@ class MainActivity : ComponentActivity() {
                             loginStreakNav(loginStreakViewModel,navController,updatedPoints,testeLoginStreak)
                         }
 
+                        composable(route = Screens.Leaderboard.route){
+                            val leaderboardViewModel: LeaderboardViewModel = viewModel()
+
+                            LaunchedEffect(Unit) {
+                                // Fetch leaderboard data here
+                                leaderboardViewModel.fetchLeaderboardData()
+                            }
+
+                            // Call the composable function here, passing the ViewModel
+                            leaderboardNav(navController,leaderboardViewModel.leaderboardData.value ?: emptyList())
+                        }
+
                         composable(route = Screens.Home.route) {
                             menuBottomNav(navController)
                         }
                         composable("map_route") {
                         }
                         composable("camera_route") {
-
                         }
                         composable(route = Screens.Trophies.route) {
                             Trophies_nav(navController)
