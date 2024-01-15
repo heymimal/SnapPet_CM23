@@ -227,12 +227,9 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
 
-
-
-
-
                 var savedUri = saveImageToMediaStore(takenPicture,context,file)
                 var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!)
+
                 Log.d(TAG, "TIPOS DA FOTOS SEI LA")
                 Log.d(TAG, photo.imageUri.toString())
                 Log.d(TAG, photo.animalType)

@@ -16,14 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.compose.ui.text.font.FontWeight
-import com.example.snappet.LeaderboardUserData
-import com.example.snappet.Navigation
+import androidx.navigation.NavHostController
+import com.example.snappet.viewModels.LeaderboardUserData
+import com.example.snappet.navigation.Navigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun leaderboardNav(navController: NavController, leaderboardData: List<LeaderboardUserData>) {
+fun leaderboardNav(navController: NavHostController, leaderboardData: List<LeaderboardUserData>) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {

@@ -1,5 +1,6 @@
 package com.example.snappet.profile
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,30 +33,53 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.snappet.navigation.Navigation
+import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.sign_In.UserData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.navigation.NavHostController
+import com.example.snappet.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController : NavHostController, userData: UserData?,
-                  onSignOut: () -> Unit) {
+fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostController,
+                  userData: UserData?,
+    //queremos ter um lambeda quando ele fizer sign out
+    //ele recebe esta função como paramentro de entrada
+                  onSignOut: () -> Unit
+                          ) {
+    val userDataState by profileViewModel.userData.observeAsState()
+    // Check the current value of userDataState whenever it changes
+    //println("userDataState: $userDataState")
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Navigation(navController = navController)
+            Navigation(navController =navController)
         }) {paddingValues ->
-        Text(text = " ", modifier = Modifier.padding(paddingValues = paddingValues))
-        UserProfileScreen(userData, onSignOut)
+        Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
+        ProfileScreenComposable(userDataState, userData, onSignOut,navController)
+
+        //Text(text = "Hello")
     }
+
 }
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen(
+//para este Screen não precisamos de um view model pois ele não
+// contém nenhum estado nem nada que "mude" ao longo do tempo
+//só mostra user data estática
+fun ProfileScreenComposable(
+    final : UserData?,
     userData: UserData?,
-    onSignOut: () -> Unit
+    //queremos ter um lambeda quando ele fizer sign out
+    //ele recebe esta função como paramentro de entrada
+    onSignOut: () -> Unit,
+    navController: NavController,
 ) {
         Column(
             modifier = Modifier
@@ -65,7 +89,7 @@ fun UserProfileScreen(
         ) {
             Text(
                 text = "Edit Profile",
-                color = Color.Black,
+                color = Color.White, // Change to Color.White for white text
                 style = TextStyle(fontSize = 25.sp),
                 modifier = Modifier
                     .align(alignment = Alignment.CenterHorizontally)
@@ -75,84 +99,53 @@ fun UserProfileScreen(
             Spacer(modifier = Modifier.height(50.dp))
 
 
+            /*Text(
+                text = "Profile Image",
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+                style = TextStyle(fontSize = 20.sp)
+            )*/
             //Texto para o username
             //se o userData não tiver um user name que seja nulo
             if(userData?.username != null) {
                 Text(
+                    //mostra o username
                     text = userData.username,
+                    //o texto vai ser centrado
                     textAlign = TextAlign.Center,
+                    //tamanho do texto
                     fontSize = 20.sp,
+                    //por negrito no texto
                     fontWeight = FontWeight.SemiBold
                 )
+
+                if (final != null) {
+                    Text(
+                        //mostra os pontos
+                        text = "SnapPoints: "+final.snaPoints,
+                        //o texto vai ser centrado
+                        textAlign = TextAlign.Center,
+                        //tamanho do texto
+                        fontSize = 20.sp,
+                        //por negrito no texto
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                //espacinho depois do username
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            /*Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                    //horizontalArrangement = Arrangement.SpaceBetween,
-                    .padding(start = 0.dp, end = 16.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Start
-            ){
-                if(userData?.profilePictureUrl != null) {
-                    AsyncImage(
-                        model = userData.profilePictureUrl,
-                        //descrição da imagem
-                        contentDescription = "Profile picture",
-                        //o tamanho que a imagem vai ter
-                        modifier = Modifier
-                            .size(120.dp)
-                            //clipar a imagem para uma forma circular
-                            .clip(CircleShape),
-                        //faz crop da imagem (retira porções indesejadas da imagem)
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                //em vez desta imagem user o AsyncImage de cima), mas mantive as dimensões
-                /*Image(
-                    painter = painterResource(id = R.drawable.profilepic),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(CircleShape)
-                        .padding(end = 16.dp)
-                )*/
-
-                Button(
-                    onClick = { /* Ação do botão Update */ },
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(text = "Update")
-                }
-
-                //Botão para logout
-                Button(
-                    onClick = onSignOut,
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(text = "Logout")
-                }
-            }
-*/
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                    .padding(start = 0.dp, end = 16.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Start
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
-                    onClick = { /* Ação do botão Update */ },
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(text = "Update")
-                }
-
+                // User profile picture
                 if (userData?.profilePictureUrl != null) {
                     AsyncImage(
                         model = userData.profilePictureUrl,
-                        // descrição da imagem
                         contentDescription = "Profile picture",
                         modifier = Modifier
                             .size(120.dp)
@@ -161,15 +154,30 @@ fun UserProfileScreen(
                     )
                 }
 
-                Button(
-                    onClick = onSignOut,
-                    modifier = Modifier.padding(start = 16.dp).width(250.dp)
+                // Buttons (Update and Logout)
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp),
 
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "Logout")
+                    Button(
+                        onClick = { /* Ação do botão Update */ },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp) // Adjust the spacing between buttons
+                    ) {
+                        Text(text = "Update")
+                    }
+
+                    Button(
+                        onClick = onSignOut,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Logout")
+                    }
                 }
             }
-
 
             Spacer(modifier = Modifier.height(50.dp))
 
@@ -193,43 +201,23 @@ fun UserProfileScreen(
             modifier = Modifier.fillMaxSize()
         ){
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(route = Screens.Leaderboard.route)
+                },
                 shape = RoundedCornerShape(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
                 modifier = Modifier
                     .align(alignment = Alignment.TopStart)
                     .offset(
-                        x = 26.dp,
+                        x = 200.dp,
                         y = 680.dp
                     )
                     .height(50.dp)
-                    .width(100.dp)
+                    .width(170.dp)
 
             )
             {
-                Text(text = "Back", style = TextStyle(fontSize = 20.sp))
-            }
-        }
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ){
-            Button(
-                onClick = { /*TODO*/ },
-                shape = RoundedCornerShape(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 246.dp,
-                        y = 680.dp
-                    )
-                    .height(50.dp)
-                    .width(100.dp)
-
-            )
-            {
-                Text(text = "Next", style = TextStyle(fontSize = 20.sp))
+                Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
             }
         }
 }
