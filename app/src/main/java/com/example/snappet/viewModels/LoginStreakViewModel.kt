@@ -1,8 +1,7 @@
-package com.example.snappet
+package com.example.snappet.viewModels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.snappet.sign_In.UserData
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase

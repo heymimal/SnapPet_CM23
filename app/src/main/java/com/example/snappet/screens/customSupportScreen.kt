@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.Navigation
+import com.example.snappet.navigation.Navigation
 import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)

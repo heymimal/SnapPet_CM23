@@ -7,10 +7,9 @@ sealed class Screens(val route:String){
     object Leaderboard : Screens ("leaderboard_route")
 
     object Home : Screens("home_route")
-    object Map : Screens("map_route")
-    object Profile : Screens("profile_route")
+    object Profile : Screens("profile")
     object Trophies: Screens("trophies_route")
 
-    object Camera: Screens("camera_route")
+    object Camera: Screens("camera")
 
 }

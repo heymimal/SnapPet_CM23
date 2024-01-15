@@ -65,6 +65,7 @@ dependencies {
 
     implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
+
     //Firebase
     //implementation ("com.google.firebase:firebase-auth-ktx:21.1.0")
     implementation ("com.google.android.gms:play-services-auth:20.4.1")
@@ -78,6 +79,20 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.3.0")
     //RealTime Database
     implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // Retrofit with Kotlin serialization Converter
+
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    // Kotlin serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
+
+
     //-----------------Adicionei o que esta encima-------------------
 
     //dependency for the navigation.
@@ -109,6 +124,13 @@ dependencies {
     implementation ("androidx.camera:camera-video:${camerax_version}")
     implementation ("androidx.camera:camera-view:${camerax_version}")
     implementation ("androidx.camera:camera-extensions:${camerax_version}")
+
+
+    implementation("dev.chrisbanes.accompanist:accompanist-glide:0.4.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.2")
+    implementation ("com.google.android.gms:play-services-tasks:17.2.2")
+
+
 
 
     testImplementation("junit:junit:4.13.2")

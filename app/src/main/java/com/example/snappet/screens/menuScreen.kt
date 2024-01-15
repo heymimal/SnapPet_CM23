@@ -1,5 +1,8 @@
 package com.example.snappet.screens
 
+import android.content.ContentValues.TAG
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,34 +21,68 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.snappet.Navigation
-import com.example.snappet.R
+import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
+import com.example.snappet.data.Photo
+import com.example.snappet.navigation.Navigation
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun menuBottomNav(navController: NavController) {
+fun HomeMenu(navController: NavHostController) {
+
+    val database = Firebase.database
+    val databaseReference = database.reference
+
+    //var recentPhotos by remember { mutableStateOf<List<Photo>>(emptyList()) }
+    //var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+    /*LaunchedEffect(Unit) {
+        LoadRecentPhotos(databaseReference)?.let {
+            recentPhotos = it
+        }
+    }*/
+
+    /*LaunchedEffect(Unit) {
+        coroutineScope {
+            LoadRecentPhotos(databaseReference)?.let {
+                recentPhotos = it
+            }
+        }
+    }*/
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             Navigation(navController =navController)
         }) {paddingValues ->
-        Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
+        Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
         ThreeByThreeGrid1()
 
-        //Text(text = "Hello")
     }
 }
 
+
 @Composable
-fun CardWithImageAndText(imageVector: ImageVector, text: String) {
+fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -64,8 +97,17 @@ fun CardWithImageAndText(imageVector: ImageVector, text: String) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Image(
+            /*Image(
                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(shape = MaterialTheme.shapes.medium)
+            )*/
+            Log.d("ImageURL", photo.imageUri.toString())
+
+            Image(
+                painter = rememberImagePainter(imageUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(48.dp)
@@ -85,16 +127,63 @@ fun CardWithImageAndText(imageVector: ImageVector, text: String) {
     }
 }
 
-
 @Composable
 fun ThreeByThreeGrid1() {
+
+    //val database = Firebase.database
+    //val databaseReference = database.reference
+    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    //val databaseReference: DatabaseReference = database.reference.child("images")
+    //val databaseReference: DatabaseReference = database.reference.child("images").child(userDisplayName ?: "")
+    val databaseReference: DatabaseReference = database.reference.child("imagesTest").child("allImages")
+
+    var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+    // Retrieve recent photos from the Realtime Database
+    LaunchedEffect(key1 = databaseReference) {
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val photos = mutableListOf<Photo>()
+                for (childSnapshot in dataSnapshot.children) {
+                    val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+                    val animalType = childSnapshot.child("animal").getValue(String::class.java)
+                    val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
+                    val description = childSnapshot.child("description").getValue(String::class.java)
+
+                    Log.d(TAG, "Image URLLL: $imageUrl")
+
+                    imageUrl?.let {
+                        val photo = Photo(
+                            imageUri = Uri.parse(it),
+                            animalType = animalType ?: "",
+                            contextPhoto = contextPhoto ?: "",
+                            description = description ?: ""
+                        )
+                        photos.add(photo)
+
+                        Log.d(TAG, "Teste 22222 -> : ${photo.imageUri.toString()}")
+                        Log.d(TAG, "Teste 33333 -> : ${Uri.parse(imageUrl)}")
+                    }
+                }
+                recentPhotos = photos
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle error
+            }
+        }
+        databaseReference.addValueEventListener(valueEventListener)
+
+
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         // First Row: "Animais"
-        item {
+       /* item {
             Column {
                 Text("Animais", fontWeight = FontWeight.Bold)
                 LazyRow {
@@ -103,11 +192,11 @@ fun ThreeByThreeGrid1() {
                     item { CardWithImageAndText(Icons.Default.Place, "Peacock") }
                 }
             }
-        }
+        }*/
 
 
         // Second Row: "Most Recent Photos"
-        item {
+        /*item {
             Column {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
                 LazyRow {
@@ -116,9 +205,29 @@ fun ThreeByThreeGrid1() {
                     item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
                 }
             }
+        }*/
+        item {
+            Column {
+                Text("Recent Photos", fontWeight = FontWeight.Bold)
+                //Log.d(TAG, LoadRecentPhotos(databaseReference)?.size.toString())
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        Log.d(TAG, "TESTAR SEI LA ")
+                        Log.d(TAG, photo.animalType)
+                        Log.d(TAG, photo.contextPhoto)
+                        Log.d(TAG, photo.description)
+                        Log.d(TAG, photo.imageUri.toString())
+                        Log.d(TAG, "Teste 1 -> : ${photo.imageUri.toString()}")
+                        Log.d(TAG, "")
+                        item { CardWithImageAndText(photo = photo, photo.imageUri.toString(), text = photo.animalType)}
+                    }
+                }
+            }
+
+
         }
 
-        item {
+        /*item {
             Column {
                 Text("Most Popular Photos", fontWeight = FontWeight.Bold)
                 LazyRow {
@@ -160,8 +269,66 @@ fun ThreeByThreeGrid1() {
                     item { CardWithImageAndText(Icons.Default.Place, "Dog3") }
                 }
             }
-        }
+        }*/
 
 
     }
 }
+
+
+suspend fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>? =
+    suspendCoroutine { continuation ->
+        val query = databaseReference.child("imagesTest").child("allImages")
+            .limitToLast(3)
+
+        val onDataChange = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val photosList = mutableListOf<Photo>()
+
+                dataSnapshot.children.forEach { photoSnapshot ->
+                    val imageUrl = photoSnapshot.child("imageUrl").getValue(String::class.java)
+                    val animalType = photoSnapshot.child("animal").getValue(String::class.java)
+                    val contextPhoto = photoSnapshot.child("context").getValue(String::class.java)
+                    val description = photoSnapshot.child("description").getValue(String::class.java)
+
+                    if (imageUrl != null) {
+                        val photo = Photo(
+                            imageUri = Uri.parse(imageUrl),
+                            animalType = animalType.orEmpty(),
+                            contextPhoto = contextPhoto.orEmpty(),
+                            description = description.orEmpty()
+                        )
+
+
+
+                        photosList.add(photo)
+
+
+                    }
+                }
+
+                Log.d(TAG, "tamanho do photosList ")
+                Log.d(TAG, photosList.size.toString())
+                Log.d(TAG, photosList[0].imageUri.toString())
+
+
+                continuation.resume(photosList)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e(TAG, "Error loading photos from database: ${databaseError.message}")
+                continuation.resume(null)
+            }
+        }
+
+        query.addListenerForSingleValueEvent(onDataChange)
+    }
+
+
+
+
+
+
+
+
+data class ImageData(val path: String, val name: String)

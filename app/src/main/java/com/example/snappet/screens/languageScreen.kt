@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.Navigation
+import com.example.snappet.navigation.Navigation
 import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +43,6 @@ fun languageNavBar() {
         }) {paddingValues ->
         Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
         Language()
-
-        //Text(text = "Hello")
     }
 }
 
@@ -129,160 +127,3 @@ fun LanguageButton(text: String, imageId: Int) {
 private fun LanguagePreview() {
     languageNavBar()
 }
-
-/*
-Text(
-            text = "Change Language",
-            color = Color.Black,
-            style = TextStyle(
-                fontSize = 25.sp),
-            modifier = Modifier
-                .align(alignment = Alignment.TopCenter)
-                .offset(
-                    x = 0.dp,
-                    y = 29.dp
-                ))
-        Box(
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 26.dp,
-                    y = 146.dp
-                )
-                .requiredWidth(width = 308.dp)
-                .requiredHeight(height = 61.dp)
-        ) {
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffd9d9d9)),
-                modifier = Modifier
-                    .requiredWidth(width = 308.dp)
-                    .requiredHeight(height = 61.dp)){ }
-            Text(
-                text = "English",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 25.sp),
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 18.dp,
-                        y = 15.dp
-                    ))
-            Image(
-                painter = painterResource(id = R.drawable.british),
-                contentDescription = "image 5",
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterStart)
-                    .offset(
-                        x = 244.dp,
-                        y = (-0.5).dp
-                    )
-                    .requiredSize(size = 50.dp))
-        }
-        Box(
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 28.dp,
-                    y = 266.dp
-                )
-                .requiredWidth(width = 308.dp)
-                .requiredHeight(height = 61.dp)
-        ) {
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffd9d9d9)),
-                modifier = Modifier
-                    .requiredWidth(width = 308.dp)
-                    .requiredHeight(height = 61.dp)){ }
-            Text(
-                text = "Português",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 25.sp),
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 16.dp,
-                        y = 15.dp
-                    ))
-            Image(
-                painter = painterResource(id = R.drawable.portuguese),
-                contentDescription = "image 6",
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterStart)
-                    .offset(
-                        x = 242.dp,
-                        y = (-0.5).dp
-                    )
-                    .requiredSize(size = 50.dp))
-        }
-        Box(
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 28.dp,
-                    y = 386.dp
-                )
-                .requiredWidth(width = 308.dp)
-                .requiredHeight(height = 61.dp)
-        ) {
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffd9d9d9)),
-                modifier = Modifier
-                    .requiredWidth(width = 308.dp)
-                    .requiredHeight(height = 61.dp)){ }
-            Text(
-                text = "Espanol",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 25.sp),
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 17.dp,
-                        y = 16.dp
-                    ))
-            Image(
-                painter = painterResource(id = R.drawable.spanish),
-                contentDescription = "image 7",
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterStart)
-                    .offset(
-                        x = 242.dp,
-                        y = (-0.5).dp
-                    )
-                    .requiredSize(size = 50.dp))
-        }
-        Box(
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 26.dp,
-                    y = 640.dp
-                )
-                .requiredWidth(width = 84.dp)
-                .requiredHeight(height = 52.dp)
-        ) {
-            Button(
-                onClick = { },
-                shape = RoundedCornerShape(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-                modifier = Modifier
-                    .requiredWidth(width = 84.dp)
-                    .requiredHeight(height = 52.dp)){ }
-            Text(
-                text = "Back",
-                color = Color.Black,
-                style = TextStyle(
-                    fontSize = 20.sp),
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 19.dp,
-                        y = 14.dp
-                    ))
-        }
- */

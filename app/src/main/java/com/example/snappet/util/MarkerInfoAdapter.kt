@@ -1,9 +1,11 @@
-package com.example.snappet
+package com.example.snappet.util
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
+import com.example.snappet.R
+import com.example.snappet.activity.Place
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 
@@ -19,7 +21,7 @@ class MarkerInfoAdapter(private val context: Context) : GoogleMap.InfoWindowAdap
 
         view.findViewById<TextView>(R.id.txt_title).text = place.name
         view.findViewById<TextView>(R.id.txt_address).text = place.address
-        view.findViewById<TextView>(R.id.txt_rating).text = context.getString(R.string.rating, place.rating)
+        view.findViewById<TextView>(R.id.txt_likes).text = context.getString(R.string.likes, place.likes)
         view.findViewById<TextView>(R.id.txt_info).text = place.info
 
         return view

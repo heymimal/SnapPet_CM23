@@ -29,12 +29,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.Navigation
+import com.example.snappet.navigation.Navigation
 import com.example.snappet.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar6() {
+fun ReportProblemsScreen() {
     val navController = rememberNavController()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -133,7 +133,7 @@ fun ReportProblem(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun ReportProblemPreview() {
-    BottomNavigationBar6()
+    ReportProblemsScreen()
 }
 
 /*

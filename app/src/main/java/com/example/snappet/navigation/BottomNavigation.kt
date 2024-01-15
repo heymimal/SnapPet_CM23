@@ -1,6 +1,7 @@
-package com.example.snappet
+package com.example.snappet.navigation
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -21,8 +22,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.navigation.Screens
+//import com.example.snappet.activity.CameraActivity
+import com.example.snappet.activity.MapActivity
+import com.example.snappet.R
+import com.google.firebase.appcheck.internal.util.Logger.TAG
+import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,12 +46,13 @@ fun BottomNavigationBar() {
 }
 
 @Composable
-fun Navigation(navController: NavController){
+fun Navigation(navController: NavHostController){
     var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Home","Map","Camera","Trophy","Profile")
-    val routes = listOf("route")
 
     val context = LocalContext.current
+
+    Log.d(TAG,navController.graph.toString())
 
     NavigationBar(
         contentColor = Color(239,139,9)
@@ -85,8 +92,9 @@ fun Navigation(navController: NavController){
         NavigationBarItem(
             selected = selectedItem == 2,
             onClick = { selectedItem = 2
-                      val intent = Intent(context, CameraActivity::class.java)
-                        context.startActivity(intent)
+                        //val intent = Intent(context, CameraActivity::class.java)
+                        //context.startActivity(intent)
+                navController.navigate("Camera")
                       },
             label = {
                 Text("Camera")

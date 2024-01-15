@@ -1,10 +1,6 @@
-package com.example.snappet
+package com.example.snappet.viewModels
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.State
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.snappet.sign_In.UserData
