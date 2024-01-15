@@ -12,5 +12,8 @@ data class UserData(
     val userId: String,
     val username: String?,
     //o "?" significa nullable state (nem todos os users podem ter foto)
-    val profilePictureUrl: String?
+    val profilePictureUrl: String?,
+
+    //user points
+    val snaPoints: String? = "0"
 )

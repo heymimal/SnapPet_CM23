@@ -13,6 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.snappet"
+        //minSdk = 24
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -59,6 +60,10 @@ android {
 
 dependencies {
 
+    //ThreeTenABP (used to get dates)
+    implementation ("com.jakewharton.threetenabp:threetenabp:1.3.0")
+
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.4")
 
 
     //Firebase
@@ -70,8 +75,10 @@ dependencies {
     //Navigation
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     //Coil compose para carregar profile imagens
-    implementation ("io.coil-kt:coil-compose:2.4.0")
+    implementation ("io.coil-kt:coil-compose:2.2.2")
     implementation("com.google.firebase:firebase-auth:22.3.0")
+    //RealTime Database
+    implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
 
     // Retrofit
@@ -108,8 +115,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.google.firebase:firebase-database:20.3.0")
-
+    implementation("androidx.navigation:navigation-runtime-ktx:2.7.5")
 
     val camerax_version = "1.2.2"
     implementation ("androidx.camera:camera-core:${camerax_version}")
