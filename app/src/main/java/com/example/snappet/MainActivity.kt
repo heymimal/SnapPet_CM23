@@ -39,11 +39,14 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
+import com.example.snappet.data.DailyMission
 import com.example.snappet.screens.DayInfo
 import com.example.snappet.screens.leaderboardNav
 import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
 import com.example.snappet.viewModels.ProfileViewModel
+import com.example.snappet.viewModels.ThrophiesViewModel
+import com.google.firebase.database.DatabaseReference
 import com.jakewharton.threetenabp.AndroidThreeTen
 import java.time.LocalDate
 import java.time.ZoneId
@@ -226,6 +229,8 @@ class MainActivity : ComponentActivity() {
                                             val dateString = "$dayOfMonth $monthValue $year"
                                             thisUserRef.child("LastLogin").setValue(dateString)
                                             //thisUserRef.child("LastLogin").setValue("1 1 1990")
+                                            createDailyMissions(thisUserRef)
+
                                         }
                                     }
 
@@ -268,6 +273,8 @@ class MainActivity : ComponentActivity() {
                                             testeLoginStreak
                                         )
                                     } else {
+                                        //novo dia, portanto ha que refrescar as missoes
+                                        refreshMissions(thisUserRef,dateString)
                                         // Increment by one
                                         testeLoginStreak++
                                         // Check if the value is 8 or above, then reset to 0
@@ -340,7 +347,16 @@ class MainActivity : ComponentActivity() {
 
                         }
                         composable(route = Screens.Trophies.route) {
-                            TrophiesNav(navController)
+                            val throphiesViewModel: ThrophiesViewModel = viewModel()
+                            val userData = googleAuthUiClient.getSignedInUser()
+
+                            LaunchedEffect(Unit) {
+                                if (userData != null) {
+                                    throphiesViewModel.fetchDailyMissions(userData.userId)
+                                }
+                            }
+                            val dailyMissions by throphiesViewModel.dailyMissionsData.observeAsState(emptyList())
+                            TrophiesNav(navController, dailyMissions ?: emptyList())
                         }
                     }
                 }
@@ -355,6 +371,58 @@ class MainActivity : ComponentActivity() {
         val providedDate = LocalDate.parse(dateString, formatter)
         val currentDate = LocalDate.now()
         return providedDate.isBefore(currentDate)
+    }
+
+    //creats the 4 first daily missions
+    private fun createDailyMissions(thisUserRef: DatabaseReference) {
+        val currentDate = LocalDate.now(ZoneId.systemDefault())
+        val dayOfMonth = currentDate.dayOfMonth
+        val monthValue = currentDate.monthValue
+        val year = currentDate.year
+        val dateString = "$dayOfMonth $monthValue $year"
+        thisUserRef.child("LastLogin").setValue(dateString)
+        val missionsReference = thisUserRef.child("DailyMissions")
+        missionsReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    // Create and store specific daily missions
+                    val missionList = listOf(
+                        DailyMission("DogMission", 3, 0, 10, "take 3 dog pictures",dateString),
+                        DailyMission("CatMission", 3, 0, 10, "take 3 cat pictures", dateString),
+                        DailyMission("BirdMission", 3, 0, 10, "take 3 bird pictures", dateString),
+                        DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString)
+                    )
+
+                    // Add each mission under the "Missions" node with a custom key
+                    for ((index, mission) in missionList.withIndex()) {
+                        missionsReference.child("DailyMission${index + 1}").setValue(mission)
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle errors
+            }
+        })
+    }
+
+    // refreshes the 4 daily missions
+    private fun refreshMissions(thisUserRef: DatabaseReference,dateString: String) {
+        // Reference to the "Missions" node
+        val missionsReference = thisUserRef.child("DailyMissions")
+
+        // Create and store specific daily missions with the same naming convention
+        val newMissionList = listOf(
+            DailyMission("DogMission", 3, 0, 10, "take 3 dog pictures",dateString),
+            DailyMission("CatMission", 3, 0, 10, "take 3 cat pictures", dateString),
+            DailyMission("BirdMission", 3, 0, 10, "take 3 bird pictures", dateString),
+            DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString)
+        )
+
+        // Replace existing missions with the new ones
+        for ((index, mission) in newMissionList.withIndex()) {
+            missionsReference.child("DailyMission${index + 1}").setValue(mission)
+        }
     }
 }
 

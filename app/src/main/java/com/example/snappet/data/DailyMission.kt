@@ -1,0 +1,11 @@
+package com.example.snappet.data
+
+data class DailyMission(
+    val missionType: String = "",
+    val goal: Int = 0,
+    var userProgress: Int = 0,
+    val points: Int = 0,
+    val missionDescription: String = "",
+    val createdDate: String = "",
+    val isCompleted: Boolean = false
+)
