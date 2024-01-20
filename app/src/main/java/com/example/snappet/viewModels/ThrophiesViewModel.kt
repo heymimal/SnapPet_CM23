@@ -25,7 +25,7 @@ class ThrophiesViewModel : ViewModel() {
                             userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: missionData?.userProgress ?: 0,
                             points = missionSnapshot.child("points").getValue(Int::class.java) ?: missionData?.points ?: 0,
                             missionDescription = missionSnapshot.child("missionDescription").getValue(String::class.java) ?: missionData?.missionDescription ?: "",
-                            isCompleted = missionSnapshot.child("isCompleted").getValue(Boolean::class.java) ?: missionData?.isCompleted ?: false,
+                            completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: missionData?.completed ?: false,
                             createdDate = missionSnapshot.child("createdDate").getValue(String::class.java) ?: missionData?.createdDate ?: ""
                         )
                     }

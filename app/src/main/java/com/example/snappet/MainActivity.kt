@@ -182,7 +182,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("Camera") {
-                            CameraClass(navController)
+                            var userData = googleAuthUiClient.getSignedInUser()
+                            if(userData != null) {
+                                CameraClass(navController, userData)
+                            }
                         }
                         //para ir para o Streak login screen
                         composable(route = Screens.Streak.route) {
@@ -387,10 +390,10 @@ class MainActivity : ComponentActivity() {
                 if (!dataSnapshot.exists()) {
                     // Create and store specific daily missions
                     val missionList = listOf(
-                        DailyMission("DogMission", 3, 0, 10, "take 3 dog pictures",dateString),
-                        DailyMission("CatMission", 3, 0, 10, "take 3 cat pictures", dateString),
-                        DailyMission("BirdMission", 3, 0, 10, "take 3 bird pictures", dateString),
-                        DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString)
+                        DailyMission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
+                        DailyMission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
+                        DailyMission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
+                        DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
                     )
 
                     // Add each mission under the "Missions" node with a custom key
@@ -413,10 +416,10 @@ class MainActivity : ComponentActivity() {
 
         // Create and store specific daily missions with the same naming convention
         val newMissionList = listOf(
-            DailyMission("DogMission", 3, 0, 10, "take 3 dog pictures",dateString),
-            DailyMission("CatMission", 3, 0, 10, "take 3 cat pictures", dateString),
-            DailyMission("BirdMission", 3, 0, 10, "take 3 bird pictures", dateString),
-            DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString)
+            DailyMission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
+            DailyMission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
+            DailyMission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
+            DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
         )
 
         // Replace existing missions with the new ones
