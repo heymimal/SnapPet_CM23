@@ -167,9 +167,10 @@ class TestMapActivity : ComponentActivity() {
                     cameraPositionState = cameraPositionState,
 
                 ) {
+                    Log.d(TAG,"Photos lenght ${photos.size}")
                     for(photo in photos){
-                        Log.d(TAG,"test")
                         val position = LatLng(photo.latitude,photo.longitude)
+                        Log.d(TAG, "testing for photo with position $position")
                         Marker(
                             state = MarkerState(position = position),
                             title = photo.animalType,
