@@ -50,6 +50,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.snappet.data.Photo
+import com.example.snappet.viewModels.PhotosViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -113,7 +115,8 @@ class TestMapActivity : ComponentActivity() {
             var context = LocalContext.current
             var isMapLoaded by remember { mutableStateOf(false) }
             var locationPoint by remember { mutableStateOf<Location?>(null) }
-            var photos by remember { mutableStateOf(emptyList<Photo>()) }
+            var photosViewModel by remember { mutableStateOf(PhotosViewModel()) }
+
 
             val locationPermissionsAlreadyGranted = ContextCompat.checkSelfPermission(
                 context,
@@ -137,6 +140,8 @@ class TestMapActivity : ComponentActivity() {
                                     locationPoint = location
                                     Log.d(TAG,"longitude: " + location.longitude + " latitude: " + location.latitude)
                                     isMapLoaded = true
+                                    photosViewModel.fetchAllPhotos()
+
                                 } else {
                                     Log.d(TAG, "No location")
                                 }
@@ -150,8 +155,9 @@ class TestMapActivity : ComponentActivity() {
                     // Clean up if needed
                 }
             }
+            val photosState by photosViewModel.photos.observeAsState()
 
-            photos = tempP()
+            //photos = tempP()
 
             // Conditional rendering of the map based on location permission
             if (isMapLoaded) {
@@ -162,7 +168,7 @@ class TestMapActivity : ComponentActivity() {
                 val cameraPositionState = rememberCameraPositionState {
                     position = CameraPosition.fromLatLngZoom(current, 15f)
                 }
-                GoogleMap(
+                /*GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
 
@@ -177,68 +183,32 @@ class TestMapActivity : ComponentActivity() {
                             snippet = photo.description
                         )
                     }
+                }*/
+                photosState?.let { photos ->
+                    GoogleMap(
+                        modifier = Modifier.fillMaxSize(),
+                        cameraPositionState = cameraPositionState,
+                    ) {
+                        Log.d(TAG, "Photos length ${photos.size}")
+                        for (photo in photos) {
+                            if(photo.latitude != 190.0 && photo.longitude != 190.0){
+                                val position = LatLng(photo.latitude, photo.longitude)
+                                Log.d(TAG, "Testing for photo with position $position")
+                                Marker(
+                                    state = MarkerState(position = position),
+                                    title = photo.animalType,
+                                    snippet = photo.description
+                                )
+                            }
+                        }
+                    }
                 }
             } else {
                 // Map is not loaded yet, you can show a loading indicator or handle it accordingly
                 Text("Loading Map...")
             }
         }
-        }
-
-
-}
-
-@Composable
-fun tempP() : List<Photo> {
-    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
-        "allImages"
-    )
-    var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
-    LaunchedEffect(key1 = databaseReference) {
-        val valueEventListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val photos = mutableListOf<Photo>()
-                for (childSnapshot in dataSnapshot.children) {
-                    val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
-                    val animalType = childSnapshot.child("animal").getValue(String::class.java)
-                    val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
-                    val description = childSnapshot.child("description").getValue(String::class.java)
-                    val id = childSnapshot.child("id").getValue(String::class.java)
-                    val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
-                    val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
-
-                    imageUrl?.let {
-                        val photo = Photo(
-                            imageUri = Uri.parse(it),
-                            animalType = animalType ?: "",
-                            contextPhoto = contextPhoto ?: "",
-                            description = description ?: "",
-                            id = id ?: "",
-                            latitude = latitude ?: 0.0,
-                            longitude = longitude ?: 0.0
-                        )
-                        Log.d(TAG,"latitude: " +latitude)
-                        Log.d(TAG,"longitude: " + longitude)
-                        if (longitude != null && latitude != null) {
-                            if(latitude != 0.0 && longitude != 0.0){
-                                Log.d(TAG,"photo added")
-                                photos.add(photo)
-                            }
-                        }
-                    }
-                }
-                recentPhotos = photos
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Handle error
-            }
-        }
-        databaseReference.addValueEventListener(valueEventListener)
-
     }
-    return recentPhotos
 }
 
 /*class TestMapActivity : ComponentActivity() {

@@ -227,8 +227,8 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
 
                 var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                var latitude = 0.0
-                var longitude = 0.0
+                var latitude = 190.0
+                var longitude = 190.0
                 if(loc!=null){
                     latitude = loc.latitude
                     longitude = loc.longitude

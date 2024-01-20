@@ -86,10 +86,6 @@ class MainActivity : ComponentActivity() {
                 "Signed out",
                 Toast.LENGTH_LONG
             ).show()
-
-            //faz voltarmos para o ecrã anterior (do login)
-            //VER ISTO!!!
-            //navController.popBackStack()
             navController.navigate("sign_in")
         }
     }
@@ -389,14 +385,9 @@ class MainActivity : ComponentActivity() {
                             // Obtenha a foto correspondente ao ID da sua fonte de dados (Firebase, ViewModel, etc.)
                             //val photo = getPhotoById(photoId) // Substitua por sua lógica de obtenção de foto
 
-                            //Log.d(TAG, "ESTE É O ID DA FOTO 2" + photoId)
-                            //Log.d(TAG, "ESTA É A FOTO" + photo)
                             var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
-                            //val photo = remember { mutableStateOf<Photo?>(null) }
-                            Log.d(TAG, "ATAO1")
                             LaunchedEffect(key1 = databaseReference) {
-                                Log.d(TAG, "ATAO2")
                                 val valueEventListener = object : ValueEventListener {
                                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                                         val photos = mutableListOf<Photo>()
@@ -416,17 +407,9 @@ class MainActivity : ComponentActivity() {
                                                     contextPhoto = contextPhoto ?: "",
                                                     description = description ?: "",
                                                     id = id ?: "",
-                                                    latitude = latitude ?: 0.0,
-                                                    longitude = longitude ?: 0.0
+                                                    latitude = latitude ?: 190.0,
+                                                    longitude = longitude ?: 190.0
                                                 )
-
-                                                //Log.d(TAG, "URI " + photo.imageUri)
-                                                //Log.d(TAG, "type " + photo.animalType)
-                                                //Log.d(TAG, "context " + photo.contextPhoto)
-                                                //Log.d(TAG, "description " + photo.description)
-                                                //Log.d(TAG, "id " + photo.id)
-
-
                                                 photos.add(photo)
                                             }
                                         }

@@ -58,25 +58,6 @@ fun HomeMenu(navController: NavHostController) {
     val currentUser = Firebase.auth.currentUser
     val userUid = currentUser?.uid
 
-    //var recentPhotos by remember { mutableStateOf<List<Photo>>(emptyList()) }
-    //var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
-
-    /*LaunchedEffect(Unit) {
-        LoadRecentPhotos(databaseReference)?.let {
-            recentPhotos = it
-        }
-    }*/
-
-    /*LaunchedEffect(Unit) {
-        coroutineScope {
-            LoadRecentPhotos(databaseReference)?.let {
-                recentPhotos = it
-            }
-        }
-    }*/
-
-
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -342,12 +323,3 @@ suspend fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>?
 
         query.addListenerForSingleValueEvent(onDataChange)
     }
-
-
-
-
-
-
-
-
-data class ImageData(val path: String, val name: String)
