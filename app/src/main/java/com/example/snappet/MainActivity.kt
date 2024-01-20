@@ -1,7 +1,11 @@
 package com.example.snappet
 
 
+import android.content.ContentValues
+import android.content.ContentValues.TAG
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,14 +43,21 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.snappet.data.DailyMission
+import com.example.snappet.data.Photo
 import com.example.snappet.screens.DayInfo
+import com.example.snappet.screens.PhotoDetailScreen
 import com.example.snappet.screens.leaderboardNav
 import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
 import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.viewModels.ThrophiesViewModel
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import java.time.LocalDate
 import java.time.ZoneId
@@ -358,11 +369,76 @@ class MainActivity : ComponentActivity() {
                             val dailyMissions by throphiesViewModel.dailyMissionsData.observeAsState(emptyList())
                             TrophiesNav(navController, dailyMissions ?: emptyList())
                         }
+
+                        composable("${Screens.PhotoDetail.route}{photoId}") { backStackEntry ->
+                            // Obtenha o ID da foto da rota
+                            val photoId = backStackEntry.arguments?.getString("photoId") ?: ""
+
+                            // Obtenha a foto correspondente ao ID da sua fonte de dados (Firebase, ViewModel, etc.)
+                            val photo = getPhotoById(photoId) // Substitua por sua lógica de obtenção de foto
+
+                            // Renderize a tela de detalhes da foto
+                            PhotoDetailScreen(photo!!)
+                        }
+
+                        //composable("")
+
                     }
                 }
             }
         }
     }
+
+    @Composable
+    private fun getPhotoById(photoId: String): Photo? {
+        val currentUser = Firebase.auth.currentUser
+        Log.d(TAG,"QUEM " + currentUser.toString());
+        Log.d(TAG,"QUEM " + currentUser?.displayName!!);
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
+            currentUser?.displayName!!
+        )
+
+        var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+        // Retrieve recent photos from the Realtime Database
+        LaunchedEffect(key1 = databaseReference) {
+            val valueEventListener = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val photos = mutableListOf<Photo>()
+                    for (childSnapshot in dataSnapshot.children) {
+                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+                        val animalType = childSnapshot.child("animal").getValue(String::class.java)
+                        val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
+                        val description = childSnapshot.child("description").getValue(String::class.java)
+                        val id = childSnapshot.child("id").getValue(String::class.java)
+
+                        imageUrl?.let {
+                            val photo = Photo(
+                                imageUri = Uri.parse(it),
+                                animalType = animalType ?: "",
+                                contextPhoto = contextPhoto ?: "",
+                                description = description ?: "",
+                                id = id ?: "",
+                            )
+                            photos.add(photo)
+                        }
+                    }
+                    recentPhotos = photos
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle error
+                }
+            }
+            databaseReference.addValueEventListener(valueEventListener)
+
+
+        }
+
+        return recentPhotos.find { it.id == photoId }
+    }
+
     //metodo para comparar 1 data com a data do momento
     //retorna false se a dateString for "hoje"
     //terona true se a dateString tiver acontecido antes de hoje

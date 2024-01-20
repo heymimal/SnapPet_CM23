@@ -4,6 +4,7 @@ import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,8 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Navigation
+import com.example.snappet.navigation.Screens
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -51,6 +54,9 @@ fun HomeMenu(navController: NavHostController) {
 
     val database = Firebase.database
     val databaseReference = database.reference
+
+    val currentUser = Firebase.auth.currentUser
+    val userUid = currentUser?.uid
 
     //var recentPhotos by remember { mutableStateOf<List<Photo>>(emptyList()) }
     //var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
@@ -69,20 +75,22 @@ fun HomeMenu(navController: NavHostController) {
         }
     }*/
 
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
-        ThreeByThreeGrid1()
+        ThreeByThreeGrid1(navController)
 
     }
 }
 
 
 @Composable
-fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String) {
+fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoClick: () -> Unit) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -91,6 +99,7 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String) {
             .width(120.dp)
             .height(160.dp)
             .padding(8.dp)
+            .clickable { onPhotoClick() }
     ) {
         Column(
             modifier = Modifier
@@ -128,14 +137,19 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String) {
 }
 
 @Composable
-fun ThreeByThreeGrid1() {
+fun ThreeByThreeGrid1(navController: NavHostController) {
 
     //val database = Firebase.database
     //val databaseReference = database.reference
-    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+
     //val databaseReference: DatabaseReference = database.reference.child("images")
     //val databaseReference: DatabaseReference = database.reference.child("images").child(userDisplayName ?: "")
+    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     val databaseReference: DatabaseReference = database.reference.child("imagesTest").child("allImages")
+
+
+    var isPopupVisible by remember { mutableStateOf(false) }
+    var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
 
     var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
@@ -149,6 +163,10 @@ fun ThreeByThreeGrid1() {
                     val animalType = childSnapshot.child("animal").getValue(String::class.java)
                     val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                     val description = childSnapshot.child("description").getValue(String::class.java)
+                    val id = childSnapshot.child("id").getValue(String::class.java)
+
+                    val key = childSnapshot.key;
+                    Log.d(TAG, "NOVO TESTE! " + key);
 
                     Log.d(TAG, "Image URLLL: $imageUrl")
 
@@ -157,12 +175,10 @@ fun ThreeByThreeGrid1() {
                             imageUri = Uri.parse(it),
                             animalType = animalType ?: "",
                             contextPhoto = contextPhoto ?: "",
-                            description = description ?: ""
+                            description = description ?: "",
+                            id = id ?: "",
                         )
                         photos.add(photo)
-
-                        Log.d(TAG, "Teste 22222 -> : ${photo.imageUri.toString()}")
-                        Log.d(TAG, "Teste 33333 -> : ${Uri.parse(imageUrl)}")
                     }
                 }
                 recentPhotos = photos
@@ -205,7 +221,7 @@ fun ThreeByThreeGrid1() {
                     item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
                 }
             }
-        }*/
+        }
         item {
             Column {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
@@ -227,49 +243,51 @@ fun ThreeByThreeGrid1() {
 
         }
 
-        /*item {
-            Column {
-                Text("Most Popular Photos", fontWeight = FontWeight.Bold)
-                LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Cat2") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Dog2") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Peacock2") }
-                }
-            }
-        }
-
         item {
             Column {
                 Text("Dogs", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Cat1") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Cat2") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Cat3") }
-                }
-            }
-        }
-
-        item {
-            Column {
-                Text("Cats", fontWeight = FontWeight.Bold)
-                LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Dog1") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Dog2") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Dog3") }
-                }
-            }
-        }
-
-        item {
-            Column {
-                Text("Cats", fontWeight = FontWeight.Bold)
-                LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Peacock1") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Dog2") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Dog3") }
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Dog"){
+                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(), text = photo.animalType)}
+                        }
+                    }
                 }
             }
         }*/
+
+        item {
+            Column {
+                Text("Cats", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Cat"){
+                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
+                                text = photo.animalType, onPhotoClick = {
+                                    navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                                })}
+                        }
+                    }
+                }
+            }
+        }
+
+        /*item {
+            Column {
+                Text("Birds", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Bird"){
+                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(), text = photo.animalType)}
+                        }
+                    }
+                }
+            }
+        }*/
+
+
+
 
 
     }

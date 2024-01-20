@@ -12,4 +12,6 @@ sealed class Screens(val route:String){
 
     object Camera: Screens("camera")
 
+    object PhotoDetail: Screens("photo_detail/{photoId}")
+
 }

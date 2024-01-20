@@ -327,12 +327,13 @@ private fun uploadPhotoToDatabase(photo: Photo) {
 
         val allImagesPath = "imagesTest/$allFolder/"
 
-        val data = hashMapOf(
+        /*val data = hashMapOf(
             "imageUrl" to photo.imageUri.toString(),
             "animal" to photo.animalType,
             "context" to photo.contextPhoto,
-            "description" to photo.description
-        )
+            "description" to photo.description,
+            "id" to photo.id
+        )*/
 
         // Reference to the database path
         val databasePath = databaseReference.child(imagePath)
@@ -341,7 +342,17 @@ private fun uploadPhotoToDatabase(photo: Photo) {
 
         // Push the photo data to the database
         val databaseKey = databasePath.push().key
+        //photo.id = databaseKey.toString()
+        Log.d(TAG, "SOME TEST " + databaseKey.toString());
         databaseKey?.let { key ->
+            photo.id = key
+            val data = hashMapOf(
+                "imageUrl" to photo.imageUri.toString(),
+                "animal" to photo.animalType,
+                "context" to photo.contextPhoto,
+                "description" to photo.description,
+                "id" to photo.id
+            )
             //databasePath.child(key).setValue(photo)
             databasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
@@ -355,6 +366,14 @@ private fun uploadPhotoToDatabase(photo: Photo) {
 
         val allImagesdatabaseKey = allImagesDatabasePath.push().key
         allImagesdatabaseKey?.let { key ->
+            photo.id = key
+            val data = hashMapOf(
+                "imageUrl" to photo.imageUri.toString(),
+                "animal" to photo.animalType,
+                "context" to photo.contextPhoto,
+                "description" to photo.description,
+                "id" to photo.id
+            )
             allImagesDatabasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {

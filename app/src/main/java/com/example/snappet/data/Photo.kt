@@ -9,7 +9,7 @@ data class Photo(
     var animalType : String = "",
     var contextPhoto: String = "",
     var description: String = "",
-    //var id: String = "",
+    var id: String = "",
     //var description:String  = "",
     //var localSrc: String = "",
     //var remoteSrc: String = "",
