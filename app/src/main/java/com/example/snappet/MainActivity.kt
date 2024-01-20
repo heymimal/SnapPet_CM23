@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.snappet.data.DailyMission
 import com.example.snappet.screens.DayInfo
+import com.example.snappet.screens.TrophiesInfoNav
 import com.example.snappet.screens.leaderboardNav
 import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
@@ -360,6 +361,9 @@ class MainActivity : ComponentActivity() {
                             }
                             val dailyMissions by throphiesViewModel.dailyMissionsData.observeAsState(emptyList())
                             TrophiesNav(navController, dailyMissions ?: emptyList())
+                        }
+                        composable(route = Screens.TrophiesInfo.route) {
+                            TrophiesInfoNav(navController)
                         }
                     }
                 }
