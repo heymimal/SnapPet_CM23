@@ -201,19 +201,6 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             }
         }*/
 
-
-        // Second Row: "Most Recent Photos"
-        /*item {
-            Column {
-                Text("Recent Photos", fontWeight = FontWeight.Bold)
-                LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Cat1") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Dog1") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
-                }
-            }
-        }*/
-
         item {
             Column {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
