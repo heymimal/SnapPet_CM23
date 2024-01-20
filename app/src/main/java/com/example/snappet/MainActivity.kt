@@ -3,6 +3,7 @@ package com.example.snappet
 
 import android.content.ContentValues
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -59,6 +60,7 @@ import com.example.snappet.viewModels.ThrophiesViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.getValue
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDate
@@ -196,7 +198,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("Camera") {
-                            CameraClass(navController)
+                           CameraClass(navController)
                         }
                         //para ir para o Streak login screen
                         composable(route = Screens.Streak.route) {
@@ -404,6 +406,8 @@ class MainActivity : ComponentActivity() {
                                             val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                                             val description = childSnapshot.child("description").getValue(String::class.java)
                                             val id = childSnapshot.child("id").getValue(String::class.java)
+                                            val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
+                                            val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
 
                                             imageUrl?.let {
                                                 val photo = Photo(
@@ -412,6 +416,8 @@ class MainActivity : ComponentActivity() {
                                                     contextPhoto = contextPhoto ?: "",
                                                     description = description ?: "",
                                                     id = id ?: "",
+                                                    latitude = latitude ?: 0.0,
+                                                    longitude = longitude ?: 0.0
                                                 )
 
                                                 //Log.d(TAG, "URI " + photo.imageUri)
@@ -485,7 +491,6 @@ class MainActivity : ComponentActivity() {
 
         // Retrieve recent photos from the Realtime Database
         LaunchedEffect(key1 = databaseReference) {
-            Log.d(TAG, "ATAO2")
             val valueEventListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val photos = mutableListOf<Photo>()
@@ -495,6 +500,8 @@ class MainActivity : ComponentActivity() {
                         val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                         val description = childSnapshot.child("description").getValue(String::class.java)
                         val id = childSnapshot.child("id").getValue(String::class.java)
+                        val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
+                        val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
 
                         Log.d(TAG, "URI " + imageUrl)
                         Log.d(TAG, "type " + animalType)
@@ -509,6 +516,8 @@ class MainActivity : ComponentActivity() {
                                 contextPhoto = contextPhoto ?: "",
                                 description = description ?: "",
                                 id = id ?: "",
+                                latitude = latitude ?: 0.0,
+                                longitude = longitude ?: 0.0
                             )
 
                             Log.d(TAG, "URI " + photo.imageUri)

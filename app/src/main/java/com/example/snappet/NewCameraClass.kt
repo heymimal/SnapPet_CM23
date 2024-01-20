@@ -25,6 +25,7 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import java.io.File
@@ -132,7 +133,9 @@ fun CameraClass(navController: NavController) {
         val imageBitmap = rememberUpdatedState(takenPicture!!).value.asImageBitmap()
         Log.d(Logger.TAG,"URI é: $uri")
         Log.d(TAG,locationPoint.toString())
-        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file)
+        var latlng: LatLng? = null
+        if(locationPoint!=null)  latlng = LatLng(locationPoint!!.latitude,locationPoint!!.longitude)
+        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file, loc = latlng)
        /*Column(
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -155,9 +155,12 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                     val description = childSnapshot.child("description").getValue(String::class.java)
                     val id = childSnapshot.child("id").getValue(String::class.java)
+                    val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
+                    val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
 
                     //val key = childSnapshot.key;
                     //Log.d(TAG, "NOVO TESTE! " + key);
+
 
                     //Log.d(TAG, "Image URLLL: $imageUrl")
 
@@ -168,6 +171,8 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                             contextPhoto = contextPhoto ?: "",
                             description = description ?: "",
                             id = id ?: "",
+                            latitude = latitude ?: 0.0,
+                            longitude = longitude ?: 0.0
                         )
                         photos.add(photo)
                     }
@@ -299,13 +304,18 @@ suspend fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>?
                     val animalType = photoSnapshot.child("animal").getValue(String::class.java)
                     val contextPhoto = photoSnapshot.child("context").getValue(String::class.java)
                     val description = photoSnapshot.child("description").getValue(String::class.java)
+                    val latitude = photoSnapshot.child("latitude").getValue(Double::class.java)
+                    val longitude  = photoSnapshot.child("longitude").getValue(Double::class.java)
+
 
                     if (imageUrl != null) {
                         val photo = Photo(
                             imageUri = Uri.parse(imageUrl),
                             animalType = animalType.orEmpty(),
                             contextPhoto = contextPhoto.orEmpty(),
-                            description = description.orEmpty()
+                            description = description.orEmpty(),
+                            latitude = latitude ?: 0.0,
+                            longitude = longitude ?: 0.0
                         )
 
 

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
@@ -60,9 +61,7 @@ import java.io.File
 //@OptIn(ExperimentalMaterial3Api::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File){
-
-    var photo = Photo(uri);
+fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File, loc : LatLng?){
 
     var photoType by remember {
         mutableStateOf<String?>("Dog")
@@ -228,7 +227,13 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
 
                 var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!)
+                var latitude = 0.0
+                var longitude = 0.0
+                if(loc!=null){
+                    latitude = loc.latitude
+                    longitude = loc.longitude
+                }
+                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "id",latitude,longitude)
 
                 Log.d(TAG, "TIPOS DA FOTOS SEI LA")
                 Log.d(TAG, photo.imageUri.toString())
@@ -351,7 +356,9 @@ private fun uploadPhotoToDatabase(photo: Photo) {
                 "animal" to photo.animalType,
                 "context" to photo.contextPhoto,
                 "description" to photo.description,
-                "id" to photo.id
+                "id" to photo.id,
+                "latitude" to photo.latitude,
+                "longitude" to photo.longitude
             )
             //databasePath.child(key).setValue(photo)
             databasePath.child(key).setValue(data)
@@ -372,7 +379,9 @@ private fun uploadPhotoToDatabase(photo: Photo) {
                 "animal" to photo.animalType,
                 "context" to photo.contextPhoto,
                 "description" to photo.description,
-                "id" to photo.id
+                "id" to photo.id,
+                "latitude" to photo.latitude,
+                "longitude" to photo.longitude
             )
             allImagesDatabasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
@@ -419,34 +428,6 @@ private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File):
 
 }
 
-
-/*@Composable
-fun radioButton(){
-    val radioOptions = listOf("Entertainment", "Needs Help")
-    var selectedOption by remember { mutableStateOf(radioOptions[0]) }
-
-    Row(
-        modifier = Modifier
-            .padding(start = 8.dp)
-            .fillMaxWidth(),
-        verticalAlignment =  Alignment.CenterVertically
-    ) {
-        radioOptions.forEach { option ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = (option == selectedOption),
-                    onClick = { selectedOption = option }
-                )
-                Text(
-                    text = option,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(end = 20.dp)
-                )
-            }
-        }
-    }
-}*/
-
 @Composable
 fun radioButton(onOptionSelected: (String) -> Unit) {
     val radioOptions = listOf("Entertainment", "Needs Help")
@@ -476,120 +457,3 @@ fun radioButton(onOptionSelected: (String) -> Unit) {
         }
     }
 }
-
-/*private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
-
-    if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
-        Log.e(TAG, "Uri inválido ou nulo")
-        return
-    }
-
-    Log.d(TAG, "Path do Uri: ${imageUri.path}")
-
-    val currentUser = Firebase.auth.currentUser
-    if(currentUser != null){
-        val userId = currentUser.uid
-        val userName = currentUser.displayName
-
-        // Create a folder name based on the user's ID or display name
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        // Update the folder path where the image will be stored
-        val folderPath = "imagesTestNew/$folderName/"
-
-        // Upload the image to Firebase Storage
-        val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-        val storageReference = storageRef.child(storageFileNameUser)
-
-        //val imageUri = capturedPhoto.imageUri
-
-        val uploadTask1 = storageReference.putFile(imageUri)
-
-        uploadTask1.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-            } else {
-                Log.d(TAG, "Failed to upload photo", task.exception)
-            }
-        }
-
-        // Upload the image to Firebase Storage
-        val storageFileName = "imagesTest/${System.currentTimeMillis()}.jpg"
-
-        val storageReference1 = storageRef.child(storageFileName)
-        val uploadTask = imageUri?.let { storageReference1.putFile(it) }
-
-        uploadTask?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-            } else {
-                Log.e(TAG, "Failed to upload photo", task.exception)
-            }
-        }
-    }
-}*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-@Preview
-@Composable
-private fun PhotoFormsPreview() {
-    SnapPetPreviewPhoto(null)
-}*/
-
-/*
- val currentUser = Firebase.auth.currentUser
-
-                if(currentUser != null){
-                    val userId = currentUser.uid
-                    val userName = currentUser.displayName
-
-                    // Create a folder name based on the user's ID or display name
-                    val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-                    // Update the folder path where the image will be stored
-                    val folderPath = "images/$folderName/"
-
-                    // Upload the image to Firebase Storage
-                    val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-                    val storageReference = storageRef.child(storageFileNameUser)
-                    val uploadTask1 = localUri?.let { storageReference.putFile(it) }
-
-                    uploadTask1?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }
-
-                    // Upload the image to Firebase Storage
-                    val storageFileName = "images/${System.currentTimeMillis()}.jpg"
-
-                    val storageReference1 = storageRef.child(storageFileName)
-                    val uploadTask = localUri?.let { storageReference1.putFile(it) }
-
-                    uploadTask?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }
-                }
-*/

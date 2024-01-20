@@ -21,14 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 //import com.example.snappet.activity.CameraActivity
-import com.example.snappet.activity.MapActivity
 import com.example.snappet.R
+import com.example.snappet.TestMapActivity
 import com.google.firebase.appcheck.internal.util.Logger.TAG
-import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,8 +74,9 @@ fun Navigation(navController: NavHostController){
             selected = selectedItem == 1,
             onClick = { selectedItem = 1
                       //navController.navigate(Screens.Map.route)
-                    val intent = Intent(context, MapActivity::class.java)
-                    context.startActivity(intent)
+                    /*val intent = Intent(context, MapActivity::class.java)
+                    context.startActivity(intent)*/
+                    context.startActivity(Intent(context, TestMapActivity::class.java))
                       },
             label = {
                 Text("Map")
