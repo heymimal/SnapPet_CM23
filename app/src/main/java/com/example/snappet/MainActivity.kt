@@ -452,7 +452,7 @@ class MainActivity : ComponentActivity() {
                                 }
                                 // Add more details as needed
 
-                                PhotoDetailScreen(catPhoto)
+                                PhotoDetailScreen(catPhoto, navController)
                             }
 
                             //PhotoDetailScreen(catPhotosr.get(0))
@@ -471,72 +471,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    @Composable
-    fun getPhotoById(photoId: String): Photo? {
-        val currentUser = Firebase.auth.currentUser
-        Log.d(TAG,"QUEM " + currentUser?.displayName!!);
-        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
-            "allImages"
-        )
-
-        var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
-
-        Log.d(TAG, "ATAOO")
-
-        // Retrieve recent photos from the Realtime Database
-        LaunchedEffect(key1 = databaseReference) {
-            Log.d(TAG, "ATAO2")
-            val valueEventListener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val photos = mutableListOf<Photo>()
-                    for (childSnapshot in dataSnapshot.children) {
-                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
-                        val animalType = childSnapshot.child("animal").getValue(String::class.java)
-                        val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
-                        val description = childSnapshot.child("description").getValue(String::class.java)
-                        val id = childSnapshot.child("id").getValue(String::class.java)
-
-                        Log.d(TAG, "URI " + imageUrl)
-                        Log.d(TAG, "type " + animalType)
-                        Log.d(TAG, "context " + contextPhoto)
-                        Log.d(TAG, "description " + description)
-                        Log.d(TAG, "id " + id)
-
-                        imageUrl?.let {
-                            val photo = Photo(
-                                imageUri = Uri.parse(it),
-                                animalType = animalType ?: "",
-                                contextPhoto = contextPhoto ?: "",
-                                description = description ?: "",
-                                id = id ?: "",
-                            )
-
-                            Log.d(TAG, "URI " + photo.imageUri)
-                            Log.d(TAG, "type " + photo.animalType)
-                            Log.d(TAG, "context " + photo.contextPhoto)
-                            Log.d(TAG, "description " + photo.description)
-                            Log.d(TAG, "id " + photo.id)
-
-
-                            photos.add(photo)
-                        }
-                    }
-                    recentPhotos = photos
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle error
-                }
-            }
-            databaseReference.addValueEventListener(valueEventListener)
-
-        }
-
-        return recentPhotos.find { it.id == photoId }
-    }
-
 
     /*@Composable
     private fun getPhotoById(photoId: String): Photo? {
