@@ -212,7 +212,8 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     item { CardWithImageAndText(Icons.Default.Place, "Peacock1") }
                 }
             }
-        }
+        }*/
+
         item {
             Column {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
@@ -226,7 +227,11 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                         Log.d(TAG, photo.imageUri.toString())
                         Log.d(TAG, "Teste 1 -> : ${photo.imageUri.toString()}")
                         Log.d(TAG, "")
-                        item { CardWithImageAndText(photo = photo, photo.imageUri.toString(), text = photo.animalType)}
+                        item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
+                            text = photo.animalType, onPhotoClick = {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            })}
                     }
                 }
             }
@@ -240,12 +245,16 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                 LazyRow {
                     recentPhotos.forEach { photo ->
                         if(photo.animalType == "Dog"){
-                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(), text = photo.animalType)}
+                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
+                                text = photo.animalType, onPhotoClick = {
+                                    navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                                })}
                         }
                     }
                 }
             }
-        }*/
+        }
 
         item {
             Column {
@@ -264,18 +273,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             }
         }
 
-        /*item {
+        item {
             Column {
                 Text("Birds", fontWeight = FontWeight.Bold)
                 LazyRow {
                     recentPhotos.forEach { photo ->
                         if(photo.animalType == "Bird"){
-                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(), text = photo.animalType)}
+                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
+                                text = photo.animalType, onPhotoClick = {
+                                    navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                                })}
                         }
                     }
                 }
             }
-        }*/
+        }
 
 
 

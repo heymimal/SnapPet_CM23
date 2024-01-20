@@ -375,13 +375,15 @@ class MainActivity : ComponentActivity() {
 
                         composable("${Screens.PhotoDetail.route}{photoId}") { backStackEntry ->
                             // Obtenha o ID da foto da rota
-                            val photoId = backStackEntry.arguments?.getString("photoId") ?: ""
+                            val rawPhotoId = backStackEntry.arguments?.getString("photoId") ?: ""
+                            val photoId = "-" + rawPhotoId.substringAfter("-")
+                            //Log.d(TAG, "PHOTO ID TOTAL:: " + photoId)
                             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
                             val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
                                 "allImages"
                             )
 
-                            Log.d(TAG, "ESTE É O ID DA FOTO" + photoId)
+                            //Log.d(TAG, "ESTE É O ID DA FOTO" + photoId)
 
 
                             // Obtenha a foto correspondente ao ID da sua fonte de dados (Firebase, ViewModel, etc.)
@@ -436,30 +438,30 @@ class MainActivity : ComponentActivity() {
                             }
 
                             val catPhotos = recentPhotos.filter { it.animalType == "cat" }
-                            val catPhotosr = recentPhotos.filter { it.animalType == "Cat" && it.contextPhoto == "Needs Help" && it.description == "foto de teste!!!"}
+                            val catPhotosr = recentPhotos.filter { it.id == photoId}
 
                             Log.d(TAG, "tamanho 0? " + catPhotos.size)
                             Log.d(TAG, "tamanho real? " + catPhotosr.size)
 
-                            catPhotos.forEach { catPhoto ->
+                            catPhotosr.forEach { catPhoto ->
                                 Log.d(TAG, "Cat Photo Details:")
-                                Log.d(TAG, "ID: ${catPhoto.id}")
-                                Log.d(TAG, "Animal Type: ${catPhoto.animalType}")
-                                Log.d(TAG, "Context: ${catPhoto.contextPhoto}")
-                                Log.d(TAG, "Description: ${catPhoto.description}")
-                                Log.d(TAG, "Image URI: ${catPhoto.imageUri}")
+                                Log.d(TAG, "ID: " + catPhoto.id)
+                                Log.d(TAG, "ID DA PHOTO NORMAL: " + photoId)
+                                if(catPhoto.id == photoId){
+                                    Log.d(TAG, "Sao iguais!")
+                                }
                                 // Add more details as needed
+
+                                PhotoDetailScreen(catPhoto)
                             }
 
+                            //PhotoDetailScreen(catPhotosr.get(0))
 
 
-                            // Renderize a tela de detalhes da foto
-                            recentPhotos.find {
-                                it.id == photoId }?.let {
-                                Log.d(TAG, "")
-                                Log.d(TAG, "teste do it id " + it.id)
-                                Log.d(TAG, "teste do photo id " + photoId)
-                                PhotoDetailScreen(it) }
+
+
+
+
                         }
 
                         //composable("")
