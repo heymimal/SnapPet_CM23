@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -59,9 +60,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.coroutines.resumeWithException
 
 
 class MainActivity : ComponentActivity() {
@@ -373,12 +376,90 @@ class MainActivity : ComponentActivity() {
                         composable("${Screens.PhotoDetail.route}{photoId}") { backStackEntry ->
                             // Obtenha o ID da foto da rota
                             val photoId = backStackEntry.arguments?.getString("photoId") ?: ""
+                            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+                            val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
+                                "allImages"
+                            )
+
+                            Log.d(TAG, "ESTE É O ID DA FOTO" + photoId)
+
 
                             // Obtenha a foto correspondente ao ID da sua fonte de dados (Firebase, ViewModel, etc.)
-                            val photo = getPhotoById(photoId) // Substitua por sua lógica de obtenção de foto
+                            //val photo = getPhotoById(photoId) // Substitua por sua lógica de obtenção de foto
+
+                            //Log.d(TAG, "ESTE É O ID DA FOTO 2" + photoId)
+                            //Log.d(TAG, "ESTA É A FOTO" + photo)
+                            var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+                            //val photo = remember { mutableStateOf<Photo?>(null) }
+                            Log.d(TAG, "ATAO1")
+                            LaunchedEffect(key1 = databaseReference) {
+                                Log.d(TAG, "ATAO2")
+                                val valueEventListener = object : ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                        val photos = mutableListOf<Photo>()
+                                        for (childSnapshot in dataSnapshot.children) {
+                                            val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+                                            val animalType = childSnapshot.child("animal").getValue(String::class.java)
+                                            val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
+                                            val description = childSnapshot.child("description").getValue(String::class.java)
+                                            val id = childSnapshot.child("id").getValue(String::class.java)
+
+                                            imageUrl?.let {
+                                                val photo = Photo(
+                                                    imageUri = Uri.parse(it),
+                                                    animalType = animalType ?: "",
+                                                    contextPhoto = contextPhoto ?: "",
+                                                    description = description ?: "",
+                                                    id = id ?: "",
+                                                )
+
+                                                //Log.d(TAG, "URI " + photo.imageUri)
+                                                //Log.d(TAG, "type " + photo.animalType)
+                                                //Log.d(TAG, "context " + photo.contextPhoto)
+                                                //Log.d(TAG, "description " + photo.description)
+                                                //Log.d(TAG, "id " + photo.id)
+
+
+                                                photos.add(photo)
+                                            }
+                                        }
+                                        recentPhotos = photos
+                                    }
+
+                                    override fun onCancelled(databaseError: DatabaseError) {
+                                        // Handle error
+                                    }
+                                }
+                                databaseReference.addValueEventListener(valueEventListener)
+
+                            }
+
+                            val catPhotos = recentPhotos.filter { it.animalType == "cat" }
+                            val catPhotosr = recentPhotos.filter { it.animalType == "Cat" && it.contextPhoto == "Needs Help" && it.description == "foto de teste!!!"}
+
+                            Log.d(TAG, "tamanho 0? " + catPhotos.size)
+                            Log.d(TAG, "tamanho real? " + catPhotosr.size)
+
+                            catPhotos.forEach { catPhoto ->
+                                Log.d(TAG, "Cat Photo Details:")
+                                Log.d(TAG, "ID: ${catPhoto.id}")
+                                Log.d(TAG, "Animal Type: ${catPhoto.animalType}")
+                                Log.d(TAG, "Context: ${catPhoto.contextPhoto}")
+                                Log.d(TAG, "Description: ${catPhoto.description}")
+                                Log.d(TAG, "Image URI: ${catPhoto.imageUri}")
+                                // Add more details as needed
+                            }
+
+
 
                             // Renderize a tela de detalhes da foto
-                            PhotoDetailScreen(photo!!)
+                            recentPhotos.find {
+                                it.id == photoId }?.let {
+                                Log.d(TAG, "")
+                                Log.d(TAG, "teste do it id " + it.id)
+                                Log.d(TAG, "teste do photo id " + photoId)
+                                PhotoDetailScreen(it) }
                         }
 
                         //composable("")
@@ -390,19 +471,21 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun getPhotoById(photoId: String): Photo? {
+    fun getPhotoById(photoId: String): Photo? {
         val currentUser = Firebase.auth.currentUser
-        Log.d(TAG,"QUEM " + currentUser.toString());
         Log.d(TAG,"QUEM " + currentUser?.displayName!!);
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
-            currentUser?.displayName!!
+            "allImages"
         )
 
         var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
+        Log.d(TAG, "ATAOO")
+
         // Retrieve recent photos from the Realtime Database
         LaunchedEffect(key1 = databaseReference) {
+            Log.d(TAG, "ATAO2")
             val valueEventListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val photos = mutableListOf<Photo>()
@@ -413,6 +496,12 @@ class MainActivity : ComponentActivity() {
                         val description = childSnapshot.child("description").getValue(String::class.java)
                         val id = childSnapshot.child("id").getValue(String::class.java)
 
+                        Log.d(TAG, "URI " + imageUrl)
+                        Log.d(TAG, "type " + animalType)
+                        Log.d(TAG, "context " + contextPhoto)
+                        Log.d(TAG, "description " + description)
+                        Log.d(TAG, "id " + id)
+
                         imageUrl?.let {
                             val photo = Photo(
                                 imageUri = Uri.parse(it),
@@ -421,6 +510,14 @@ class MainActivity : ComponentActivity() {
                                 description = description ?: "",
                                 id = id ?: "",
                             )
+
+                            Log.d(TAG, "URI " + photo.imageUri)
+                            Log.d(TAG, "type " + photo.animalType)
+                            Log.d(TAG, "context " + photo.contextPhoto)
+                            Log.d(TAG, "description " + photo.description)
+                            Log.d(TAG, "id " + photo.id)
+
+
                             photos.add(photo)
                         }
                     }
@@ -433,11 +530,75 @@ class MainActivity : ComponentActivity() {
             }
             databaseReference.addValueEventListener(valueEventListener)
 
-
         }
 
         return recentPhotos.find { it.id == photoId }
     }
+
+
+    /*@Composable
+    private fun getPhotoById(photoId: String): Photo? {
+        val currentUser = Firebase.auth.currentUser
+        Log.d(TAG,"QUEM " + currentUser.toString());
+        Log.d(TAG,"QUEM " + currentUser?.displayName!!);
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
+            "allImages"
+        )
+
+        var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+        Log.d(TAG, "ATAOO")
+
+        databaseReference.addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.d(TAG, "ATAOO22")
+                val photos = mutableListOf<Photo>()
+                for (childSnapshot in dataSnapshot.children) {
+                    val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+                    val animalType = childSnapshot.child("animal").getValue(String::class.java)
+                    val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
+                    val description = childSnapshot.child("description").getValue(String::class.java)
+                    val id = childSnapshot.child("id").getValue(String::class.java)
+
+                    Log.d(TAG, "URI " + imageUrl)
+                    Log.d(TAG, "type " + animalType)
+                    Log.d(TAG, "context " + contextPhoto)
+                    Log.d(TAG, "description " + description)
+                    Log.d(TAG, "id " + id)
+
+                    imageUrl?.let {
+                        val photo = Photo(
+                            imageUri = Uri.parse(it),
+                            animalType = animalType ?: "",
+                            contextPhoto = contextPhoto ?: "",
+                            description = description ?: "",
+                            id = id ?: "",
+                        )
+
+                        Log.d(TAG, "URI " + photo.imageUri)
+                        Log.d(TAG, "type " + photo.animalType)
+                        Log.d(TAG, "context " + photo.contextPhoto)
+                        Log.d(TAG, "description " + photo.description)
+                        Log.d(TAG, "id " + photo.id)
+
+
+                        photos.add(photo)
+                    }
+                }
+                recentPhotos = photos
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle error
+            }
+
+        })
+        return recentPhotos.find { it.id == photoId }
+    }*/
+
+
+
 
     //metodo para comparar 1 data com a data do momento
     //retorna false se a dateString for "hoje"

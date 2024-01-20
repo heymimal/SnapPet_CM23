@@ -139,17 +139,8 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
 @Composable
 fun ThreeByThreeGrid1(navController: NavHostController) {
 
-    //val database = Firebase.database
-    //val databaseReference = database.reference
-
-    //val databaseReference: DatabaseReference = database.reference.child("images")
-    //val databaseReference: DatabaseReference = database.reference.child("images").child(userDisplayName ?: "")
     val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     val databaseReference: DatabaseReference = database.reference.child("imagesTest").child("allImages")
-
-
-    var isPopupVisible by remember { mutableStateOf(false) }
-    var selectedPhoto by remember { mutableStateOf<Photo?>(null) }
 
     var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
@@ -165,10 +156,10 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     val description = childSnapshot.child("description").getValue(String::class.java)
                     val id = childSnapshot.child("id").getValue(String::class.java)
 
-                    val key = childSnapshot.key;
-                    Log.d(TAG, "NOVO TESTE! " + key);
+                    //val key = childSnapshot.key;
+                    //Log.d(TAG, "NOVO TESTE! " + key);
 
-                    Log.d(TAG, "Image URLLL: $imageUrl")
+                    //Log.d(TAG, "Image URLLL: $imageUrl")
 
                     imageUrl?.let {
                         val photo = Photo(
