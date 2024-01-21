@@ -10,6 +10,8 @@ sealed class Screens(val route:String){
     object Profile : Screens("profile")
     object Trophies: Screens("trophies_route")
 
+    object TrophiesInfo: Screens("trophiesInfo_route")
+
     object Camera: Screens("camera")
 
     object PhotoDetail: Screens("photo_detail/{photoId}")

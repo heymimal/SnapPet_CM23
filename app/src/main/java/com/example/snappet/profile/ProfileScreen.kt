@@ -40,7 +40,11 @@ import com.example.snappet.sign_In.UserData
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavHostController
+import com.example.snappet.data.Trophy
 import com.example.snappet.navigation.Screens
+import com.example.snappet.screens.RaritySquare
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,8 +55,8 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
                   onSignOut: () -> Unit
                           ) {
     val userDataState by profileViewModel.userData.observeAsState()
-    // Check the current value of userDataState whenever it changes
-    //println("userDataState: $userDataState")
+    // Observe trophy data
+    val trophy by profileViewModel.trophyData.observeAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -60,7 +64,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
             Navigation(navController =navController)
         }) {paddingValues ->
         Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
-        ProfileScreenComposable(userDataState, userData, onSignOut,navController)
+        ProfileScreenComposable(userDataState, userData, onSignOut,navController,trophy)
 
         //Text(text = "Hello")
     }
@@ -70,16 +74,14 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-//para este Screen não precisamos de um view model pois ele não
-// contém nenhum estado nem nada que "mude" ao longo do tempo
-//só mostra user data estática
 fun ProfileScreenComposable(
-    final : UserData?,
+    final: UserData?,
     userData: UserData?,
     //queremos ter um lambeda quando ele fizer sign out
     //ele recebe esta função como paramentro de entrada
     onSignOut: () -> Unit,
     navController: NavController,
+    trophy: Trophy?,
 ) {
         Column(
             modifier = Modifier
@@ -120,6 +122,9 @@ fun ProfileScreenComposable(
                 )
 
                 if (final != null) {
+                    if (trophy != null) {
+                        final.snaPoints?.let { updateTrophy(userData.userId, it.toInt()) }
+                    }
                     Text(
                         //mostra os pontos
                         text = "SnapPoints: "+final.snaPoints,
@@ -220,4 +225,40 @@ fun ProfileScreenComposable(
                 Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
             }
         }
+}
+
+// Function to determine the trophy based on points
+fun determineTrophy(points: Int): Trophy {
+    return when {
+        points in 0..49 -> Trophy("bronze", "Novice")
+        points in 50..99 -> Trophy("bronze", "Snappy Snapper")
+        points in 100..149 -> Trophy("bronze", "Animal Explorer")
+        points in 150..199 -> Trophy("bronze", "Pet Paparazzo")
+        points in 200..249 -> Trophy("bronze", "Nature Scout")
+        points in 250..299 -> Trophy("bronze", "Wildlife Rookie")
+        points in 300..349 -> Trophy("silver", "Silver Safari Scout")
+        points in 350..399 -> Trophy("silver", "Lens Warrior")
+        points in 400..449 -> Trophy("silver", "Animal Whisperer")
+        points in 450..499 -> Trophy("silver", "Nature Enthusiast")
+        points in 500..549 -> Trophy("silver", "Silver Snapshot Master")
+        points in 550..599 -> Trophy("gold", "Gold Wilderness Conquerer")
+        points in 600..649 -> Trophy("gold", "Shutter Champion")
+        points in 650..699 -> Trophy("gold", "Creature Adventurer")
+        points in 700..749 -> Trophy("gold", "Gold Wildlife Expert")
+        points in 750..799 -> Trophy("gold", "Gold Photo Virtuoso")
+        points in 800..849 -> Trophy("legendary", "Legendary Nature Maestro")
+        points in 850..899 -> Trophy("legendary", "Platinum Safari Maestro")
+        points in 900..949 -> Trophy("legendary", "Supreme Wildlife Photographer")
+        points in 950..999 -> Trophy("legendary", "SnaPet Virtuoso")
+        else -> Trophy("legendary", "SnaPet Master")
+    }
+}
+
+// Function to update user trophy based on points
+@Composable
+fun updateTrophy(userId: String, points: Int) {
+    val trophy = determineTrophy(points)
+    val userRef = Firebase.database.getReference("Users (Quim)").child(userId)
+    userRef.child("Trophy").setValue(trophy)
+    RaritySquare(text = trophy.text, trophyType = trophy.trophyType)
 }

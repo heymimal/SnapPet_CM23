@@ -19,10 +19,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,8 +34,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -55,10 +62,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
 import com.google.android.gms.maps.model.LatLng
+import com.example.snappet.sign_In.UserData
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -70,7 +81,7 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File, loc : LatLng?){
+fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File, loc : LatLng?, userData: UserData){
 
     var photoType by remember {
         mutableStateOf<String?>("")
@@ -92,7 +103,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     val user = Firebase.auth.currentUser
     val userId = user?.uid
 
-    Log.d(TAG, "USER " + user?.displayName + " "+ userId)
+    //var navController = rememberNavController()
 
     Log.d(TAG, "URI");
     Log.d(TAG, uri.toString());
@@ -199,7 +210,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -223,7 +234,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Log.d(TAG, "TESTE DO CONTEXTO");
         Log.d(TAG, contextPhotoType!!);
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -302,6 +313,11 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         modifier = Modifier.fillMaxSize()
     ){
 
+        var latitude = 190.0
+        var longitude = 190.0
+
+        var isLocationChecked = SwitchOption()
+
         val showAlertMessage = remember{ mutableStateOf(false) }
 
         if(showAlertMessage.value){
@@ -333,22 +349,27 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 }else{
                     showAlertMessage.value = false
                     var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                    //val downloadUrl = uploadImageToStorage(fileName, imageBitmap)
-                    //var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", userId.toString()!!)
-                //var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                var latitude = 190.0
-                var longitude = 190.0
+
                 if(loc!=null){
                     latitude = loc.latitude
                     longitude = loc.longitude
                 }
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude)
 
-                    uploadImageToStorage(fileName, imageBitmap, photo);
+                if(isLocationChecked){
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude, 0)
+                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
+                }else{
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,190.0,190.0, 0)
+                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
                 }
-
-
-                //uploadPhotoToDatabase(photo)
+                    if (contextPhotoType == "Needs Help") {
+                        Toast.makeText(
+                            context,
+                            "Animal Shelter Entities Have Been Notified!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
             },
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(Color.Black),
@@ -360,18 +381,230 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 )
                 .height(50.dp)
                 .width(150.dp)
-
         )
         {
             Text(text = "Upload", style = TextStyle(fontSize = 20.sp), color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
+}
+
+@Composable
+fun SwitchOption(): Boolean{
+    var isChecked by remember{ mutableStateOf(true) }
+
+    val icons = if(isChecked) Icons.Filled.Check else Icons.Filled.Close
+
+    val icon: (@Composable () -> Unit)? =
+        if (isChecked){
+            {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                )
+            }
+
+        }else null
+
+    Column(
+        modifier = Modifier.offset(y = 720.dp).padding(20.dp)
+    ){
+        Text(
+            text = "Share Location",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Switch(
+            checked = isChecked,
+            onCheckedChange = {isChecked = it},
+            thumbContent = icon,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+    }
+
+    return isChecked
 
 }
 
+//when the user takes a photo, the missions progress are updated
+fun updateDailyMissions(userData: UserData?, animalType: String) {
+    val database = Firebase.database
+    val myReference = database.getReference("Users (Quim)")
+    // Log the userID and animalType
+    if (userData != null) {
+        // Get reference to the user's DailyMissions
+        val thisUserRef = myReference.child(userData.userId)
+        val missionsReference = thisUserRef.child("DailyMissions")
+
+        // Query the missions with missionType as "10PicturesMission" or specific animalType
+        missionsReference.orderByChild("missionType")
+            .equalTo("10PicturesMission")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (missionSnapshot in dataSnapshot.children) {
+                        // Check if the mission is not completed
+                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                        if (!completed) {
+                            // Update the userProgress property
+                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                            missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
+
+                            // Check if userProgress equals the goal
+                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                            if (userProgress + 1 == goal) {
+                                // Fetch the mission points and add to user's snaPoints
+                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                updateSnaPoints(userData, myReference, missionPoints)
+
+                                // Set completed to true
+                                missionSnapshot.ref.child("completed").setValue(true)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    //Log.e(TAG, "Error fetching missions: ${databaseError.message}")
+                }
+            })
+
+        // If the animalType is specified, also update the userProgress for that animalType
+        if (animalType.isNotEmpty()) {
+            missionsReference.orderByChild("missionType")
+                .equalTo(animalType)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        for (missionSnapshot in dataSnapshot.children) {
+                            // Check if the mission is not completed
+                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                            if (!completed) {
+                                // Update the userProgress property
+                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                                missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
+
+                                // Check if userProgress equals the goal
+                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                                if (userProgress + 1 == goal) {
+                                    // Fetch the mission points and add to user's snaPoints
+                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                    updateSnaPoints(userData, myReference, missionPoints)
+
+                                    // Set completed to true
+                                    missionSnapshot.ref.child("completed").setValue(true)
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        //Log.e(TAG, "Error fetching missions: ${databaseError.message}")
+                    }
+                })
+        }
+    }
+}
+
+fun updateMonthlyMissions(userData: UserData?, animalType: String) {
+    val database = Firebase.database
+    val myReference = database.getReference("Users (Quim)")
+
+    if (userData != null) {
+        // Get reference to the user's MonthlyMissions
+        val thisUserRef = myReference.child(userData.userId)
+        val missionsReference = thisUserRef.child("MonthlyMissions")
+
+        // Query the missions with missionType as "10PicturesMission" or specific animalType
+        missionsReference.orderByChild("missionType")
+            .equalTo("100PicturesMission")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (missionSnapshot in dataSnapshot.children) {
+                        // Check if the mission is not completed
+                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                        if (!completed) {
+                            // Update the userProgress property
+                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                            missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
+
+                            // Check if userProgress equals the goal
+                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                            if (userProgress + 1 == goal) {
+                                // Fetch the mission points and add to user's snaPoints
+                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                updateSnaPoints(userData, myReference, missionPoints)
+
+                                // Set completed to true
+                                missionSnapshot.ref.child("completed").setValue(true)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle errors
+                }
+            })
+
+        // If the animalType is specified, also update the userProgress for that animalType
+        if (animalType.isNotEmpty()) {
+            missionsReference.orderByChild("missionType")
+                .equalTo(animalType)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        for (missionSnapshot in dataSnapshot.children) {
+                            // Check if the mission is not completed
+                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                            if (!completed) {
+                                // Update the userProgress property
+                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                                missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
+
+                                // Check if userProgress equals the goal
+                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                                if (userProgress + 1 == goal) {
+                                    // Fetch the mission points and add to user's snaPoints
+                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                    updateSnaPoints(userData, myReference, missionPoints)
+
+                                    // Set completed to true
+                                    missionSnapshot.ref.child("completed").setValue(true)
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        // Handle errors
+                    }
+                })
+        }
+    }
+}
+
+//updates users snaPoints
+private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, missionPoints: Int) {
+    // Fetch the current snaPoints
+    val snaPointsReference = myReference.child(userData.userId).child("snaPoints")
+    snaPointsReference.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val currentSnaPoints = dataSnapshot.getValue(String::class.java) ?: "0"
+
+            // Add missionPoints to the current snaPoints and update in the database
+            val newSnaPoints = (currentSnaPoints.toInt() + missionPoints).toString()
+            snaPointsReference.setValue(newSnaPoints)
+
+            //Log.d(TAG, "Updated snaPoints: $newSnaPoints")
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            //Log.e(TAG, "Error fetching snaPoints: ${databaseError.message}")
+        }
+    })
+}
 
 
-private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo){
+private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo, userData: UserData){
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)
 
@@ -412,109 +645,24 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, pho
                 run {
                     var imageUrl = uri.toString()
                     downloadUrlFirebase = imageUrl
-                    uploadPhotoToDatabase(photo, downloadUrlFirebase)
+                    uploadPhotoToDatabase(photo, downloadUrlFirebase, userData)
                 }
             }
-            //val downloadUrlr = taskSnapshot.metadata?.reference?.downloadUrl
-            //downloadUrl = downloadUrlr.toString()
-
-            //Log.d(TAG, "downloadurl!! -> " + downloadUrlReal)
-            //Log.d(TAG, "downloadurl -> " + downloadUrl)555
-            // You can use the downloadUrl for further processing or store it in your database
         }.addOnFailureListener { exception ->
             // Handle the failure case, e.g., show an error message
             Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
         }
     }
-
-
 }
 
-/*private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
-    val currentUser = Firebase.auth.currentUser
-    val database = Firebase.database
-    val databaseReference = database.reference
-
-    currentUser?.let {
-        val userId = it.uid
-        val userName = it.displayName
-
-        // Create a folder name based on the user's ID or display name
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        val allFolder = "allImages"
-
-        // Update the path where the image URL will be stored in the database
-        val imagePath = "imagesTest/$folderName/"
-
-        val allImagesPath = "imagesTest/$allFolder/"
-
-        // Reference to the database path
-        val databasePath = databaseReference.child(imagePath)
-
-        val allImagesDatabasePath = databaseReference.child(allImagesPath)
-
-        // Push the photo data to the database
-        val databaseKey = databasePath.push().key
-        //photo.id = databaseKey.toString()
-        Log.d(TAG, "SOME TEST " + databaseKey.toString());
-        databaseKey?.let { key ->
-            photo.id = key
-            val data = hashMapOf(
-                "imageUrl" to photo.imageUri.toString(),
-                "animal" to photo.animalType,
-                "context" to photo.contextPhoto,
-                "description" to photo.description,
-                "id" to photo.id,
-                "downloadUrl" to downloadUrl,
-                "sender" to it.uid
-                "id" to photo.id,
-                "latitude" to photo.latitude,
-                "longitude" to photo.longitude
-            )
-            //databasePath.child(key).setValue(photo)
-            databasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to Realtime Database.")
-                    } else {
-                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
-                    }
-                }
-        }
-
-        val allImagesdatabaseKey = allImagesDatabasePath.push().key
-        allImagesdatabaseKey?.let { key ->
-            photo.id = key
-            val data = hashMapOf(
-                "imageUrl" to photo.imageUri.toString(),
-                "animal" to photo.animalType,
-                "context" to photo.contextPhoto,
-                "description" to photo.description,
-                "id" to photo.id,
-                "latitude" to photo.latitude,
-                "longitude" to photo.longitude
-                "id" to photo.id,
-                "downloadUrl" to downloadUrl,
-                "sender" to it.uid
-            )
-            allImagesDatabasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to Realtime Database to all images folder.")
-                    } else {
-                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
-                    }
-                }
-        }
-    }
-}*/
-
 //ja mete as fotos com o mesmo id em folders diferentes
-private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
+private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData) {
     val currentUser = Firebase.auth.currentUser
     val database = Firebase.database
     val databaseReference = database.reference
+
+    var post1 = false
+    var post2 = false
 
     currentUser?.let {
         val userId = it.uid
@@ -540,13 +688,16 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
                 "downloadUrl" to downloadUrl,
                 "sender" to it.uid,
                 "latitude" to photo.latitude,
-                "longitude" to photo.longitude
+                "longitude" to photo.longitude,
+                "likes" to photo.likes
             )
 
             // each user folder
             databasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        updateDailyMissions(userData, photo.animalType!!)
+                        updateMonthlyMissions(userData, photo.animalType!!)
                         Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
                         Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
@@ -565,7 +716,6 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
         }
     }
 }
-
 
 
 

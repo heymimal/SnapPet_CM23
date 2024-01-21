@@ -7,5 +7,5 @@ data class DailyMission(
     val points: Int = 0,
     val missionDescription: String = "",
     val createdDate: String = "",
-    val isCompleted: Boolean = false
+    val completed: Boolean = false
 )
