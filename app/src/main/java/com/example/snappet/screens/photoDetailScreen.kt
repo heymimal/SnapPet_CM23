@@ -36,6 +36,9 @@ import com.example.snappet.R
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Screens
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -137,8 +140,28 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
                         likePhotoMessage.value = true
                         photo.likes +=1
                         updateLikes(photo, photo.id, photo.likes)
-                        updateUserLikes(photo, photo.id)
-                        isLikeEnabled = false
+                        //updateUserLikes(photo, photo.id)
+
+                        val listLikedPhotos = updateUserLikes(
+                            photo,
+                            photo.id,
+                            onSuccess = { updatedLikedPhotos ->
+                                for (likedPhotoId in updatedLikedPhotos) {
+                                    // Do something with each likedPhotoId
+                                    if(likedPhotoId == photo.id){
+                                        isLikeEnabled = false
+                                    }
+                                    Log.d(TAG, "liked photo id: " + likedPhotoId)
+                                }
+                            },
+                            onFailure = {
+                                exception -> Log.e(TAG, "failed to update ", exception)
+                            }
+                        )
+
+
+
+
                 }
             //.align(alignment = Alignment.BottomEnd)
         )
@@ -179,8 +202,10 @@ fun updateLikes(photo: Photo, photoId: String, newLikes: Int){
         }
 }
 
-fun updateUserLikes(photo: Photo, photoId: String){
+/*fun updateUserLikes(photo: Photo, photoId: String) : List<String>{
     val user = Firebase.auth.currentUser
+
+    var updatedLikedPhotos: List<String> = emptyList()
 
     val database = Firebase.database
     val reference = user?.let { database.reference.child("Users (Quim)").child(it.uid).child("likedPhotos") }
@@ -189,9 +214,55 @@ fun updateUserLikes(photo: Photo, photoId: String){
     likedPhotoReference?.setValue(photoId)
         ?.addOnSuccessListener {
             Log.d(TAG, "photo liked added to user's liked photos")
+
+            // Retrieve the updated list after adding the new photoId
+            reference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    updatedLikedPhotos = snapshot.children.mapNotNull { it.value as? String }
+                    //onSuccess(updatedLikedPhotos)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    //onFailure(error.toException())
+                }
+            })
+
         }
         ?.addOnFailureListener {
             Log.e(TAG, "failed to add liked photo to user's liked photos", it)
         }
 
+    return updatedLikedPhotos
+}*/
+
+fun updateUserLikes(photo: Photo, photoId: String, onSuccess: (List<String>) -> Unit, onFailure: (Exception) -> Unit) {
+    val user = Firebase.auth.currentUser
+
+    if (user != null) {
+        val database = Firebase.database
+        val reference = database.reference.child("Users (Quim)").child(user.uid).child("likedPhotos")
+
+        val likedPhotoReference = reference.push()
+        likedPhotoReference.setValue(photoId)
+            .addOnSuccessListener {
+                Log.d(TAG, "liked photo added to user's liked photos list")
+
+                //get the list of photos, after update
+                reference.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val updatedLikedPhotos = snapshot.children.mapNotNull { it.value as? String }
+                        onSuccess(updatedLikedPhotos)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        onFailure(error.toException())
+                    }
+                })
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "failed to add liked photo to user's liked photos list", it)
+                onFailure(it)
+            }
+    }
 }
+
