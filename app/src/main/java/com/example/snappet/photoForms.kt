@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +47,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
@@ -240,17 +245,44 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     Box(
         modifier = Modifier.fillMaxSize()
     ){
+
+        val showAlertMessage = remember{ mutableStateOf(false) }
+
+        if(showAlertMessage.value){
+            AlertDialog(
+                onDismissRequest = { showAlertMessage.value = false },
+                title = {Text(text = "Warning")},
+                text = {Text (
+                    text = "Fill everything!",
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                )},
+                confirmButton = {
+                    Button(
+                        onClick = {showAlertMessage.value = false},
+                        colors = ButtonDefaults.buttonColors(Color.Black)
+                    ){
+                        Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            )
+        }
+
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
 
+                if(photoType == "" || contextPhotoType == "" || descriptionPhoto == ""){
+                        showAlertMessage.value = true
+                }else{
+                    showAlertMessage.value = false
+                    var savedUri = saveImageToMediaStore(takenPicture,context,file)
+                    //val downloadUrl = uploadImageToStorage(fileName, imageBitmap)
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", userId.toString()!!)
+
+                    uploadImageToStorage(fileName, imageBitmap, photo);
+                }
 
 
-                var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                //val downloadUrl = uploadImageToStorage(fileName, imageBitmap)
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", userId.toString()!!)
-
-                uploadImageToStorage(fileName, imageBitmap, photo);
                 //uploadPhotoToDatabase(photo)
             },
             shape = RoundedCornerShape(50.dp),
@@ -268,10 +300,23 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         {
             Text(text = "Upload", style = TextStyle(fontSize = 20.sp))
         }
+
+
     }
 
 }
 
+@Composable
+fun WarningMessage(message: String) {
+    Text(
+        text = message,
+        color = Color.Red,
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .background(Color.Gray) // Optional: Add background color for better visibility
+    )
+}
 
 private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo){
     val storage = Firebase.storage
