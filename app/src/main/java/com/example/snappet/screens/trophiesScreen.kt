@@ -1,5 +1,6 @@
 package com.example.snappet.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.snappet.data.DailyMission
+import com.example.snappet.data.MonthlyMission
 import com.example.snappet.navigation.Navigation
 import com.example.snappet.navigation.Screens
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMission>) {
+fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMission>, monthlyMissions: List<DailyMission>) {
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -59,7 +61,38 @@ fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMissi
                 )
 
                 LazyColumn {
+                    // Sticky header for daily missions
+                    stickyHeader {
+                        Text(
+                            text = "Daily Missions",
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.Gray)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    // Display daily missions
                     itemsIndexed(dailyMissions) { index, mission ->
+                        MissionCard(mission = mission)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    // Sticky header for monthly missions
+                    stickyHeader {
+                        Text(
+                            text = "Monthly Missions",
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.Gray)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    // Display monthly missions
+                    itemsIndexed(monthlyMissions) { index, mission ->
                         MissionCard(mission = mission)
                         Spacer(modifier = Modifier.height(8.dp))
                     }

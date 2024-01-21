@@ -2,6 +2,7 @@ package com.example.snappet
 
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -236,13 +237,14 @@ class MainActivity : ComponentActivity() {
                                             thisUserRef.child("Trophy").setValue(Trophy("bronze", "Novice"))
                                             //thisUserRef.child("LastLogin").setValue("1 1 1990")
                                             createDailyMissions(thisUserRef)
+                                            createMonthlyMissions(thisUserRef)
 
                                         }
                                     }
 
                                     override fun onCancelled(databaseError: DatabaseError) {
                                         // Handle potential errors
-                                        println("Error: ${databaseError.message}")
+                                        //println("Error: ${databaseError.message}")
                                     }
                                 })
 
@@ -271,6 +273,13 @@ class MainActivity : ComponentActivity() {
                                     val dateString = "$dayOfMonth $monthValue $year"
                                     testeLoginStreak = loginStreakDataState as Int
                                     val isBeforeToday = isDateBeforePresentDate(usersLastLogin)
+
+                                    //if the last time the user logged in was in the previous
+                                    //month, the monthly missions must be refreshed
+                                    if (!isDateInPresentMonth(usersLastLogin)) {
+                                        refreshMonthlyMissions(thisUserRef, dateString)
+                                    }
+
                                     if (!isBeforeToday) {
                                         loginStreakNav(
                                             loginStreakViewModel,
@@ -280,7 +289,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     } else {
                                         //novo dia, portanto ha que refrescar as missoes
-                                        refreshMissions(thisUserRef,dateString)
+                                        refreshDailyMissions(thisUserRef,dateString)
                                         // Increment by one
                                         testeLoginStreak++
                                         // Check if the value is 8 or above, then reset to 0
@@ -303,10 +312,10 @@ class MainActivity : ComponentActivity() {
                                         ).addOnCompleteListener { task ->
                                             if (task.isSuccessful) {
                                                 // Update successful
-                                                println("User data updated successfully")
+                                               //println("User data updated successfully")
                                             } else {
                                                 // Update failed
-                                                println("Error updating user data: ${task.exception}")
+                                                //println("Error updating user data: ${task.exception}")
                                             }
                                         }
 
@@ -356,14 +365,22 @@ class MainActivity : ComponentActivity() {
                             val throphiesViewModel: ThrophiesViewModel = viewModel()
                             val userData = googleAuthUiClient.getSignedInUser()
 
-                            LaunchedEffect(Unit) {
+                            // Use LaunchedEffect to fetch data when the composable is first launched
+                            LaunchedEffect(userData) {
                                 if (userData != null) {
                                     throphiesViewModel.fetchDailyMissions(userData.userId)
+                                    throphiesViewModel.fetchMonthlyMissions(userData.userId)
                                 }
                             }
+
+                            // Observe changes in daily and monthly missions separately
                             val dailyMissions by throphiesViewModel.dailyMissionsData.observeAsState(emptyList())
-                            TrophiesNav(navController, dailyMissions ?: emptyList())
+                            val monthlyMissions by throphiesViewModel.monthlyMissionsData.observeAsState(emptyList())
+
+                            // Pass both daily and monthly missions as parameters to TrophiesNav
+                            TrophiesNav(navController, dailyMissions ?: emptyList(), monthlyMissions ?: emptyList())
                         }
+
                         composable(route = Screens.TrophiesInfo.route) {
                             TrophiesInfoNav(navController)
                         }
@@ -380,6 +397,21 @@ class MainActivity : ComponentActivity() {
         val providedDate = LocalDate.parse(dateString, formatter)
         val currentDate = LocalDate.now()
         return providedDate.isBefore(currentDate)
+    }
+
+    //returns true if date is of the present month, false otherwise
+    fun isDateInPresentMonth(dateString: String): Boolean {
+        val formatter = DateTimeFormatter.ofPattern("d M yyyy")
+        val providedDate = LocalDate.parse(dateString, formatter)
+        val currentDate = LocalDate.now()
+
+        // Get the first day of the current month and the first day of the previous month
+        val firstDayOfCurrentMonth = currentDate.withDayOfMonth(1)
+        val firstDayOfPreviousMonth = firstDayOfCurrentMonth.minusMonths(1)
+
+        // Check if the provided date is after or equal to the first day of the previous month
+        // and before the first day of the current month
+        return providedDate.isAfter(firstDayOfPreviousMonth) || providedDate.isEqual(firstDayOfPreviousMonth)
     }
 
     //creats the 4 first daily missions
@@ -416,7 +448,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // refreshes the 4 daily missions
-    private fun refreshMissions(thisUserRef: DatabaseReference,dateString: String) {
+    private fun refreshDailyMissions(thisUserRef: DatabaseReference,dateString: String) {
         // Reference to the "Missions" node
         val missionsReference = thisUserRef.child("DailyMissions")
 
@@ -431,6 +463,57 @@ class MainActivity : ComponentActivity() {
         // Replace existing missions with the new ones
         for ((index, mission) in newMissionList.withIndex()) {
             missionsReference.child("DailyMission${index + 1}").setValue(mission)
+        }
+    }
+
+    private fun createMonthlyMissions(thisUserRef: DatabaseReference) {
+        val currentDate = LocalDate.now(ZoneId.systemDefault())
+        val dayOfMonth = currentDate.dayOfMonth
+        val monthValue = currentDate.monthValue
+        val year = currentDate.year
+        val dateString = "$dayOfMonth $monthValue $year"
+        thisUserRef.child("LastLogin").setValue(dateString)
+        val missionsReference = thisUserRef.child("MonthlyMissions")
+        missionsReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    // Create and store specific monthly missions
+                    val missionList = listOf(
+                        DailyMission("Dog", 30, 0, 40, "take 30 dog pictures", dateString, false),
+                        DailyMission("Cat", 30, 0, 40, "take 30 cat pictures", dateString, false),
+                        DailyMission("Bird", 30, 0, 40, "take 30 bird pictures", dateString, false),
+                        DailyMission("100PicturesMission", 100, 0, 120, "take 100 pictures", dateString, false)
+                    )
+
+                    // Add each mission under the "Missions" node with a custom key
+                    for ((index, mission) in missionList.withIndex()) {
+                        missionsReference.child("MonthlyMission${index + 1}").setValue(mission)
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle errors
+            }
+        })
+    }
+
+    // Refreshes the monthly missions
+    private fun refreshMonthlyMissions(thisUserRef: DatabaseReference, dateString: String) {
+        // Reference to the "Missions" node
+        val missionsReference = thisUserRef.child("MonthlyMissions")
+
+        // Create and store specific monthly missions with the same naming convention
+        val newMissionList = listOf(
+            DailyMission("Dog", 30, 0, 40, "take 30 dog pictures", dateString, false),
+            DailyMission("Cat", 30, 0, 40, "take 30 cat pictures", dateString, false),
+            DailyMission("Bird", 30, 0, 40, "take 30 bird pictures", dateString, false),
+            DailyMission("100PicturesMission", 100, 0, 120, "take 100 pictures", dateString, false)
+        )
+
+        // Replace existing missions with the new ones
+        for ((index, mission) in newMissionList.withIndex()) {
+            missionsReference.child("MonthlyMission${index + 1}").setValue(mission)
         }
     }
 }
