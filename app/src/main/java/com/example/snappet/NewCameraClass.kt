@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.location.Location
 import android.net.Uri
 import android.os.Environment
@@ -26,6 +27,7 @@ import androidx.navigation.NavController
 import com.example.snappet.sign_In.UserData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.database.DatabaseReference
@@ -79,9 +81,22 @@ fun CameraClass(navController: NavController, userData: UserData) {
     val getCameraImage =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
+                val matrix = Matrix()
+                matrix.postRotate(90F)
+
                 capturedImageUri = uri;
 
                 takenPicture = BitmapFactory.decodeFile(currentImagePath)
+                val picture = takenPicture
+                takenPicture = Bitmap.createBitmap(
+                    picture!!,
+                    0,
+                    0,
+                    picture.width,
+                    picture.height,
+                    matrix,
+                    true
+                )
 
             }
         }
@@ -134,7 +149,9 @@ fun CameraClass(navController: NavController, userData: UserData) {
         val imageBitmap = rememberUpdatedState(takenPicture!!).value.asImageBitmap()
         Log.d(Logger.TAG,"URI é: $uri")
         Log.d(TAG,locationPoint.toString())
-        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file, userData = userData)
+        var latlng: LatLng? = null
+        if(locationPoint!=null)  latlng = LatLng(locationPoint!!.latitude,locationPoint!!.longitude)
+        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file, loc = latlng, userData = userData)
        /*Column(
             modifier = Modifier.fillMaxWidth()
         ) {

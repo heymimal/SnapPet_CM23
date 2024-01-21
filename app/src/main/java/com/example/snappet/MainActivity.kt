@@ -1,6 +1,8 @@
 package com.example.snappet
 
 
+import android.content.ContentValues.TAG
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -40,16 +42,23 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.snappet.data.DailyMission
 import com.example.snappet.data.Trophy
+import com.example.snappet.data.Photo
 import com.example.snappet.screens.DayInfo
 import com.example.snappet.screens.TrophiesInfoNav
+import com.example.snappet.screens.PhotoDetailScreen
 import com.example.snappet.screens.leaderboardNav
 import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
 import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.viewModels.ThrophiesViewModel
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.getValue
 import com.jakewharton.threetenabp.AndroidThreeTen
 import java.time.LocalDate
 import java.time.ZoneId
@@ -73,10 +82,6 @@ class MainActivity : ComponentActivity() {
                 "Signed out",
                 Toast.LENGTH_LONG
             ).show()
-
-            //faz voltarmos para o ecrã anterior (do login)
-            //VER ISTO!!!
-            //navController.popBackStack()
             navController.navigate("sign_in")
         }
     }
@@ -312,10 +317,10 @@ class MainActivity : ComponentActivity() {
                                         ).addOnCompleteListener { task ->
                                             if (task.isSuccessful) {
                                                 // Update successful
-                                               //println("User data updated successfully")
+                                                println("User data updated successfully")
                                             } else {
                                                 // Update failed
-                                                //println("Error updating user data: ${task.exception}")
+                                                println("Error updating user data: ${task.exception}")
                                             }
                                         }
 
@@ -356,11 +361,6 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.Home.route) {
                             HomeMenu(navController)
                         }
-                        composable("map_route") {
-                        }
-                        composable("camera_route") {
-
-                        }
                         composable(route = Screens.Trophies.route) {
                             val throphiesViewModel: ThrophiesViewModel = viewModel()
                             val userData = googleAuthUiClient.getSignedInUser()
@@ -384,11 +384,90 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.TrophiesInfo.route) {
                             TrophiesInfoNav(navController)
                         }
+
+                        composable("${Screens.PhotoDetail.route}{photoId}") { backStackEntry ->
+                            // Obtenha o ID da foto da rota
+                            val rawPhotoId = backStackEntry.arguments?.getString("photoId") ?: ""
+                            val photoId = "-" + rawPhotoId.substringAfter("-")
+                            val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+                            val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
+                                "allImages"
+                            )
+
+                            var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+
+                            recentPhotos = getPhotos(databaseReference)
+
+                            val catPhotosr = recentPhotos.filter { it.id == photoId}
+
+                            catPhotosr.forEach { catPhoto ->
+                                if(catPhoto.id == photoId){
+                                    Log.d(TAG, "Sao iguais!")
+                                }
+                                PhotoDetailScreen(catPhoto, navController)
+                            }
+                        }
+
                     }
                 }
             }
         }
     }
+
+    @Composable
+    fun getPhotos(databaseReference: DatabaseReference): List<Photo>{
+
+        var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
+
+        LaunchedEffect(key1 = databaseReference) {
+            val valueEventListener = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val photos = mutableListOf<Photo>()
+                    for (childSnapshot in dataSnapshot.children) {
+                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+                        val animalType = childSnapshot.child("animal").getValue(String::class.java)
+                        val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
+                        val description = childSnapshot.child("description").getValue(String::class.java)
+                        val id = childSnapshot.child("id").getValue(String::class.java)
+                        val downloadUrl = childSnapshot.child("downloadUrl").getValue(String::class.java)
+                        val sender = childSnapshot.child("sender").getValue(String::class.java)
+                        val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
+                        val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
+                        val likes  = childSnapshot.child("likes").getValue(Int::class.java)
+
+
+                        imageUrl?.let {
+                            val photo = Photo(
+                                imageUri = Uri.parse(it),
+                                animalType = animalType ?: "",
+                                contextPhoto = contextPhoto ?: "",
+                                description = description ?: "",
+                                id = id ?: "",
+                                downloadUrl = downloadUrl?: "",
+                                sender = sender?: "",
+                                latitude = latitude ?: 0.0,
+                                longitude = longitude ?: 0.0,
+                                likes = likes ?: 0
+                            )
+
+                            photos.add(photo)
+                        }
+                    }
+                    recentPhotos = photos
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle error
+                }
+            }
+            databaseReference.addValueEventListener(valueEventListener)
+
+        }
+
+        return recentPhotos
+    }
+
     //metodo para comparar 1 data com a data do momento
     //retorna false se a dateString for "hoje"
     //terona true se a dateString tiver acontecido antes de hoje

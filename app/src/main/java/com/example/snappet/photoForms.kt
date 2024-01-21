@@ -19,16 +19,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -42,16 +52,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
+import com.google.android.gms.maps.model.LatLng
 import com.example.snappet.sign_In.UserData
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -62,23 +79,20 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 
-//@OptIn(ExperimentalMaterial3Api::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File, userData: UserData){
-
-    var photo = Photo(uri);
+fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File, loc : LatLng?, userData: UserData){
 
     var photoType by remember {
-        mutableStateOf<String?>("Dog")
+        mutableStateOf<String?>("")
     }
 
     var contextPhotoType by remember{
-        mutableStateOf<String?>("Entertainment")
+        mutableStateOf<String?>("")
     }
 
     var descriptionPhoto by remember{
-        mutableStateOf<String?>("n")
+        mutableStateOf<String?>("")
     }
 
     val storage = Firebase.storage
@@ -86,6 +100,8 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
     val context = LocalContext.current
 
+    val user = Firebase.auth.currentUser
+    val userId = user?.uid
 
     //var navController = rememberNavController()
 
@@ -127,9 +143,15 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Animal Type",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                    append("Animal Type")
+                }
+                withStyle(style = SpanStyle(fontSize = 15.sp)) {
+                    append(" *")
+                }
+            },
             color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
                 .align(alignment = Alignment.Start)
         )
@@ -139,9 +161,11 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            val options = listOf("Dog", "Cat", "Bird")
+            val options = listOf("Bee", "Bird", "Butterfly", "Cat", "Chicken", "Cow", "Dog", "Duck", "Gecko", "Goat",
+                "Horse", "Lizard", "Peacock", "Pig", "Rabbit", "Sheep")
             var expanded by remember { mutableStateOf(false) } //menu drop down aberto ou nao
-            var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+            //var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+            var selectedOptionText by remember { mutableStateOf<String?>(null) } // current selected
 
 
             ExposedDropdownMenuBox(
@@ -151,7 +175,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 TextField(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
-                    value = selectedOptionText,
+                    value = selectedOptionText?: "",
                     onValueChange = {},
                     label = { Text("Animal") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -167,21 +191,21 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                             onClick = {
                                 selectedOptionText = selectionOption
                                 expanded = false
-                                photoType = selectedOptionText
+                                //photoType = selectedOptionText
+                                photoType = if (selectedOptionText != null) selectedOptionText else null
 
-                                Log.d(TAG, "TESTEEEEEEEEEEE")
-                                Log.d(TAG, selectedOptionText)
-                                Log.d(TAG, photoType!!)
                             },
 
 
                             )
                     }
+
+                    Log.d(TAG, "ANIMAL SELECIONADO -> " + photoType)
                 }
             }
-            Log.d(TAG, "TESTE")
-            Log.d(TAG, selectedOptionText)
-            Log.d(TAG, photoType!!)
+
+            Log.d(TAG, "ANIMAL SELECIONADO1 -> " + photoType)
+
 
 
         }
@@ -189,9 +213,15 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "Context",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                    append("Context")
+                }
+                withStyle(style = SpanStyle(fontSize = 15.sp)) {
+                    append(" *")
+                }
+            },
             color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
                 .align(alignment = Alignment.Start)
         )
@@ -204,79 +234,196 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Log.d(TAG, "TESTE DO CONTEXTO");
         Log.d(TAG, contextPhotoType!!);
 
+        Spacer(modifier = Modifier.height(15.dp))
+
         Text(
-            text = "Description",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                    append("Description")
+                }
+                withStyle(style = SpanStyle(fontSize = 15.sp)) {
+                    append(" *")
+                }
+            },
             color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier.align(alignment = Alignment.Start)
         )
         Spacer(modifier = Modifier.height(15.dp))
 
-        var ttext by remember { mutableStateOf("Describe the Photo...") }
+        var ttext by remember { mutableStateOf<String?>("") }
 
-        TextField(
-            value = ttext,
+        val maxChar = 60
+
+        /*TextField(
+            value = ttext!!,
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onValueChange = { ttext = it },
+            onValueChange = {
+                if(it.length <= maxChar){
+                    ttext = it
+                } },
             label = { Text("Description") }
         )
 
-        descriptionPhoto = ttext
+        descriptionPhoto = ttext*/
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            // Character count display
+            Text(
+                text = "Characters: ${ttext?.length}/$maxChar",
+                color = Color.Gray,
+                style = TextStyle(fontSize = 12.sp),
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterHorizontally)
+
+            )
+
+            // TextField with character limit
+            TextField(
+                value = ttext!!,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onValueChange = {
+                    if (it.length <= maxChar) {
+                        ttext = it
+                    }
+                },
+                label = { Text("Description") }
+            )
+
+
+
+            descriptionPhoto = ttext
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Text(
+            text = "(Options selected with * are mandatory to fill in!)",
+            color = Color.Black,
+            style = TextStyle(fontSize = 10.sp, fontStyle = FontStyle.Italic),
+            modifier = Modifier.align(alignment = Alignment.Start)
+        )
+
 
     }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ){
+
+        var latitude = 190.0
+        var longitude = 190.0
+
+        var isLocationChecked = SwitchOption()
+
+        val showAlertMessage = remember{ mutableStateOf(false) }
+
+        if(showAlertMessage.value){
+            AlertDialog(
+                onDismissRequest = { showAlertMessage.value = false },
+                title = {Text(text = "Warning")},
+                text = {Text (
+                    text = "Fill everything!",
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                )},
+                confirmButton = {
+                    Button(
+                        onClick = {showAlertMessage.value = false},
+                        colors = ButtonDefaults.buttonColors(Color.Black)
+                    ){
+                        Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            )
+        }
+
+
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
 
-                var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!)
+                if(photoType == "" || contextPhotoType == "" || descriptionPhoto == ""){
+                        showAlertMessage.value = true
+                }else{
+                    showAlertMessage.value = false
+                    var savedUri = saveImageToMediaStore(takenPicture,context,file)
 
-                Log.d(TAG, "TIPOS DA FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.animalType)
+                if(loc!=null){
+                    latitude = loc.latitude
+                    longitude = loc.longitude
+                }
 
-                Log.d(TAG, "CONTEXTO DAS FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.contextPhoto)
-
-                Log.d(TAG, "DESCRICAO DAS FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.description)
-                uploadImageToStorage(fileName, imageBitmap);
-                uploadPhotoToDatabase(photo)
-
-                updateDailyMissions(userData, photo.animalType!!)
-                updateMonthlyMissions(userData, photo.animalType!!)
-                // Show a Toast if photo.description equals "Needs Help"
-                if (photo.contextPhoto == "Needs Help") {
-                    println("AAA: ${photo.contextPhoto}")
-                    Toast.makeText(
-                        context,
-                        "Animal Shelter Entities Have Been Notified!",
-                        Toast.LENGTH_LONG
-                    ).show()
+                if(isLocationChecked){
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude, 0)
+                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
+                }else{
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,190.0,190.0, 0)
+                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
+                }
+                    if (contextPhotoType == "Needs Help") {
+                        Toast.makeText(
+                            context,
+                            "Animal Shelter Entities Have Been Notified!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             },
             shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+            colors = ButtonDefaults.buttonColors(Color.Black),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
                 .offset(
                     x = 246.dp,
-                    y = 680.dp
+                    y = 740.dp
                 )
                 .height(50.dp)
                 .width(150.dp)
-
         )
         {
-            Text(text = "Upload", style = TextStyle(fontSize = 20.sp))
+            Text(text = "Upload", style = TextStyle(fontSize = 20.sp), color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
+}
+
+@Composable
+fun SwitchOption(): Boolean{
+    var isChecked by remember{ mutableStateOf(true) }
+
+    val icons = if(isChecked) Icons.Filled.Check else Icons.Filled.Close
+
+    val icon: (@Composable () -> Unit)? =
+        if (isChecked){
+            {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                )
+            }
+
+        }else null
+
+    Column(
+        modifier = Modifier.offset(y = 720.dp).padding(20.dp)
+    ){
+        Text(
+            text = "Share Location",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Switch(
+            checked = isChecked,
+            onCheckedChange = {isChecked = it},
+            thumbContent = icon,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+    }
+
+    return isChecked
 
 }
 
@@ -456,12 +603,18 @@ private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, 
     })
 }
 
-private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
+
+private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo, userData: UserData){
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)
 
     val currentUser = Firebase.auth.currentUser
     val userUid = currentUser?.uid
+
+    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    val databaseReference: DatabaseReference = database.reference.child("urlTest")
+
+    var downloadUrl = ""
 
     if(userUid!= null){
         val userFolderRef = storage.reference.child("user_images_storage/$userUid")
@@ -486,73 +639,78 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
 
         uploadTask.addOnSuccessListener { taskSnapshot ->
             // Image upload success, you can retrieve the download URL if needed
-            val downloadUrl = taskSnapshot.metadata?.reference?.downloadUrl
-            // You can use the downloadUrl for further processing or store it in your database
+            var downloadUrlFirebase = ""
+            val downloadUrlReal = taskSnapshot.storage.downloadUrl;
+            downloadUrlReal.addOnSuccessListener { uri ->
+                run {
+                    var imageUrl = uri.toString()
+                    downloadUrlFirebase = imageUrl
+                    uploadPhotoToDatabase(photo, downloadUrlFirebase, userData)
+                }
+            }
         }.addOnFailureListener { exception ->
             // Handle the failure case, e.g., show an error message
             Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
         }
     }
-
-
 }
 
-private fun uploadPhotoToDatabase(photo: Photo) {
+//ja mete as fotos com o mesmo id em folders diferentes
+private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData) {
     val currentUser = Firebase.auth.currentUser
     val database = Firebase.database
     val databaseReference = database.reference
+
+    var post1 = false
+    var post2 = false
 
     currentUser?.let {
         val userId = it.uid
         val userName = it.displayName
 
-        // Create a folder name based on the user's ID or display name
         val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        // Update the path where the photo data will be stored in the database
-        //val photoPath = "photoData/$folderName/"
-
         val allFolder = "allImages"
-
-        // Update the path where the image URL will be stored in the database
         val imagePath = "imagesTest/$folderName/"
-
         val allImagesPath = "imagesTest/$allFolder/"
 
-        val data = hashMapOf(
-            "imageUrl" to photo.imageUri.toString(),
-            "animal" to photo.animalType,
-            "context" to photo.contextPhoto,
-            "description" to photo.description
-        )
-
-        // Reference to the database path
         val databasePath = databaseReference.child(imagePath)
-
         val allImagesDatabasePath = databaseReference.child(allImagesPath)
 
-        // Push the photo data to the database
-        val databaseKey = databasePath.push().key
-        databaseKey?.let { key ->
-            //databasePath.child(key).setValue(photo)
+        val sharedKey = databasePath.push().key
+        sharedKey?.let { key ->
+            photo.id = key
+            val data = hashMapOf(
+                "imageUrl" to photo.imageUri.toString(),
+                "animal" to photo.animalType,
+                "context" to photo.contextPhoto,
+                "description" to photo.description,
+                "id" to photo.id,
+                "downloadUrl" to downloadUrl,
+                "sender" to it.uid,
+                "latitude" to photo.latitude,
+                "longitude" to photo.longitude,
+                "likes" to photo.likes
+            )
+
+            // each user folder
             databasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to Realtime Database.")
+                        updateDailyMissions(userData, photo.animalType!!)
+                        updateMonthlyMissions(userData, photo.animalType!!)
+                        Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
-                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
+                        Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
                     }
                 }
-        }
 
-        val allImagesdatabaseKey = allImagesDatabasePath.push().key
-        allImagesdatabaseKey?.let { key ->
+            // all images folder
             allImagesDatabasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to Realtime Database to all images folder.")
+                        Log.d(TAG, "Photo data uploaded to shared folder.")
                     } else {
-                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
+                        Log.e(TAG, "Failed to upload photo data to shared folder", task.exception)
                     }
                 }
         }
@@ -592,38 +750,11 @@ private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File):
 
 }
 
-
-/*@Composable
-fun radioButton(){
-    val radioOptions = listOf("Entertainment", "Needs Help")
-    var selectedOption by remember { mutableStateOf(radioOptions[0]) }
-
-    Row(
-        modifier = Modifier
-            .padding(start = 8.dp)
-            .fillMaxWidth(),
-        verticalAlignment =  Alignment.CenterVertically
-    ) {
-        radioOptions.forEach { option ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = (option == selectedOption),
-                    onClick = { selectedOption = option }
-                )
-                Text(
-                    text = option,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(end = 20.dp)
-                )
-            }
-        }
-    }
-}*/
-
 @Composable
 fun radioButton(onOptionSelected: (String) -> Unit) {
     val radioOptions = listOf("Entertainment", "Needs Help")
-    var selectedOption by remember { mutableStateOf(radioOptions[0]) }
+    //var selectedOption by remember { mutableStateOf(radioOptions[0]) }
+    var selectedOption by remember { mutableStateOf<String?>("") }
 
     Row(
         modifier = Modifier
@@ -636,8 +767,9 @@ fun radioButton(onOptionSelected: (String) -> Unit) {
                 RadioButton(
                     selected = (option == selectedOption),
                     onClick = {
-                        selectedOption = option
-                        onOptionSelected(selectedOption)
+                        //selectedOption = option
+                        selectedOption = if (selectedOption == option) null else option
+                        onOptionSelected(selectedOption!!)
                     }
                 )
                 Text(
@@ -649,120 +781,3 @@ fun radioButton(onOptionSelected: (String) -> Unit) {
         }
     }
 }
-
-/*private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
-
-    if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
-        Log.e(TAG, "Uri inválido ou nulo")
-        return
-    }
-
-    Log.d(TAG, "Path do Uri: ${imageUri.path}")
-
-    val currentUser = Firebase.auth.currentUser
-    if(currentUser != null){
-        val userId = currentUser.uid
-        val userName = currentUser.displayName
-
-        // Create a folder name based on the user's ID or display name
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        // Update the folder path where the image will be stored
-        val folderPath = "imagesTestNew/$folderName/"
-
-        // Upload the image to Firebase Storage
-        val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-        val storageReference = storageRef.child(storageFileNameUser)
-
-        //val imageUri = capturedPhoto.imageUri
-
-        val uploadTask1 = storageReference.putFile(imageUri)
-
-        uploadTask1.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-            } else {
-                Log.d(TAG, "Failed to upload photo", task.exception)
-            }
-        }
-
-        // Upload the image to Firebase Storage
-        val storageFileName = "imagesTest/${System.currentTimeMillis()}.jpg"
-
-        val storageReference1 = storageRef.child(storageFileName)
-        val uploadTask = imageUri?.let { storageReference1.putFile(it) }
-
-        uploadTask?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-            } else {
-                Log.e(TAG, "Failed to upload photo", task.exception)
-            }
-        }
-    }
-}*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-@Preview
-@Composable
-private fun PhotoFormsPreview() {
-    SnapPetPreviewPhoto(null)
-}*/
-
-/*
- val currentUser = Firebase.auth.currentUser
-
-                if(currentUser != null){
-                    val userId = currentUser.uid
-                    val userName = currentUser.displayName
-
-                    // Create a folder name based on the user's ID or display name
-                    val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-                    // Update the folder path where the image will be stored
-                    val folderPath = "images/$folderName/"
-
-                    // Upload the image to Firebase Storage
-                    val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-                    val storageReference = storageRef.child(storageFileNameUser)
-                    val uploadTask1 = localUri?.let { storageReference.putFile(it) }
-
-                    uploadTask1?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }
-
-                    // Upload the image to Firebase Storage
-                    val storageFileName = "images/${System.currentTimeMillis()}.jpg"
-
-                    val storageReference1 = storageRef.child(storageFileName)
-                    val uploadTask = localUri?.let { storageReference1.putFile(it) }
-
-                    uploadTask?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }
-                }
-*/

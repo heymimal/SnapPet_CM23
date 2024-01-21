@@ -4,6 +4,7 @@ plugins {
     //plugin necessário para login com conta google
     id("com.google.gms.google-services")
     id("com.google.secrets_gradle_plugin") version "0.5"
+    //id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 
 }
 
@@ -59,6 +60,11 @@ android {
 }
 
 dependencies {
+
+    // Maps
+    implementation ("com.google.maps.android:maps-compose:4.3.0")
+
+
 
     //ThreeTenABP (used to get dates)
     implementation ("com.jakewharton.threetenabp:threetenabp:1.3.0")
@@ -130,7 +136,12 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.2")
     implementation ("com.google.android.gms:play-services-tasks:17.2.2")
 
+    // Optionally, you can include the Compose utils library for Clustering,
+    // Street View metadata checks, etc.
+    implementation ("com.google.maps.android:maps-compose-utils:4.3.0")
 
+    // Optionally, you can include the widgets library for ScaleBar, etc.
+    implementation ("com.google.maps.android:maps-compose-widgets:4.3.0")
 
 
     testImplementation("junit:junit:4.13.2")

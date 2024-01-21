@@ -74,9 +74,6 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-//para este Screen não precisamos de um view model pois ele não
-// contém nenhum estado nem nada que "mude" ao longo do tempo
-//só mostra user data estática
 fun ProfileScreenComposable(
     final: UserData?,
     userData: UserData?,
