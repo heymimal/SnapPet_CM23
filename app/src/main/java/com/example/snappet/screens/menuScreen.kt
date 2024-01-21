@@ -87,14 +87,6 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            /*Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(shape = MaterialTheme.shapes.medium)
-            )*/
-            Log.d("ImageURL", photo.imageUri.toString())
 
             // Use downloadUrl if sender is not the current user
             val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.example.snappet.data.Photo
 import com.example.snappet.screens.PhotoDetailCard
+import com.example.snappet.screens.ClusterViewPhotos
 import com.example.snappet.viewModels.PhotosViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -170,11 +171,11 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
           onClusterClick = {
               clickSinglePoint = false
               clickOnCluster = false
-              Log.d(TAG,"This is the photo test:\n$photos")
+              Log.d(TAG,"clusted deactivated")
+
               photos =  it.items.map { it.photoInfo }
-              Log.d(TAG,"${it.items}")
-              Log.d(TAG,"This is the photo test:\n$photos")
               Log.d(TAG, "Cluster clicked! $it")
+              clickOnCluster = true
               false
           },
           onClusterItemClick = {
@@ -183,6 +184,7 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
           },
           onClusterItemInfoWindowClick = {
               clickSinglePoint = false
+              clickOnCluster = false
               photo = it.photoInfo
               clickSinglePoint = true
               Log.d(TAG, "Cluster item info window clicked! $it")
@@ -206,6 +208,9 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
                 Text(text = "click me")
             }
         }
+    }
+    if(clickOnCluster){
+        ClusterViewPhotos(photos)
     }
 
 }
