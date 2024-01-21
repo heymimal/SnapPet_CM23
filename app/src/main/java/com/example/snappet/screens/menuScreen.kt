@@ -146,15 +146,10 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                     val description = childSnapshot.child("description").getValue(String::class.java)
                     val id = childSnapshot.child("id").getValue(String::class.java)
-                    val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
-                    val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
                     val downloadUrl = childSnapshot.child("downloadUrl").getValue(String::class.java)
                     val sender = childSnapshot.child("sender").getValue(String::class.java)
-
-                    //val key = childSnapshot.key;
-                    //Log.d(TAG, "NOVO TESTE! " + key);
-
-                    //Log.d(TAG, "Image URLLL: $imageUrl")
+                    val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
+                    val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
 
                     imageUrl?.let {
                         val photo = Photo(
@@ -164,7 +159,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                             description = description ?: "",
                             id = id ?: "",
                             downloadUrl = downloadUrl ?: "",
-                            sender = sender ?: ""
+                            sender = sender ?: "",
                             latitude = latitude ?: 0.0,
                             longitude = longitude ?: 0.0
                         )

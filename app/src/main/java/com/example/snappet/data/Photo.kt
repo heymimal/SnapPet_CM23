@@ -11,7 +11,7 @@ data class Photo(
     var description: String = "",
     var id: String = "",
     var downloadUrl: String = "",
-    var sender: String = ""
+    var sender: String = "",
     var latitude: Double,
     var longitude: Double
     //var description:String  = "",

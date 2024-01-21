@@ -439,7 +439,7 @@ class MainActivity : ComponentActivity() {
                                 description = description ?: "",
                                 id = id ?: "",
                                 downloadUrl = downloadUrl?: "",
-                                sender = sender?: ""
+                                sender = sender?: "",
                                 latitude = latitude ?: 0.0,
                                 longitude = longitude ?: 0.0
                             )

@@ -94,8 +94,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
     Log.d(TAG, "USER " + user?.displayName + " "+ userId)
 
-    //var navController = rememberNavController()
-
     Log.d(TAG, "URI");
     Log.d(TAG, uri.toString());
 
@@ -344,7 +342,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                     latitude = loc.latitude
                     longitude = loc.longitude
                 }
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "id",latitude,longitude)
+                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude)
 
                     uploadImageToStorage(fileName, imageBitmap, photo);
                 }
@@ -540,7 +538,9 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
                 "description" to photo.description,
                 "id" to photo.id,
                 "downloadUrl" to downloadUrl,
-                "sender" to it.uid
+                "sender" to it.uid,
+                "latitude" to photo.latitude,
+                "longitude" to photo.longitude
             )
 
             // each user folder

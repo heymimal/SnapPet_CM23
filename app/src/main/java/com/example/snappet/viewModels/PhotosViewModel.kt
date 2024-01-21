@@ -36,6 +36,8 @@ class PhotosViewModel : ViewModel() {
                     val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                     val description = childSnapshot.child("description").getValue(String::class.java)
                     val id = childSnapshot.child("id").getValue(String::class.java)
+                    val downloadUrl = childSnapshot.child("downloadUrl").getValue(String::class.java)
+                    val sender = childSnapshot.child("sender").getValue(String::class.java)
                     val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
                     val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
 
@@ -46,8 +48,10 @@ class PhotosViewModel : ViewModel() {
                             contextPhoto = contextPhoto ?: "",
                             description = description ?: "",
                             id = id ?: "",
-                            latitude = latitude ?: 190.0,
-                            longitude = longitude ?: 190.0
+                            downloadUrl = downloadUrl ?: "",
+                            sender = sender ?: "",
+                            latitude = latitude ?: 0.0,
+                            longitude = longitude ?: 0.0
                         )
                         photos.add(photo)
                     }
