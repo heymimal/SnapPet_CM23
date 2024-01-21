@@ -40,6 +40,7 @@ class PhotosViewModel : ViewModel() {
                     val sender = childSnapshot.child("sender").getValue(String::class.java)
                     val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
                     val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
+                    val likes  = childSnapshot.child("likes").getValue(Int::class.java)
 
                     imageUrl?.let {
                         val photo = Photo(
@@ -51,7 +52,8 @@ class PhotosViewModel : ViewModel() {
                             downloadUrl = downloadUrl ?: "",
                             sender = sender ?: "",
                             latitude = latitude ?: 0.0,
-                            longitude = longitude ?: 0.0
+                            longitude = longitude ?: 0.0,
+                            likes = likes ?: 0
                         )
                         photos.add(photo)
                     }

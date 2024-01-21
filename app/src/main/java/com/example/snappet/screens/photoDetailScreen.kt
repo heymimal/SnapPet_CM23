@@ -1,26 +1,42 @@
 package com.example.snappet.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.example.snappet.R
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Screens
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 @Composable
@@ -68,6 +84,74 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        val likePhotoMessage = remember{ mutableStateOf(false) }
+
+        if(likePhotoMessage.value){
+            AlertDialog(
+                onDismissRequest = { likePhotoMessage.value = false },
+                title = {Text(text = "Thank you!")},
+                text = {Text (
+                    text = "You like the photo!",
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                )},
+                confirmButton = {
+                    Button(
+                        onClick = {likePhotoMessage.value = false},
+                        colors = ButtonDefaults.buttonColors(Color.Black)
+                    ){
+                        Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            )
+        }
+
+        val alreadyLikedPhotoMessage = remember{ mutableStateOf(false) }
+
+        if(alreadyLikedPhotoMessage.value){
+            AlertDialog(
+                onDismissRequest = { alreadyLikedPhotoMessage.value = false },
+                title = {Text(text = "Warning!")},
+                text = {Text (
+                    text = "You have already liked the photo, can't like it again!",
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                )},
+                confirmButton = {
+                    Button(
+                        onClick = {alreadyLikedPhotoMessage.value = false},
+                        colors = ButtonDefaults.buttonColors(Color.Black)
+                    ){
+                        Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            )
+        }
+
+        var isLikeEnabled by remember { mutableStateOf(true) }
+
+        Image(
+            painter = painterResource(R.drawable.heart),
+            contentDescription = "Like",
+            modifier = Modifier
+                .size(25.dp)
+                .clickable(enabled = isLikeEnabled) {
+                        likePhotoMessage.value = true
+                        photo.likes +=1
+                        updateLikes(photo, photo.id, photo.likes)
+                        isLikeEnabled = false
+                }
+            //.align(alignment = Alignment.BottomEnd)
+        )
+
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Number of Likes: ${photo.likes}",
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         Button(
             onClick = {navController.navigate(Screens.Home.route) },
             modifier = Modifier
@@ -79,4 +163,17 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
 
 
     }
+}
+
+fun updateLikes(photo: Photo, photoId: String, newLikes: Int){
+    val database = Firebase.database
+    val reference = database.reference.child("imagesTest").child("allImages")
+        .child(photoId).child("likes")
+
+    reference.setValue(newLikes).addOnSuccessListener {
+        Log.d(TAG, "LIKES UPDATED")
+    }
+        .addOnFailureListener{
+            Log.d(TAG, "LIKES NOT UPDATED")
+        }
 }

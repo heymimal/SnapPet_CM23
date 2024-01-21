@@ -19,10 +19,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,8 +34,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -199,7 +206,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -223,7 +230,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Log.d(TAG, "TESTE DO CONTEXTO");
         Log.d(TAG, contextPhotoType!!);
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -302,6 +309,11 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         modifier = Modifier.fillMaxSize()
     ){
 
+        var latitude = 190.0
+        var longitude = 190.0
+
+        var isLocationChecked = SwitchOption()
+
         val showAlertMessage = remember{ mutableStateOf(false) }
 
         if(showAlertMessage.value){
@@ -336,15 +348,23 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                     //val downloadUrl = uploadImageToStorage(fileName, imageBitmap)
                     //var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", userId.toString()!!)
                 //var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                var latitude = 190.0
-                var longitude = 190.0
+
                 if(loc!=null){
                     latitude = loc.latitude
                     longitude = loc.longitude
                 }
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude)
 
+                if(isLocationChecked){
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude, 0)
                     uploadImageToStorage(fileName, imageBitmap, photo);
+                }else{
+                    var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,190.0,190.0, 0)
+                    uploadImageToStorage(fileName, imageBitmap, photo);
+                }
+
+
+
+
                 }
 
 
@@ -369,7 +389,44 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
 }
 
+@Composable
+fun SwitchOption(): Boolean{
+    var isChecked by remember{ mutableStateOf(true) }
 
+    val icons = if(isChecked) Icons.Filled.Check else Icons.Filled.Close
+
+    val icon: (@Composable () -> Unit)? =
+        if (isChecked){
+            {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                )
+            }
+
+        }else null
+
+    Column(
+        modifier = Modifier.offset(y = 720.dp).padding(20.dp)
+    ){
+        Text(
+            text = "Share Location",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Switch(
+            checked = isChecked,
+            onCheckedChange = {isChecked = it},
+            thumbContent = icon,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+    }
+
+    return isChecked
+
+}
 
 private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo){
     val storage = Firebase.storage
@@ -540,7 +597,8 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
                 "downloadUrl" to downloadUrl,
                 "sender" to it.uid,
                 "latitude" to photo.latitude,
-                "longitude" to photo.longitude
+                "longitude" to photo.longitude,
+                "likes" to photo.likes
             )
 
             // each user folder

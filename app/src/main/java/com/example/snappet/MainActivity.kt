@@ -1,9 +1,7 @@
 package com.example.snappet
 
 
-import android.content.ContentValues
 import android.content.ContentValues.TAG
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -57,16 +54,13 @@ import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
 import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.viewModels.ThrophiesViewModel
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.getValue
 import com.jakewharton.threetenabp.AndroidThreeTen
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import kotlin.coroutines.resumeWithException
 
 
 class MainActivity : ComponentActivity() {
@@ -429,6 +423,7 @@ class MainActivity : ComponentActivity() {
                         val sender = childSnapshot.child("sender").getValue(String::class.java)
                         val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
                         val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
+                        val likes  = childSnapshot.child("likes").getValue(Int::class.java)
 
 
                         imageUrl?.let {
@@ -441,7 +436,8 @@ class MainActivity : ComponentActivity() {
                                 downloadUrl = downloadUrl?: "",
                                 sender = sender?: "",
                                 latitude = latitude ?: 0.0,
-                                longitude = longitude ?: 0.0
+                                longitude = longitude ?: 0.0,
+                                likes = likes ?: 0
                             )
 
                             photos.add(photo)

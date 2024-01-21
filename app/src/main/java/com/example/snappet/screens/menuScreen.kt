@@ -29,11 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.example.snappet.R
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Navigation
 import com.example.snappet.navigation.Screens
@@ -45,8 +47,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,8 +78,8 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
             defaultElevation = 6.dp
         ),
         modifier = Modifier
-            .width(120.dp)
-            .height(160.dp)
+            .width(140.dp)
+            .height(200.dp)
             .padding(8.dp)
             .clickable { onPhotoClick() }
     ) {
@@ -107,7 +108,7 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
                 painter = rememberImagePainter(imageUrl),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(80.dp)
                     .clip(shape = MaterialTheme.shapes.medium)
             )
 
@@ -120,9 +121,28 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            /*Button(
+                onClick = {},
+                modifier = Modifier.height(20.dp).align(alignment = Alignment.End)
+            ){
+                Text(text = "Like")
+            }*/
+
+            Image(
+                painter = painterResource(R.drawable.heart),
+                contentDescription = "Like",
+                modifier = Modifier
+                    .size(25.dp)
+                    .clickable {}
+                    //.align(alignment = Alignment.BottomEnd)
+            )
         }
     }
 }
+
 
 @Composable
 fun ThreeByThreeGrid1(navController: NavHostController) {
@@ -150,6 +170,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     val sender = childSnapshot.child("sender").getValue(String::class.java)
                     val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
                     val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
+                    val likes  = childSnapshot.child("likes").getValue(Int::class.java)
 
                     imageUrl?.let {
                         val photo = Photo(
@@ -161,12 +182,13 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                             downloadUrl = downloadUrl ?: "",
                             sender = sender ?: "",
                             latitude = latitude ?: 0.0,
-                            longitude = longitude ?: 0.0
+                            longitude = longitude ?: 0.0,
+                            likes = likes ?: 0
                         )
                         photos.add(photo)
                     }
                 }
-                recentPhotos = photos
+                recentPhotos = photos.reversed()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -291,55 +313,6 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 }
 
 
-suspend fun LoadRecentPhotos(databaseReference: DatabaseReference): List<Photo>? =
-    suspendCoroutine { continuation ->
-        val query = databaseReference.child("imagesTest").child("allImages")
-            .limitToLast(3)
-
-        val onDataChange = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val photosList = mutableListOf<Photo>()
-
-                dataSnapshot.children.forEach { photoSnapshot ->
-                    val imageUrl = photoSnapshot.child("imageUrl").getValue(String::class.java)
-                    val animalType = photoSnapshot.child("animal").getValue(String::class.java)
-                    val contextPhoto = photoSnapshot.child("context").getValue(String::class.java)
-                    val description = photoSnapshot.child("description").getValue(String::class.java)
-                    val latitude = photoSnapshot.child("latitude").getValue(Double::class.java)
-                    val longitude  = photoSnapshot.child("longitude").getValue(Double::class.java)
-
-
-                    if (imageUrl != null) {
-                        val photo = Photo(
-                            imageUri = Uri.parse(imageUrl),
-                            animalType = animalType.orEmpty(),
-                            contextPhoto = contextPhoto.orEmpty(),
-                            description = description.orEmpty(),
-                            latitude = latitude ?: 0.0,
-                            longitude = longitude ?: 0.0
-                        )
 
 
 
-                        photosList.add(photo)
-
-
-                    }
-                }
-
-                Log.d(TAG, "tamanho do photosList ")
-                Log.d(TAG, photosList.size.toString())
-                Log.d(TAG, photosList[0].imageUri.toString())
-
-
-                continuation.resume(photosList)
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e(TAG, "Error loading photos from database: ${databaseError.message}")
-                continuation.resume(null)
-            }
-        }
-
-        query.addListenerForSingleValueEvent(onDataChange)
-    }
