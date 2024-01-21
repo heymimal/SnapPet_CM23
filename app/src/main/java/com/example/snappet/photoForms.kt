@@ -48,6 +48,8 @@ import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
@@ -81,6 +83,10 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
     val context = LocalContext.current
 
+    val user = Firebase.auth.currentUser
+    val userId = user?.uid
+
+    Log.d(TAG, "USER " + user?.displayName + " "+ userId)
 
     //var navController = rememberNavController()
 
@@ -227,22 +233,14 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
 
+
+
                 var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!)
+                //val downloadUrl = uploadImageToStorage(fileName, imageBitmap)
+                var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", userId.toString()!!)
 
-                Log.d(TAG, "TIPOS DA FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.animalType)
-
-                Log.d(TAG, "CONTEXTO DAS FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.contextPhoto)
-
-                Log.d(TAG, "DESCRICAO DAS FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.description)
-                uploadImageToStorage(fileName, imageBitmap);
-                uploadPhotoToDatabase(photo)
+                uploadImageToStorage(fileName, imageBitmap, photo);
+                //uploadPhotoToDatabase(photo)
             },
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
@@ -264,12 +262,17 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 }
 
 
-private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
+private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo){
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)
 
     val currentUser = Firebase.auth.currentUser
     val userUid = currentUser?.uid
+
+    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    val databaseReference: DatabaseReference = database.reference.child("urlTest")
+
+    var downloadUrl = ""
 
     if(userUid!= null){
         val userFolderRef = storage.reference.child("user_images_storage/$userUid")
@@ -294,7 +297,20 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
 
         uploadTask.addOnSuccessListener { taskSnapshot ->
             // Image upload success, you can retrieve the download URL if needed
-            val downloadUrl = taskSnapshot.metadata?.reference?.downloadUrl
+            var variavel = ""
+            val downloadUrlReal = taskSnapshot.storage.downloadUrl;
+            downloadUrlReal.addOnSuccessListener { uri ->
+                run {
+                    var imageUrl = uri.toString()
+                    variavel = imageUrl
+                    uploadPhotoToDatabase(photo, variavel)
+                }
+            }
+            //val downloadUrlr = taskSnapshot.metadata?.reference?.downloadUrl
+            //downloadUrl = downloadUrlr.toString()
+
+            //Log.d(TAG, "downloadurl!! -> " + downloadUrlReal)
+            //Log.d(TAG, "downloadurl -> " + downloadUrl)555
             // You can use the downloadUrl for further processing or store it in your database
         }.addOnFailureListener { exception ->
             // Handle the failure case, e.g., show an error message
@@ -305,7 +321,7 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap) {
 
 }
 
-private fun uploadPhotoToDatabase(photo: Photo) {
+private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
     val currentUser = Firebase.auth.currentUser
     val database = Firebase.database
     val databaseReference = database.reference
@@ -327,14 +343,6 @@ private fun uploadPhotoToDatabase(photo: Photo) {
 
         val allImagesPath = "imagesTest/$allFolder/"
 
-        /*val data = hashMapOf(
-            "imageUrl" to photo.imageUri.toString(),
-            "animal" to photo.animalType,
-            "context" to photo.contextPhoto,
-            "description" to photo.description,
-            "id" to photo.id
-        )*/
-
         // Reference to the database path
         val databasePath = databaseReference.child(imagePath)
 
@@ -351,7 +359,9 @@ private fun uploadPhotoToDatabase(photo: Photo) {
                 "animal" to photo.animalType,
                 "context" to photo.contextPhoto,
                 "description" to photo.description,
-                "id" to photo.id
+                "id" to photo.id,
+                "downloadUrl" to downloadUrl,
+                "sender" to it.uid
             )
             //databasePath.child(key).setValue(photo)
             databasePath.child(key).setValue(data)
@@ -372,7 +382,9 @@ private fun uploadPhotoToDatabase(photo: Photo) {
                 "animal" to photo.animalType,
                 "context" to photo.contextPhoto,
                 "description" to photo.description,
-                "id" to photo.id
+                "id" to photo.id,
+                "downloadUrl" to downloadUrl,
+                "sender" to it.uid
             )
             allImagesDatabasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
@@ -476,120 +488,3 @@ fun radioButton(onOptionSelected: (String) -> Unit) {
         }
     }
 }
-
-/*private fun uploadImageStorage(imageUri: Uri, storageRef: StorageReference){
-
-    if (imageUri == null || imageUri.scheme == null || !imageUri.scheme!!.startsWith("content")) {
-        Log.e(TAG, "Uri inválido ou nulo")
-        return
-    }
-
-    Log.d(TAG, "Path do Uri: ${imageUri.path}")
-
-    val currentUser = Firebase.auth.currentUser
-    if(currentUser != null){
-        val userId = currentUser.uid
-        val userName = currentUser.displayName
-
-        // Create a folder name based on the user's ID or display name
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        // Update the folder path where the image will be stored
-        val folderPath = "imagesTestNew/$folderName/"
-
-        // Upload the image to Firebase Storage
-        val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-        val storageReference = storageRef.child(storageFileNameUser)
-
-        //val imageUri = capturedPhoto.imageUri
-
-        val uploadTask1 = storageReference.putFile(imageUri)
-
-        uploadTask1.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-            } else {
-                Log.d(TAG, "Failed to upload photo", task.exception)
-            }
-        }
-
-        // Upload the image to Firebase Storage
-        val storageFileName = "imagesTest/${System.currentTimeMillis()}.jpg"
-
-        val storageReference1 = storageRef.child(storageFileName)
-        val uploadTask = imageUri?.let { storageReference1.putFile(it) }
-
-        uploadTask?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Photo uploaded to Firebase Storage.")
-            } else {
-                Log.e(TAG, "Failed to upload photo", task.exception)
-            }
-        }
-    }
-}*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-@Preview
-@Composable
-private fun PhotoFormsPreview() {
-    SnapPetPreviewPhoto(null)
-}*/
-
-/*
- val currentUser = Firebase.auth.currentUser
-
-                if(currentUser != null){
-                    val userId = currentUser.uid
-                    val userName = currentUser.displayName
-
-                    // Create a folder name based on the user's ID or display name
-                    val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-                    // Update the folder path where the image will be stored
-                    val folderPath = "images/$folderName/"
-
-                    // Upload the image to Firebase Storage
-                    val storageFileNameUser = "$folderPath${System.currentTimeMillis()}.jpg"
-
-                    val storageReference = storageRef.child(storageFileNameUser)
-                    val uploadTask1 = localUri?.let { storageReference.putFile(it) }
-
-                    uploadTask1?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }
-
-                    // Upload the image to Firebase Storage
-                    val storageFileName = "images/${System.currentTimeMillis()}.jpg"
-
-                    val storageReference1 = storageRef.child(storageFileName)
-                    val uploadTask = localUri?.let { storageReference1.putFile(it) }
-
-                    uploadTask?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d(TAG, "Photo uploaded to Firebase Storage.")
-                        } else {
-                            Log.e(TAG, "Failed to upload photo", task.exception)
-                        }
-                    }
-                }
-*/

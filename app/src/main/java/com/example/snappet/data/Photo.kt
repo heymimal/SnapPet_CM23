@@ -10,6 +10,8 @@ data class Photo(
     var contextPhoto: String = "",
     var description: String = "",
     var id: String = "",
+    var downloadUrl: String = "",
+    var sender: String = ""
     //var description:String  = "",
     //var localSrc: String = "",
     //var remoteSrc: String = "",

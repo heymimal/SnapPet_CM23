@@ -464,6 +464,9 @@ class MainActivity : ComponentActivity() {
                         val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
                         val description = childSnapshot.child("description").getValue(String::class.java)
                         val id = childSnapshot.child("id").getValue(String::class.java)
+                        val downloadUrl = childSnapshot.child("downloadUrl").getValue(String::class.java)
+                        val sender = childSnapshot.child("sender").getValue(String::class.java)
+
 
                         imageUrl?.let {
                             val photo = Photo(
@@ -472,6 +475,8 @@ class MainActivity : ComponentActivity() {
                                 contextPhoto = contextPhoto ?: "",
                                 description = description ?: "",
                                 id = id ?: "",
+                                downloadUrl = downloadUrl?: "",
+                                sender = sender?: ""
                             )
 
                             photos.add(photo)
