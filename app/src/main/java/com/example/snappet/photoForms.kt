@@ -430,7 +430,7 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, pho
 
 }
 
-private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
+/*private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
     val currentUser = Firebase.auth.currentUser
     val database = Firebase.database
     val databaseReference = database.reference
@@ -441,9 +441,6 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
 
         // Create a folder name based on the user's ID or display name
         val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        // Update the path where the photo data will be stored in the database
-        //val photoPath = "photoData/$folderName/"
 
         val allFolder = "allImages"
 
@@ -505,7 +502,62 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
                 }
         }
     }
+}*/
+
+//ja mete as fotos com o mesmo id em folders diferentes
+private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
+    val currentUser = Firebase.auth.currentUser
+    val database = Firebase.database
+    val databaseReference = database.reference
+
+    currentUser?.let {
+        val userId = it.uid
+        val userName = it.displayName
+
+        val folderName = if (!userName.isNullOrBlank()) userName else userId
+        val allFolder = "allImages"
+        val imagePath = "imagesTest/$folderName/"
+        val allImagesPath = "imagesTest/$allFolder/"
+
+        val databasePath = databaseReference.child(imagePath)
+        val allImagesDatabasePath = databaseReference.child(allImagesPath)
+
+        val sharedKey = databasePath.push().key
+        sharedKey?.let { key ->
+            photo.id = key
+            val data = hashMapOf(
+                "imageUrl" to photo.imageUri.toString(),
+                "animal" to photo.animalType,
+                "context" to photo.contextPhoto,
+                "description" to photo.description,
+                "id" to photo.id,
+                "downloadUrl" to downloadUrl,
+                "sender" to it.uid
+            )
+
+            // each user folder
+            databasePath.child(key).setValue(data)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Photo data uploaded to user-specific folder.")
+                    } else {
+                        Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
+                    }
+                }
+
+            // all images folder
+            allImagesDatabasePath.child(key).setValue(data)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Photo data uploaded to shared folder.")
+                    } else {
+                        Log.e(TAG, "Failed to upload photo data to shared folder", task.exception)
+                    }
+                }
+        }
+    }
 }
+
 
 
 
