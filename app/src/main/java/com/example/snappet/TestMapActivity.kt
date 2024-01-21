@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -27,9 +28,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,8 +53,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.example.snappet.data.Photo
 import com.example.snappet.viewModels.PhotosViewModel
@@ -196,16 +202,65 @@ class TestMapActivity : ComponentActivity() {
 @OptIn(MapsComposeExperimentalApi ::class)
 @Composable
 fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: CameraPositionState){
+    var touched by remember {
+        mutableStateOf(false)
+    }
+
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
     ) {
       Clustering (
           items = items,
+          onClusterClick = {
+              Log.d(TAG, "Cluster clicked! $it")
+              false
+          },
+          onClusterItemClick = {
+              Log.d(TAG, "Cluster item clicked! $it")
+              false
+          },
+          onClusterItemInfoWindowClick = {
+              touched = true
+              Log.d(TAG, "Cluster item info window clicked! $it")
+          },
+          clusterContent = { cluster ->
+              CircleContent(
+                  modifier = Modifier.size(40.dp),
+                  text = "%,d".format(cluster.size),
+                  color = Color.Blue,
+              )
+          },
           clusterItemContent = null
       )
     }
+    if(touched)   Text("Testing")
 
+}
+
+
+@Composable
+private fun CircleContent(
+    color: Color,
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier,
+        shape = CircleShape,
+        color = color,
+        contentColor = Color.White,
+        border = BorderStroke(1.dp, Color.White)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Black,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
 
 
