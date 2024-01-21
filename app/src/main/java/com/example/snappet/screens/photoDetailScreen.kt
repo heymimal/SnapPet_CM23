@@ -155,7 +155,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
                                 }
                             },
                             onFailure = {
-                                exception -> Log.e(TAG, "failed to update ", exception)
+                                exception -> Log.e(TAG, "failed to update", exception)
                             }
                         )
 
