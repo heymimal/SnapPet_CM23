@@ -7,29 +7,35 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import androidx.lifecycle.ViewModel
 import com.example.snappet.data.DailyMission
+import com.example.snappet.data.MonthlyMission
 
 class ThrophiesViewModel : ViewModel() {
     private val _dailyMissionsData = MutableLiveData<List<DailyMission>>()
     val dailyMissionsData: LiveData<List<DailyMission>> get() = _dailyMissionsData
 
+    private val _monthlyMissionsData = MutableLiveData<List<DailyMission>>()
+    val monthlyMissionsData: LiveData<List<DailyMission>> get() = _monthlyMissionsData
+
+    // Fetch daily missions
     fun fetchDailyMissions(userId: String) {
-        val reference = Firebase.database.getReference("Users (Quim)").child(userId).child("DailyMissions")
+        fetchMissions(userId, "DailyMissions", _dailyMissionsData)
+    }
+
+    // Fetch monthly missions
+    fun fetchMonthlyMissions(userId: String) {
+        fetchMissions(userId, "MonthlyMissions", _monthlyMissionsData)
+    }
+
+    // Generic function to fetch missions
+    private fun fetchMissions(userId: String, node: String, liveData: MutableLiveData<List<DailyMission>>) {
+        val reference = Firebase.database.getReference("Users (Quim)").child(userId).child(node)
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val missions = dataSnapshot.children
                     .mapNotNull { missionSnapshot ->
-                        val missionData = missionSnapshot.getValue(DailyMission::class.java)
-                        missionData?.copy(
-                            missionType = missionSnapshot.child("missionType").getValue(String::class.java) ?: missionData?.missionType ?: "",
-                            goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: missionData?.goal ?: 0,
-                            userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: missionData?.userProgress ?: 0,
-                            points = missionSnapshot.child("points").getValue(Int::class.java) ?: missionData?.points ?: 0,
-                            missionDescription = missionSnapshot.child("missionDescription").getValue(String::class.java) ?: missionData?.missionDescription ?: "",
-                            isCompleted = missionSnapshot.child("isCompleted").getValue(Boolean::class.java) ?: missionData?.isCompleted ?: false,
-                            createdDate = missionSnapshot.child("createdDate").getValue(String::class.java) ?: missionData?.createdDate ?: ""
-                        )
+                        missionSnapshot.getValue(DailyMission::class.java)
                     }
-                _dailyMissionsData.value = missions
+                liveData.value = missions
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

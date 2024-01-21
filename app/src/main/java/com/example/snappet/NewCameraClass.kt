@@ -24,11 +24,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
+import com.example.snappet.sign_In.UserData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger
 import com.google.firebase.appcheck.internal.util.Logger.TAG
+import com.google.firebase.database.DatabaseReference
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,7 +39,7 @@ import java.util.Objects
 
 
 @Composable
-fun CameraClass(navController: NavController) {
+fun CameraClass(navController: NavController, userData: UserData) {
     val context = LocalContext.current
 
     lateinit var currentImagePath: String
@@ -149,7 +151,7 @@ fun CameraClass(navController: NavController) {
         Log.d(TAG,locationPoint.toString())
         var latlng: LatLng? = null
         if(locationPoint!=null)  latlng = LatLng(locationPoint!!.latitude,locationPoint!!.longitude)
-        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file, loc = latlng)
+        PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file, loc = latlng, userData = userData)
        /*Column(
             modifier = Modifier.fillMaxWidth()
         ) {
