@@ -9,7 +9,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,8 +45,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
@@ -132,9 +135,15 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Animal Type *",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                    append("Animal Type")
+                }
+                withStyle(style = SpanStyle(fontSize = 15.sp)) {
+                    append(" *")
+                }
+            },
             color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
                 .align(alignment = Alignment.Start)
         )
@@ -193,12 +202,18 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Context *",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                    append("Context")
+                }
+                withStyle(style = SpanStyle(fontSize = 15.sp)) {
+                    append(" *")
+                }
+            },
             color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
                 .align(alignment = Alignment.Start)
         )
@@ -211,39 +226,86 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Log.d(TAG, "TESTE DO CONTEXTO");
         Log.d(TAG, contextPhotoType!!);
 
+        Spacer(modifier = Modifier.height(20.dp))
+
         Text(
-            text = "Description *",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(fontSize = 20.sp)) {
+                    append("Description")
+                }
+                withStyle(style = SpanStyle(fontSize = 15.sp)) {
+                    append(" *")
+                }
+            },
             color = Color.Black,
-            style = TextStyle(fontSize = 20.sp),
             modifier = Modifier.align(alignment = Alignment.Start)
         )
         Spacer(modifier = Modifier.height(15.dp))
 
         var ttext by remember { mutableStateOf<String?>("") }
 
-        TextField(
+        val maxChar = 60
+
+        /*TextField(
             value = ttext!!,
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onValueChange = { ttext = it },
+            onValueChange = {
+                if(it.length <= maxChar){
+                    ttext = it
+                } },
             label = { Text("Description") }
         )
 
-        descriptionPhoto = ttext
+        descriptionPhoto = ttext*/
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+
+            // Character count display
+            Text(
+                text = "Characters: ${ttext?.length}/$maxChar",
+                color = Color.Gray,
+                style = TextStyle(fontSize = 12.sp),
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterHorizontally)
+
+            )
+
+            // TextField with character limit
+            TextField(
+                value = ttext!!,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onValueChange = {
+                    if (it.length <= maxChar) {
+                        ttext = it
+                    }
+                },
+                label = { Text("Description") }
+            )
+
+
+
+            descriptionPhoto = ttext
+        }
 
         Spacer(modifier = Modifier.height(30.dp))
 
         Text(
-            text = "Options selected with * are mandatory to fill in!",
+            text = "(Options selected with * are mandatory to fill in!)",
             color = Color.Black,
-            style = TextStyle(fontSize = 10.sp),
+            style = TextStyle(fontSize = 10.sp, fontStyle = FontStyle.Italic),
             modifier = Modifier.align(alignment = Alignment.Start)
         )
 
 
     }
 
+
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
     ){
 
         val showAlertMessage = remember{ mutableStateOf(false) }
@@ -267,6 +329,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             )
         }
 
+
         Button(
             onClick = {
                 val fileName = "photo_${System.currentTimeMillis()}.jpg"
@@ -286,19 +349,19 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 //uploadPhotoToDatabase(photo)
             },
             shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+            colors = ButtonDefaults.buttonColors(Color.Black),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
                 .offset(
                     x = 246.dp,
-                    y = 680.dp
+                    y = 740.dp
                 )
                 .height(50.dp)
                 .width(150.dp)
 
         )
         {
-            Text(text = "Upload", style = TextStyle(fontSize = 20.sp))
+            Text(text = "Upload", style = TextStyle(fontSize = 20.sp), color = Color.White, fontWeight = FontWeight.Bold)
         }
 
 
@@ -306,17 +369,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
 }
 
-@Composable
-fun WarningMessage(message: String) {
-    Text(
-        text = message,
-        color = Color.Red,
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .background(Color.Gray) // Optional: Add background color for better visibility
-    )
-}
+
 
 private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo){
     val storage = Firebase.storage
