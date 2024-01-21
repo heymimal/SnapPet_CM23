@@ -166,7 +166,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                         photos.add(photo)
                     }
                 }
-                recentPhotos = photos
+                recentPhotos = photos.reversed()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

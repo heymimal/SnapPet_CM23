@@ -1,96 +1,55 @@
 package com.example.snappet
 
 import android.Manifest
-import android.content.ContentValues
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.example.snappet.data.Photo
+import com.example.snappet.screens.PhotoDetailCard
 import com.example.snappet.viewModels.PhotosViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.PinConfig
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.maps.android.clustering.ClusterItem
-import com.google.maps.android.compose.AdvancedMarker
 import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapType
-import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerComposable
-import com.google.maps.android.compose.MarkerInfoWindowContent
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 //import com.google.maps.android.compose.theme.MapsComposeSampleTheme
-import kotlinx.coroutines.launch
 
 private const val TAG = "BasicMapActivity"
 
@@ -165,31 +124,16 @@ class TestMapActivity : ComponentActivity() {
                     val items = remember { mutableStateListOf<MyPhotoCluster>()}
                     LaunchedEffect(Unit){
                         for(photo in photos){
-                            val position = LatLng(photo.latitude,photo.longitude)
-                            items.add(MyPhotoCluster(position,photo.animalType,photo.description,0f,photo))
-                        }
+                            if(photo.latitude != 190.0 && photo.longitude != 190.0){
+                                val position = LatLng(photo.latitude,photo.longitude)
+                                items.add(MyPhotoCluster(position,photo.animalType,photo.description,0f,photo))
+                            }
+                           }
                         itemsCheck = true
                     }
                     if(itemsCheck){
                         GoogleMapClustering(items = items, cameraPositionState = cameraPositionState )
                     }
-                    /*GoogleMap(
-                        modifier = Modifier.fillMaxSize(),
-                        cameraPositionState = cameraPositionState,
-                    ) {
-                        Log.d(TAG, "Photos length ${photos.size}")
-                        for (photo in photos) {
-                            if(photo.latitude != 190.0 && photo.longitude != 190.0){
-                                val position = LatLng(photo.latitude, photo.longitude)
-                                Log.d(TAG, "Testing for photo with position $position")
-                                Marker(
-                                    state = MarkerState(position = position),
-                                    title = photo.animalType,
-                                    snippet = photo.description
-                                )
-                            }
-                        }
-                    }*/
                 }
             } else {
                 // Map is not loaded yet, you can show a loading indicator or handle it accordingly
@@ -202,10 +146,21 @@ class TestMapActivity : ComponentActivity() {
 @OptIn(MapsComposeExperimentalApi ::class)
 @Composable
 fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: CameraPositionState){
-    var touched by remember {
+    var photon = Photo(latitude = 190.0, longitude = 190.0)
+    var clickSinglePoint by remember {
+        mutableStateOf(false)
+    }
+    var clickOnCluster by remember {
         mutableStateOf(false)
     }
 
+    var photo by remember {
+        mutableStateOf(photon)
+    }
+
+    var photos by remember {
+        mutableStateOf(emptyList<Photo>())
+    }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
@@ -213,6 +168,12 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
       Clustering (
           items = items,
           onClusterClick = {
+              clickSinglePoint = false
+              clickOnCluster = false
+              Log.d(TAG,"This is the photo test:\n$photos")
+              photos =  it.items.map { it.photoInfo }
+              Log.d(TAG,"${it.items}")
+              Log.d(TAG,"This is the photo test:\n$photos")
               Log.d(TAG, "Cluster clicked! $it")
               false
           },
@@ -221,7 +182,9 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
               false
           },
           onClusterItemInfoWindowClick = {
-              touched = true
+              clickSinglePoint = false
+              photo = it.photoInfo
+              clickSinglePoint = true
               Log.d(TAG, "Cluster item info window clicked! $it")
           },
           clusterContent = { cluster ->
@@ -234,7 +197,16 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
           clusterItemContent = null
       )
     }
-    if(touched)   Text("Testing")
+    if(clickSinglePoint)   {
+        Column {
+            //Text("Clicked!")
+            Log.d(TAG,"photo info: $photo")
+            PhotoDetailCard(photo)
+            Button(onClick = { clickSinglePoint = false}) {
+                Text(text = "click me")
+            }
+        }
+    }
 
 }
 
