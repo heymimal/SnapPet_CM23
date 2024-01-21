@@ -388,42 +388,6 @@ class MainActivity : ComponentActivity() {
                             //val photo = remember { mutableStateOf<Photo?>(null) }
                             Log.d(TAG, "ATAO1")
 
-                            //DA PARA TIRAR ESTA PARTE DO CODIGO
-                            /*LaunchedEffect(key1 = databaseReference) {
-                                Log.d(TAG, "ATAO2")
-                                val valueEventListener = object : ValueEventListener {
-                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                        val photos = mutableListOf<Photo>()
-                                        for (childSnapshot in dataSnapshot.children) {
-                                            val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
-                                            val animalType = childSnapshot.child("animal").getValue(String::class.java)
-                                            val contextPhoto = childSnapshot.child("context").getValue(String::class.java)
-                                            val description = childSnapshot.child("description").getValue(String::class.java)
-                                            val id = childSnapshot.child("id").getValue(String::class.java)
-
-                                            imageUrl?.let {
-                                                val photo = Photo(
-                                                    imageUri = Uri.parse(it),
-                                                    animalType = animalType ?: "",
-                                                    contextPhoto = contextPhoto ?: "",
-                                                    description = description ?: "",
-                                                    id = id ?: "",
-                                                )
-
-                                                photos.add(photo)
-                                            }
-                                        }
-                                        recentPhotos = photos
-                                    }
-
-                                    override fun onCancelled(databaseError: DatabaseError) {
-                                        // Handle error
-                                    }
-                                }
-                                databaseReference.addValueEventListener(valueEventListener)
-
-                            }*/
-
                             recentPhotos = getPhotos(databaseReference)
 
                             val catPhotos = recentPhotos.filter { it.animalType == "cat" }
