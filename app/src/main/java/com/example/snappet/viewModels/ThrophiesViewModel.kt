@@ -7,7 +7,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import androidx.lifecycle.ViewModel
 import com.example.snappet.data.DailyMission
-import com.example.snappet.data.MonthlyMission
 
 class ThrophiesViewModel : ViewModel() {
     private val _dailyMissionsData = MutableLiveData<List<DailyMission>>()

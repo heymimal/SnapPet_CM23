@@ -69,7 +69,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -350,9 +349,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 }else{
                     showAlertMessage.value = false
                     var savedUri = saveImageToMediaStore(takenPicture,context,file)
-                    //val downloadUrl = uploadImageToStorage(fileName, imageBitmap)
-                    //var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", userId.toString()!!)
-                //var savedUri = saveImageToMediaStore(takenPicture,context,file)
 
                 if(loc!=null){
                     latitude = loc.latitude
@@ -361,35 +357,18 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
                 if(isLocationChecked){
                     var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude, 0)
-                    uploadImageToStorage(fileName, imageBitmap, photo);
+                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
                 }else{
                     var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,190.0,190.0, 0)
-                    uploadImageToStorage(fileName, imageBitmap, photo);
+                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
                 }
-
-
-
-
-                }
-
-
-                //uploadPhotoToDatabase(photo)
-                Log.d(TAG, "DESCRICAO DAS FOTOS SEI LA")
-                Log.d(TAG, photo.imageUri.toString())
-                Log.d(TAG, photo.description)
-                uploadImageToStorage(fileName, imageBitmap);
-                uploadPhotoToDatabase(photo)
-
-                updateDailyMissions(userData, photo.animalType!!)
-                updateMonthlyMissions(userData, photo.animalType!!)
-                // Show a Toast if photo.description equals "Needs Help"
-                if (photo.contextPhoto == "Needs Help") {
-                    println("AAA: ${photo.contextPhoto}")
-                    Toast.makeText(
-                        context,
-                        "Animal Shelter Entities Have Been Notified!",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    if (contextPhotoType == "Needs Help") {
+                        Toast.makeText(
+                            context,
+                            "Animal Shelter Entities Have Been Notified!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             },
             shape = RoundedCornerShape(50.dp),
@@ -625,7 +604,7 @@ private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, 
 }
 
 
-private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo){
+private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo, userData: UserData){
     val storage = Firebase.storage
     val storageRef: StorageReference = storage.reference.child(fileName)
 
@@ -666,109 +645,24 @@ private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, pho
                 run {
                     var imageUrl = uri.toString()
                     downloadUrlFirebase = imageUrl
-                    uploadPhotoToDatabase(photo, downloadUrlFirebase)
+                    uploadPhotoToDatabase(photo, downloadUrlFirebase, userData)
                 }
             }
-            //val downloadUrlr = taskSnapshot.metadata?.reference?.downloadUrl
-            //downloadUrl = downloadUrlr.toString()
-
-            //Log.d(TAG, "downloadurl!! -> " + downloadUrlReal)
-            //Log.d(TAG, "downloadurl -> " + downloadUrl)555
-            // You can use the downloadUrl for further processing or store it in your database
         }.addOnFailureListener { exception ->
             // Handle the failure case, e.g., show an error message
             Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
         }
     }
-
-
 }
 
-/*private fun uploadPhotoToDatabase(photo: Photo, downloadUrl : String) {
-    val currentUser = Firebase.auth.currentUser
-    val database = Firebase.database
-    val databaseReference = database.reference
-
-    currentUser?.let {
-        val userId = it.uid
-        val userName = it.displayName
-
-        // Create a folder name based on the user's ID or display name
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-
-        val allFolder = "allImages"
-
-        // Update the path where the image URL will be stored in the database
-        val imagePath = "imagesTest/$folderName/"
-
-        val allImagesPath = "imagesTest/$allFolder/"
-
-        // Reference to the database path
-        val databasePath = databaseReference.child(imagePath)
-
-        val allImagesDatabasePath = databaseReference.child(allImagesPath)
-
-        // Push the photo data to the database
-        val databaseKey = databasePath.push().key
-        //photo.id = databaseKey.toString()
-        Log.d(TAG, "SOME TEST " + databaseKey.toString());
-        databaseKey?.let { key ->
-            photo.id = key
-            val data = hashMapOf(
-                "imageUrl" to photo.imageUri.toString(),
-                "animal" to photo.animalType,
-                "context" to photo.contextPhoto,
-                "description" to photo.description,
-                "id" to photo.id,
-                "downloadUrl" to downloadUrl,
-                "sender" to it.uid
-                "id" to photo.id,
-                "latitude" to photo.latitude,
-                "longitude" to photo.longitude
-            )
-            //databasePath.child(key).setValue(photo)
-            databasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to Realtime Database.")
-                    } else {
-                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
-                    }
-                }
-        }
-
-        val allImagesdatabaseKey = allImagesDatabasePath.push().key
-        allImagesdatabaseKey?.let { key ->
-            photo.id = key
-            val data = hashMapOf(
-                "imageUrl" to photo.imageUri.toString(),
-                "animal" to photo.animalType,
-                "context" to photo.contextPhoto,
-                "description" to photo.description,
-                "id" to photo.id,
-                "latitude" to photo.latitude,
-                "longitude" to photo.longitude
-                "id" to photo.id,
-                "downloadUrl" to downloadUrl,
-                "sender" to it.uid
-            )
-            allImagesDatabasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to Realtime Database to all images folder.")
-                    } else {
-                        Log.e(TAG, "Failed to upload photo data to Realtime Database", task.exception)
-                    }
-                }
-        }
-    }
-}*/
-
 //ja mete as fotos com o mesmo id em folders diferentes
-private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
+private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData) {
     val currentUser = Firebase.auth.currentUser
     val database = Firebase.database
     val databaseReference = database.reference
+
+    var post1 = false
+    var post2 = false
 
     currentUser?.let {
         val userId = it.uid
@@ -802,6 +696,8 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String) {
             databasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        updateDailyMissions(userData, photo.animalType!!)
+                        updateMonthlyMissions(userData, photo.animalType!!)
                         Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
                         Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)

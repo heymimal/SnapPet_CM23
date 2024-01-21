@@ -361,11 +361,6 @@ class MainActivity : ComponentActivity() {
                         composable(route = Screens.Home.route) {
                             HomeMenu(navController)
                         }
-                        composable("map_route") {
-                        }
-                        composable("camera_route") {
-
-                        }
                         composable(route = Screens.Trophies.route) {
                             val throphiesViewModel: ThrophiesViewModel = viewModel()
                             val userData = googleAuthUiClient.getSignedInUser()
@@ -394,7 +389,6 @@ class MainActivity : ComponentActivity() {
                             // Obtenha o ID da foto da rota
                             val rawPhotoId = backStackEntry.arguments?.getString("photoId") ?: ""
                             val photoId = "-" + rawPhotoId.substringAfter("-")
-                            //Log.d(TAG, "PHOTO ID TOTAL:: " + photoId)
                             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
                             val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
                                 "allImages"
@@ -402,23 +396,15 @@ class MainActivity : ComponentActivity() {
 
                             var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
-                            //val photo = remember { mutableStateOf<Photo?>(null) }
-                            Log.d(TAG, "ATAO1")
 
                             recentPhotos = getPhotos(databaseReference)
 
-                            val catPhotos = recentPhotos.filter { it.animalType == "cat" }
                             val catPhotosr = recentPhotos.filter { it.id == photoId}
-
-                            Log.d(TAG, "tamanho 0? " + catPhotos.size)
-                            Log.d(TAG, "tamanho real? " + catPhotosr.size)
 
                             catPhotosr.forEach { catPhoto ->
                                 if(catPhoto.id == photoId){
                                     Log.d(TAG, "Sao iguais!")
                                 }
-                                // Add more details as needed
-
                                 PhotoDetailScreen(catPhoto, navController)
                             }
                         }

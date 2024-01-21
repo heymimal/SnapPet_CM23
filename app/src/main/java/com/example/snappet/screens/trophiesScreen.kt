@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.snappet.data.DailyMission
-import com.example.snappet.data.MonthlyMission
 import com.example.snappet.navigation.Navigation
 import com.example.snappet.navigation.Screens
 
