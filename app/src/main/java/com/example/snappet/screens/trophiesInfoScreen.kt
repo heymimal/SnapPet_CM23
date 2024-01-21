@@ -3,10 +3,8 @@ package com.example.snappet.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.snappet.navigation.Navigation
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -347,6 +343,8 @@ fun RaritySquare(text: String, trophyType: String) {
         else -> Color.Black
     }
 
+    val textColor = if (trophyType == "gold") Color.Black else Color.White
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -360,7 +358,7 @@ fun RaritySquare(text: String, trophyType: String) {
         ) {
             Text(
                 text = text,
-                style = TextStyle(fontSize = 16.sp, color = Color.White)
+                style = TextStyle(fontSize = 16.sp, color = textColor)
             )
         }
     }

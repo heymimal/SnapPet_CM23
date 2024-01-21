@@ -40,6 +40,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.snappet.data.DailyMission
+import com.example.snappet.data.Trophy
 import com.example.snappet.screens.DayInfo
 import com.example.snappet.screens.TrophiesInfoNav
 import com.example.snappet.screens.leaderboardNav
@@ -232,6 +233,7 @@ class MainActivity : ComponentActivity() {
                                             //guardar o dia, mes e ano na RealTimeDataBase (dentro do user)
                                             val dateString = "$dayOfMonth $monthValue $year"
                                             thisUserRef.child("LastLogin").setValue(dateString)
+                                            thisUserRef.child("Trophy").setValue(Trophy("bronze", "Novice"))
                                             //thisUserRef.child("LastLogin").setValue("1 1 1990")
                                             createDailyMissions(thisUserRef)
 
