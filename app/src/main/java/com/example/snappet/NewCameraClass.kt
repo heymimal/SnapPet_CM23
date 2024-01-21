@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.location.Location
 import android.net.Uri
 import android.os.Environment
@@ -78,9 +79,22 @@ fun CameraClass(navController: NavController) {
     val getCameraImage =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
+                val matrix = Matrix()
+                matrix.postRotate(90F)
+
                 capturedImageUri = uri;
 
                 takenPicture = BitmapFactory.decodeFile(currentImagePath)
+                val picture = takenPicture
+                takenPicture = Bitmap.createBitmap(
+                    picture!!,
+                    0,
+                    0,
+                    picture.width,
+                    picture.height,
+                    matrix,
+                    true
+                )
 
             }
         }
