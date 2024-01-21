@@ -137,6 +137,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
                         likePhotoMessage.value = true
                         photo.likes +=1
                         updateLikes(photo, photo.id, photo.likes)
+                        updateUserLikes(photo, photo.id)
                         isLikeEnabled = false
                 }
             //.align(alignment = Alignment.BottomEnd)
@@ -176,4 +177,21 @@ fun updateLikes(photo: Photo, photoId: String, newLikes: Int){
         .addOnFailureListener{
             Log.d(TAG, "LIKES NOT UPDATED")
         }
+}
+
+fun updateUserLikes(photo: Photo, photoId: String){
+    val user = Firebase.auth.currentUser
+
+    val database = Firebase.database
+    val reference = user?.let { database.reference.child("Users (Quim)").child(it.uid).child("likedPhotos") }
+
+    val likedPhotoReference = reference?.push()
+    likedPhotoReference?.setValue(photoId)
+        ?.addOnSuccessListener {
+            Log.d(TAG, "photo liked added to user's liked photos")
+        }
+        ?.addOnFailureListener {
+            Log.e(TAG, "failed to add liked photo to user's liked photos", it)
+        }
+
 }
