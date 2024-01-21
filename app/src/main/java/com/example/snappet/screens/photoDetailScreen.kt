@@ -20,6 +20,8 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Screens
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun PhotoDetailScreen(photo: Photo, navController: NavController) {
@@ -30,8 +32,14 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
             .padding(16.dp)
     ) {
         // Display the photo with a fixed height
+        val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {
+            photo.downloadUrl
+        } else {
+            photo.imageUri.toString()
+        }
+
         Image(
-            painter = rememberImagePainter(photo.imageUri.toString()),
+            painter = rememberImagePainter(imageUrl),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
