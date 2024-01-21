@@ -462,6 +462,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun getPhotoById(photoId: String): Photo? {
         val currentUser = Firebase.auth.currentUser
+        currentUser?.uid
         Log.d(TAG,"QUEM " + currentUser?.displayName!!);
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
         val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
