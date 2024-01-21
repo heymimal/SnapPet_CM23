@@ -59,7 +59,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 
-//@OptIn(ExperimentalMaterial3Api::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap, takenPicture : Bitmap, file: File){
@@ -67,15 +66,15 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     var photo = Photo(uri);
 
     var photoType by remember {
-        mutableStateOf<String?>("Dog")
+        mutableStateOf<String?>("")
     }
 
     var contextPhotoType by remember{
-        mutableStateOf<String?>("Entertainment")
+        mutableStateOf<String?>("")
     }
 
     var descriptionPhoto by remember{
-        mutableStateOf<String?>("n")
+        mutableStateOf<String?>("")
     }
 
     val storage = Firebase.storage
@@ -128,7 +127,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Animal Type",
+            text = "Animal Type *",
             color = Color.Black,
             style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
@@ -140,9 +139,11 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            val options = listOf("Dog", "Cat", "Bird")
+            val options = listOf("Bee", "Bird", "Butterfly", "Cat", "Chicken", "Cow", "Dog", "Duck", "Gecko", "Goat",
+                "Horse", "Lizard", "Peacock", "Pig", "Rabbit", "Sheep")
             var expanded by remember { mutableStateOf(false) } //menu drop down aberto ou nao
-            var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+            //var selectedOptionText by remember { mutableStateOf(options[0]) } //current selected
+            var selectedOptionText by remember { mutableStateOf<String?>(null) } // current selected
 
 
             ExposedDropdownMenuBox(
@@ -152,7 +153,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 TextField(
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
-                    value = selectedOptionText,
+                    value = selectedOptionText?: "",
                     onValueChange = {},
                     label = { Text("Animal") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -168,21 +169,21 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                             onClick = {
                                 selectedOptionText = selectionOption
                                 expanded = false
-                                photoType = selectedOptionText
+                                //photoType = selectedOptionText
+                                photoType = if (selectedOptionText != null) selectedOptionText else null
 
-                                Log.d(TAG, "TESTEEEEEEEEEEE")
-                                Log.d(TAG, selectedOptionText)
-                                Log.d(TAG, photoType!!)
                             },
 
 
                             )
                     }
+
+                    Log.d(TAG, "ANIMAL SELECIONADO -> " + photoType)
                 }
             }
-            Log.d(TAG, "TESTE")
-            Log.d(TAG, selectedOptionText)
-            Log.d(TAG, photoType!!)
+
+            Log.d(TAG, "ANIMAL SELECIONADO1 -> " + photoType)
+
 
 
         }
@@ -190,7 +191,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "Context",
+            text = "Context *",
             color = Color.Black,
             style = TextStyle(fontSize = 20.sp),
             modifier = Modifier
@@ -206,23 +207,33 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         Log.d(TAG, contextPhotoType!!);
 
         Text(
-            text = "Description",
+            text = "Description *",
             color = Color.Black,
             style = TextStyle(fontSize = 20.sp),
             modifier = Modifier.align(alignment = Alignment.Start)
         )
         Spacer(modifier = Modifier.height(15.dp))
 
-        var ttext by remember { mutableStateOf("Describe the Photo...") }
+        var ttext by remember { mutableStateOf<String?>("") }
 
         TextField(
-            value = ttext,
+            value = ttext!!,
             modifier = Modifier.align(Alignment.CenterHorizontally),
             onValueChange = { ttext = it },
             label = { Text("Description") }
         )
 
         descriptionPhoto = ttext
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Text(
+            text = "Options selected with * are mandatory to fill in!",
+            color = Color.Black,
+            style = TextStyle(fontSize = 10.sp),
+            modifier = Modifier.align(alignment = Alignment.Start)
+        )
+
 
     }
 
@@ -462,7 +473,8 @@ fun radioButton(){
 @Composable
 fun radioButton(onOptionSelected: (String) -> Unit) {
     val radioOptions = listOf("Entertainment", "Needs Help")
-    var selectedOption by remember { mutableStateOf(radioOptions[0]) }
+    //var selectedOption by remember { mutableStateOf(radioOptions[0]) }
+    var selectedOption by remember { mutableStateOf<String?>("") }
 
     Row(
         modifier = Modifier
@@ -475,8 +487,9 @@ fun radioButton(onOptionSelected: (String) -> Unit) {
                 RadioButton(
                     selected = (option == selectedOption),
                     onClick = {
-                        selectedOption = option
-                        onOptionSelected(selectedOption)
+                        //selectedOption = option
+                        selectedOption = if (selectedOption == option) null else option
+                        onOptionSelected(selectedOption!!)
                     }
                 )
                 Text(
