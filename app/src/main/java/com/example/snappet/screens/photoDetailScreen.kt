@@ -36,12 +36,21 @@ import coil.compose.rememberImagePainter
 import com.example.snappet.R
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Screens
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
 fun PhotoDetailScreen(photo: Photo, navController: NavController) {
@@ -138,29 +147,27 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
             modifier = Modifier
                 .size(25.dp)
                 .clickable(enabled = isLikeEnabled) {
-                        likePhotoMessage.value = true
-                        photo.likes +=1
-                        updateLikes(photo, photo.id, photo.likes)
-                        //updateUserLikes(photo, photo.id)
+                    likePhotoMessage.value = true
+                    photo.likes += 1
+                    updateLikes(photo, photo.id, photo.likes)
+                    //updateUserLikes(photo, photo.id)
 
-                        val listLikedPhotos = updateUserLikes(
-                            photo,
-                            photo.id,
-                            onSuccess = { updatedLikedPhotos ->
-                                for (likedPhotoId in updatedLikedPhotos) {
-                                    // Do something with each likedPhotoId
-                                    if(likedPhotoId == photo.id){
-                                        isLikeEnabled = false
-                                    }
-                                    Log.d(TAG, "liked photo id: " + likedPhotoId)
+                    val listLikedPhotos = updateUserLikes(
+                        photo,
+                        photo.id,
+                        onSuccess = { updatedLikedPhotos ->
+                            for (likedPhotoId in updatedLikedPhotos) {
+                                // Do something with each likedPhotoId
+                                if (likedPhotoId == photo.id) {
+                                    isLikeEnabled = false
                                 }
-                            },
-                            onFailure = {
-                                exception -> Log.e(TAG, "failed to update", exception)
+                                Log.d(TAG, "liked photo id: " + likedPhotoId)
                             }
-                        )
-
-
+                        },
+                        onFailure = { exception ->
+                            Log.e(TAG, "failed to update", exception)
+                        }
+                    )
 
 
                 }
@@ -176,6 +183,35 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(20.dp))
+
+        if(photo.longitude != 190.0){
+            val positionL = LatLng(photo.latitude,photo.longitude)
+            var cameraPositionState = rememberCameraPositionState{
+                position = CameraPosition.fromLatLngZoom(positionL,10f)
+            }
+            CameraPositionState(CameraPosition.fromLatLngZoom(positionL,10f))
+
+            val positionState = MarkerState(position = positionL)
+
+            var uiSettings = MapUiSettings(
+                zoomControlsEnabled = false,
+                scrollGesturesEnabled = false,
+                scrollGesturesEnabledDuringRotateOrZoom = false,
+                tiltGesturesEnabled = false,
+                mapToolbarEnabled = false,
+            )
+            GoogleMap (
+                cameraPositionState = CameraPositionState(CameraPosition.fromLatLngZoom(positionL,14f)),
+                modifier = Modifier.fillMaxWidth()
+                    .height(150.dp)
+            ) {
+                Marker(
+                    state = positionState,
+                    title = photo.description
+                )
+            }
+
+        }
 
         Button(
             onClick = {navController.navigate(Screens.Home.route) },
