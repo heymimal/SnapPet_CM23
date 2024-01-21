@@ -124,17 +124,6 @@ fun CameraClass(navController: NavController, userData: UserData) {
             }
         } )
 
-
-    /*val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) {
-        if (it) {
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-            getCameraImage.launch(uri)
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }*/
     DisposableEffect(Unit) {
         //permissionLauncher.launch(Manifest.permission.CAMERA)
         locationPermission.launch(locationPermissions)
@@ -152,46 +141,6 @@ fun CameraClass(navController: NavController, userData: UserData) {
         var latlng: LatLng? = null
         if(locationPoint!=null)  latlng = LatLng(locationPoint!!.latitude,locationPoint!!.longitude)
         PhotoForm(uri = uri, imageBitmap = imageBitmap, takenPicture = takenPicture!!, file = file, loc = latlng, userData = userData)
-       /*Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Image(
-                    bitmap = imageBitmap,
-            contentDescription = "description",
-            modifier = Modifier
-                .padding(16.dp, 8.dp)
-                .size(200.dp)
-                .align(Alignment.CenterHorizontally)
-            )
-            Button(onClick = { saveImageToMediaStore(takenPicture!!,context,file) },
-                modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text("Save")
-            }
-            }
-        */}
+     }
 
 }
-
-//Text(text = " MUITO      BACANO!!!!!!!", color = androidx.compose.ui.graphics.Color.White)
-//PhotoForm(uri = uri, imageBitmap = imageBitmap)
-/*Column {
-    Text(text = "Como")
-    Text(text = "COMO CARAGO")
-    Image(
-        bitmap = imageBitmap,
-        contentDescription = "description",
-        modifier = Modifier.padding(16.dp, 8.dp)
-    )
-    /*Button(onClick = { navController.popBackStack() }) {
-        Text(text = "Nope")
-    }*/
-}*/
-
-//PhotoForm(navController = navController, uri = uri,  imageBitmap = imageBitmap)
-//SnapPetPreviewPhoto(navController = navController, uri = Uri.EMPTY , imageBitmap = imageBitmap)
-//* } else {
-/*  Log.d(Logger.TAG,"Image is null")
-}*/
-// Function to save the image to a specific folder in the device's media store
-
-

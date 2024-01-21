@@ -147,7 +147,7 @@ class TestMapActivity : ComponentActivity() {
 @OptIn(MapsComposeExperimentalApi ::class)
 @Composable
 fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: CameraPositionState){
-    var photon = Photo(latitude = 190.0, longitude = 190.0)
+    var photon = Photo(latitude = 190.0, longitude = 190.0,likes = 0)
     var clickSinglePoint by remember {
         mutableStateOf(false)
     }

@@ -1,7 +1,12 @@
 package com.example.snappet.screens
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,14 +42,13 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun ClusterViewPhotos(clusterPhotos : List<Photo>){
-
+    var expandedCardIndex by remember {
+        mutableStateOf(-1)
+    }
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp)
-            //.padding(16.dp)
     ) {
-        item {
+       item {
             Column {
                 LazyRow(
                     modifier = Modifier.padding(end = 4.dp)
@@ -55,11 +60,9 @@ fun ClusterViewPhotos(clusterPhotos : List<Photo>){
                     }
                 }
             }
-
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
