@@ -151,6 +151,8 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
     var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
+    var orderedPhotosLikes by remember { mutableStateOf(emptyList<Photo>()) }
+
     val user = Firebase.auth.currentUser
     val userId = user?.uid
 
@@ -188,6 +190,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     }
                 }
                 recentPhotos = photos.reversed()
+                orderedPhotosLikes = photos.sortedByDescending{ it.likes}
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -246,19 +249,27 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
         item {
             Column {
+                Text("Most Liked Photos", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    orderedPhotosLikes.forEach { photo ->
+                        item { CardWithImageAndText(
+                            photo = photo, text = photo.animalType
+                        ) {
+                            navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                        }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
                 Text("Bees", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Bee"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
-                            }
-                            }
-                        }
-                    }
                 }
             }
         }
