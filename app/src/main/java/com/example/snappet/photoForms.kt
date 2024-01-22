@@ -368,7 +368,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 }
             },
             shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(Color.Black),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
             modifier = Modifier
                 .align(alignment = Alignment.BottomEnd)
                 .padding(end = 30.dp, bottom = 30.dp)
