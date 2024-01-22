@@ -1,5 +1,6 @@
 package com.example.snappet.screens
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -15,25 +16,33 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -51,168 +60,246 @@ import com.google.firebase.ktx.Firebase
 
 
 //meter nome do utilizador
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean) {
     // Use a Column to arrange the information vertically
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = photo.animalType + " Photo by " + photo.senderName,
+                        color = Color.Black
+                    )
+
+                        },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.navigate(Screens.Home.route) }
+                    ) {
+                        Icon(Icons.Filled.KeyboardArrowLeft, contentDescription = "Back")
+                    }
+                }
+            )
+        }
     ) {
-        // Display the photo with a fixed height
-        val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {
-            photo.downloadUrl
-        } else {
-            photo.imageUri.toString()
-        }
-
-        Image(
-            painter = rememberImagePainter(imageUrl),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                //.height(300.dp)
-                .size(400.dp)
-                .clip(MaterialTheme.shapes.medium)
-        )
-
-        // Add some space between the photo and the text information
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Uploaded by: ${photo.senderName}",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Display the animal type
-        Text(
-            text = "Animal Type: ${photo.animalType}",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
-        )
-
-        // Add more space
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Display the description
-        Text(
-            text = "Description: ${photo.description}",
-            fontSize = 16.sp
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        val likePhotoMessage = remember{ mutableStateOf(false) }
-
-        if(likePhotoMessage.value){
-            AlertDialog(
-                onDismissRequest = { likePhotoMessage.value = false },
-                title = {Text(text = "Thank you!")},
-                text = {Text (
-                    text = "You like the photo!",
-                    modifier = Modifier.verticalScroll(rememberScrollState())
-                )},
-                confirmButton = {
-                    Button(
-                        onClick = {likePhotoMessage.value = false},
-                        colors = ButtonDefaults.buttonColors(Color.Black)
-                    ){
-                        Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-                }
-            )
-        }
-
-        val alreadyLikedPhotoMessage = remember{ mutableStateOf(false) }
-
-        if(alreadyLikedPhotoMessage.value){
-            AlertDialog(
-                onDismissRequest = { alreadyLikedPhotoMessage.value = false },
-                title = {Text(text = "Warning!")},
-                text = {Text (
-                    text = "You have already liked the photo, can't like it again!",
-                    modifier = Modifier.verticalScroll(rememberScrollState())
-                )},
-                confirmButton = {
-                    Button(
-                        onClick = {alreadyLikedPhotoMessage.value = false},
-                        colors = ButtonDefaults.buttonColors(Color.Black)
-                    ){
-                        Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-                }
-            )
-        }
-
-        var isLikeEnabled by remember { mutableStateOf(!check) }
-
-        Log.d(TAG, "Check -> " + check)
-        Log.d(TAG, "isLikeEnabled -> " + isLikeEnabled)
-
-
-
-        //Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Number of Likes: ${photo.likes}",
-            fontSize = 16.sp
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-        ){
+        ) {
+            // Display the photo with a fixed height
+            val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {
+                photo.downloadUrl
+            } else {
+                photo.imageUri.toString()
+            }
 
-            Column (
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-                verticalArrangement = Arrangement.Bottom
+            Image(
+                painter = rememberImagePainter(imageUrl),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    //.height(300.dp)
+                    .size(400.dp)
+                    .clip(MaterialTheme.shapes.medium)
+            )
+
+            // Add some space between the photo and the text information
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ){
+
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalAlignment = Alignment.CenterVertically
                 ){
-                    Button(
-                        onClick = {navController.navigate(Screens.Home.route) },
-                        modifier = Modifier.height(50.dp)
-                            .width(150.dp)
+                    Text(
+                        text = "Animal: ",
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 20.sp
+                    )
 
-                    ) {
-                        Text(text = "Back", style = TextStyle(fontSize = 20.sp), fontWeight = FontWeight.Bold)
-                    }
+                    Text(
+                        text = photo.animalType,
+                        fontSize = 20.sp
+                    )
+                }
 
+                /*Text(
+                    text = "Animal Type: ${photo.animalType}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )*/
+
+                Row(
+                    modifier = Modifier.weight(1f),//.padding(end = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End,
+                ){
                     Image(
                         painter = painterResource(R.drawable.heart),
                         contentDescription = "Like",
                         modifier = Modifier
-                            .size(75.dp)
-                            .clickable(enabled = isLikeEnabled) {
-                                likePhotoMessage.value = true
-                                photo.likes += 1
+                            .size(25.dp)
+                            .padding(end = 4.dp)
 
-                                updateUserLikes(photo, photo.id, onFailure = { exception ->
-                                    Log.e(TAG, "failed to update liked photos", exception)
-                                })
-
-                                isLikeEnabled = false
-
-                                Log.d(TAG, "photo id: " + photo.id)
-                                Log.d(TAG, "photo likes: " + photo.likes)
-                            }
                     )
+
+                    Text(
+                        text = photo.likes.toString(),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(end = 35.dp)
+                    )
+                }
+
+
+
+            }
+
+
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = "Description: ",
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 20.sp
+                )
+
+                Text(
+                    text = photo.description,
+                    fontSize = 20.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(140.dp))
+
+            /*Text(
+                text = "Uploaded by: ${photo.senderName}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )*/
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Uploaded by: ",
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 20.sp
+                )
+                Text(
+                    text = photo.senderName,
+                    fontSize = 20.sp
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            val likePhotoMessage = remember{ mutableStateOf(false) }
+
+            if(likePhotoMessage.value){
+                AlertDialog(
+                    onDismissRequest = { likePhotoMessage.value = false },
+                    title = {Text(text = "Thank you!")},
+                    text = {Text (
+                        text = "You like the photo!",
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    )},
+                    confirmButton = {
+                        Button(
+                            onClick = {likePhotoMessage.value = false},
+                            colors = ButtonDefaults.buttonColors(Color.Black)
+                        ){
+                            Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                )
+            }
+
+            val alreadyLikedPhotoMessage = remember{ mutableStateOf(false) }
+
+            if(alreadyLikedPhotoMessage.value){
+                AlertDialog(
+                    onDismissRequest = { alreadyLikedPhotoMessage.value = false },
+                    title = {Text(text = "Warning!")},
+                    text = {Text (
+                        text = "You have already liked the photo, can't like it again!",
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    )},
+                    confirmButton = {
+                        Button(
+                            onClick = {alreadyLikedPhotoMessage.value = false},
+                            colors = ButtonDefaults.buttonColors(Color.Black)
+                        ){
+                            Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                )
+            }
+
+            var isLikeEnabled by remember { mutableStateOf(!check) }
+
+            Log.d(TAG, "Check -> " + check)
+            Log.d(TAG, "isLikeEnabled -> " + isLikeEnabled)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ){
+
+                Column (
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom
+                ){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ){
+                        Image(
+                            painter = painterResource(R.drawable.heart),
+                            contentDescription = "Like",
+                            modifier = Modifier
+                                .size(75.dp)
+                                .clickable(enabled = isLikeEnabled) {
+                                    likePhotoMessage.value = true
+                                    photo.likes += 1
+
+                                    updateUserLikes(photo, photo.id, onFailure = { exception ->
+                                        Log.e(TAG, "failed to update liked photos", exception)
+                                    })
+
+                                    isLikeEnabled = false
+
+                                    Log.d(TAG, "photo id: " + photo.id)
+                                    Log.d(TAG, "photo likes: " + photo.likes)
+                                }
+                        )
+                    }
                 }
             }
         }
-
-
-
-
     }
+
+
 }
 
 /*updateUserLikes(
