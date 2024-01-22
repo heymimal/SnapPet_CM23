@@ -179,11 +179,16 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                     fontSize = 20.sp
                 )
 
-                Text(
+                /*Text(
                     text = photo.description,
                     fontSize = 20.sp
-                )
+                )*/
             }
+
+            Text(
+                text = photo.description,
+                fontSize = 20.sp
+            )
 
             Spacer(modifier = Modifier.height(140.dp))
 
