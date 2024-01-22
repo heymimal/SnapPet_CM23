@@ -1,7 +1,6 @@
 package com.example.snappet.screens
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -90,7 +89,6 @@ fun CardWithImageAndText(photo: Photo, text: String, onPhotoClick: () -> Unit) {
                 .padding(8.dp)
         ) {
 
-            Log.d("ImageURL", photo.imageUri.toString())
 
             // Use downloadUrl if sender is not the current user
             val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {
@@ -153,6 +151,8 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
     var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
+    var orderedPhotosLikes by remember { mutableStateOf(emptyList<Photo>()) }
+
     val user = Firebase.auth.currentUser
     val userId = user?.uid
 
@@ -190,6 +190,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     }
                 }
                 recentPhotos = photos.reversed()
+                orderedPhotosLikes = photos.sortedByDescending{ it.likes}
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -207,16 +208,6 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             .padding(16.dp)
     ) {
         // First Row: "Animais"
-       /* item {
-            Column {
-                Text("Animais", fontWeight = FontWeight.Bold)
-                LazyRow {
-                    item { CardWithImageAndText(Icons.Default.Person, "Cat") }
-                    item { CardWithImageAndText(Icons.Default.Phone, "Dog") }
-                    item { CardWithImageAndText(Icons.Default.Place, "Peacock") }
-                }
-            }
-        }*/
 
         item {
             Column {
@@ -235,16 +226,89 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                     }
                 }
             }
-
-
         }
 
         item {
             Column {
-                Text("Dogs", fontWeight = FontWeight.Bold)
+                Text("My Photos", fontWeight = FontWeight.Bold)
                 LazyRow {
                     recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Dog"){
+                        if(photo.sender == userId){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Most Liked Photos", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    orderedPhotosLikes.forEach { photo ->
+                        item { CardWithImageAndText(
+                            photo = photo, text = photo.animalType
+                        ) {
+                            navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                        }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Bees", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Bee"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Birds", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Bird"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Butterflies", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Butterfly"){
                             item { CardWithImageAndText(
                                 photo = photo, text = photo.animalType
                             ) {
@@ -271,8 +335,6 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
                             }
                             }
-
-
                         }
                     }
                 }
@@ -281,10 +343,10 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
         item {
             Column {
-                Text("Birds", fontWeight = FontWeight.Bold)
+                Text("Chickens", fontWeight = FontWeight.Bold)
                 LazyRow {
                     recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Bird"){
+                        if(photo.animalType == "Chicken"){
                             item { CardWithImageAndText(
                                 photo = photo, text = photo.animalType
                             ) {
@@ -298,9 +360,214 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             }
         }
 
+        item {
+            Column {
+                Text("Cows", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Cow"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
+        item {
+            Column {
+                Text("Dogs", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Dog"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Ducks", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Duck"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Geckos", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Gecko"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Goats", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Goat"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Horses", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Horse"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Lizards", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Lizard"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Peacocks", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Peacock"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Pigs", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Pig"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Rabbits", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Rabbit"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Column {
+                Text("Sheeps", fontWeight = FontWeight.Bold)
+                LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Sheep"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+
+                            }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     }
 }

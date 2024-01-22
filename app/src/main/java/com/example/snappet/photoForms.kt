@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -63,14 +62,14 @@ import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
 import com.example.snappet.database.saveImageToMediaStore
 import com.example.snappet.database.uploadImageToStorage
-import com.google.android.gms.maps.model.LatLng
 import com.example.snappet.sign_In.UserData
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -105,6 +104,8 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
     val user = Firebase.auth.currentUser
     val userId = user?.uid
 
+    //var navController = rememberNavController()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -118,7 +119,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             modifier = Modifier
                 .align(alignment = Alignment.CenterHorizontally)
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         Box(
             modifier = Modifier
@@ -137,7 +138,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -152,7 +153,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             modifier = Modifier
                 .align(alignment = Alignment.Start)
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -201,7 +202,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             }
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -218,11 +219,10 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         )
 
         radioButton { selectedOption ->
-            // Atualizar a variável contextPhotoType com a opção selecionada
             contextPhotoType = selectedOption
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -236,23 +236,11 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             color = Color.Black,
             modifier = Modifier.align(alignment = Alignment.Start)
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         var ttext by remember { mutableStateOf<String?>("") }
 
         val maxChar = 60
-
-        /*TextField(
-            value = ttext!!,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onValueChange = {
-                if(it.length <= maxChar){
-                    ttext = it
-                } },
-            label = { Text("Description") }
-        )
-
-        descriptionPhoto = ttext*/
 
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -279,13 +267,10 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 },
                 label = { Text("Description") }
             )
-
-
-
             descriptionPhoto = ttext
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Text(
             text = "(Options selected with * are mandatory to fill in!)",
@@ -304,7 +289,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         var latitude = 190.0
         var longitude = 190.0
 
-        var isLocationChecked = SwitchOption()
+        var isLocationChecked = false
 
         val showAlertMessage = remember{ mutableStateOf(false) }
 
@@ -325,6 +310,13 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                     }
                 }
             )
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+        ){
+            isLocationChecked = SwitchOption()
         }
 
 
@@ -360,13 +352,10 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 }
             },
             shape = RoundedCornerShape(50.dp),
-            colors = ButtonDefaults.buttonColors(Color.Black),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
             modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 246.dp,
-                    y = 740.dp
-                )
+                .align(alignment = Alignment.BottomEnd)
+                .padding(end = 30.dp, bottom = 30.dp)
                 .height(50.dp)
                 .width(150.dp)
         )
@@ -395,7 +384,8 @@ fun SwitchOption(): Boolean{
         }else null
 
     Column(
-        modifier = Modifier.offset(y = 720.dp).padding(20.dp)
+        modifier = Modifier
+            .padding(20.dp)
     ){
         Text(
             text = "Share Location",
@@ -588,6 +578,153 @@ private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, 
             //Log.e(TAG, "Error fetching snaPoints: ${databaseError.message}")
         }
     })
+}
+
+
+private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo, userData: UserData){
+    val storage = Firebase.storage
+    val storageRef: StorageReference = storage.reference.child(fileName)
+
+    val currentUser = Firebase.auth.currentUser
+    val userUid = currentUser?.uid
+
+    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    val databaseReference: DatabaseReference = database.reference.child("urlTest")
+
+    var downloadUrl = ""
+
+    if(userUid!= null){
+        val userFolderRef = storage.reference.child("user_images_storage/$userUid")
+
+        // Create a unique filename for the image in the user's folder
+        val filePath = "$fileName.jpg"
+        val imageRef = userFolderRef.child(filePath)
+
+        // Convert ImageBitmap to byte array
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        // Convert ImageBitmap to Bitmap (asAndroidBitmap)
+        val androidBitmap = imageBitmap.asAndroidBitmap()
+
+        // Encode the Bitmap as JPEG
+        androidBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
+
+        val data = byteArrayOutputStream.toByteArray()
+
+        // Upload the image to Firebase Storage
+        val uploadTask: UploadTask = imageRef.putBytes(data)
+
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            // Image upload success, you can retrieve the download URL if needed
+            var downloadUrlFirebase = ""
+            val downloadUrlReal = taskSnapshot.storage.downloadUrl;
+            downloadUrlReal.addOnSuccessListener { uri ->
+                run {
+                    var imageUrl = uri.toString()
+                    downloadUrlFirebase = imageUrl
+                    uploadPhotoToDatabase(photo, downloadUrlFirebase, userData)
+                }
+            }
+        }.addOnFailureListener { exception ->
+            // Handle the failure case, e.g., show an error message
+            Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
+        }
+    }
+}
+
+//ja mete as fotos com o mesmo id em folders diferentes
+private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData) {
+    val currentUser = Firebase.auth.currentUser
+    val database = Firebase.database
+    val databaseReference = database.reference
+
+    var post1 = false
+    var post2 = false
+
+    currentUser?.let {
+        val userId = it.uid
+        val userName = it.displayName
+
+        val folderName = if (!userName.isNullOrBlank()) userName else userId
+        val allFolder = "allImages"
+        val imagePath = "imagesTest/$folderName/"
+        val allImagesPath = "imagesTest/$allFolder/"
+
+        val databasePath = databaseReference.child(imagePath)
+        val allImagesDatabasePath = databaseReference.child(allImagesPath)
+
+        val sharedKey = databasePath.push().key
+        sharedKey?.let { key ->
+            photo.id = key
+            val data = hashMapOf(
+                "imageUrl" to photo.imageUri.toString(),
+                "animal" to photo.animalType,
+                "context" to photo.contextPhoto,
+                "description" to photo.description,
+                "id" to photo.id,
+                "downloadUrl" to downloadUrl,
+                "sender" to it.uid,
+                "latitude" to photo.latitude,
+                "longitude" to photo.longitude,
+                "likes" to photo.likes,
+                "senderName" to userName
+            )
+
+            // each user folder
+            databasePath.child(key).setValue(data)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        updateDailyMissions(userData, photo.animalType!!)
+                        updateMonthlyMissions(userData, photo.animalType!!)
+                        Log.d(TAG, "Photo data uploaded to user-specific folder.")
+                    } else {
+                        Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
+                    }
+                }
+
+            // all images folder
+            allImagesDatabasePath.child(key).setValue(data)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "Photo data uploaded to shared folder.")
+                    } else {
+                        Log.e(TAG, "Failed to upload photo data to shared folder", task.exception)
+                    }
+                }
+        }
+    }
+}
+
+
+
+private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File): Uri? {
+    val folderName = "Snappet"
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "${file.name}")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.WIDTH, bitmap.width)
+        put(MediaStore.Images.Media.HEIGHT, bitmap.height)
+        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
+        put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + folderName)
+    }
+
+    val contentResolver = context.contentResolver
+    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+    uri?.let { imageUri ->
+        contentResolver.openOutputStream(imageUri)?.use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
+
+        }
+
+        return imageUri
+    }
+
+    return null
+
 }
 
 @Composable
