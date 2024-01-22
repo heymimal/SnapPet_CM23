@@ -267,9 +267,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
                                     })}
                             }else{
-                                Log.d(TAG, " NAO SOU EU!!!!!!!!!!")
-                                Log.d(TAG, "id do sender -> " + photo.sender)
-                                Log.d(TAG, "id do user -> " + userId)
+
                                 item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
                                     text = photo.animalType, onPhotoClick = {
                                         navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
