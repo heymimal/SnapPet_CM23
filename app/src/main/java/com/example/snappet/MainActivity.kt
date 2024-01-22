@@ -494,6 +494,7 @@ class MainActivity : ComponentActivity() {
                         val latitude = childSnapshot.child("latitude").getValue(Double::class.java)
                         val longitude  = childSnapshot.child("longitude").getValue(Double::class.java)
                         val likes  = childSnapshot.child("likes").getValue(Int::class.java)
+                        val senderName = childSnapshot.child("senderName").getValue(String::class.java)
 
 
                         imageUrl?.let {
@@ -507,7 +508,8 @@ class MainActivity : ComponentActivity() {
                                 sender = sender?: "",
                                 latitude = latitude ?: 0.0,
                                 longitude = longitude ?: 0.0,
-                                likes = likes ?: 0
+                                likes = likes ?: 0,
+                                senderName = senderName ?: ""
                             )
 
                             photos.add(photo)

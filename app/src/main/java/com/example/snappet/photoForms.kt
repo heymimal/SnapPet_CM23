@@ -61,14 +61,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.data.Photo
-import com.google.android.gms.maps.model.LatLng
 import com.example.snappet.sign_In.UserData
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -689,7 +689,8 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: U
                 "sender" to it.uid,
                 "latitude" to photo.latitude,
                 "longitude" to photo.longitude,
-                "likes" to photo.likes
+                "likes" to photo.likes,
+                "senderName" to userName
             )
 
             // each user folder

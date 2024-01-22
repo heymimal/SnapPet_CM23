@@ -15,5 +15,6 @@ data class Photo(
     var latitude: Double,
     var longitude: Double,
     var likes: Int,
+    var senderName: String = "",
     // to change
     )
