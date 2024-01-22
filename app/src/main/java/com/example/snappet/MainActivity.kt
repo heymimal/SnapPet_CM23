@@ -508,7 +508,7 @@ class MainActivity : ComponentActivity() {
         return providedDate.isAfter(firstDayOfPreviousMonth) || providedDate.isEqual(firstDayOfPreviousMonth)
     }
 
-    //creats the 4 first daily missions
+    //creats the 5 first daily missions
     private fun createDailyMissions(thisUserRef: DatabaseReference) {
         val currentDate = LocalDate.now(ZoneId.systemDefault())
         val dayOfMonth = currentDate.dayOfMonth
@@ -516,33 +516,40 @@ class MainActivity : ComponentActivity() {
         val year = currentDate.year
         val dateString = "$dayOfMonth $monthValue $year"
         thisUserRef.child("LastLogin").setValue(dateString)
+
         val missionsReference = thisUserRef.child("DailyMissions")
         missionsReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (!dataSnapshot.exists()) {
-                    // Create and store specific daily missions
+                    // Define the missionList excluding the "10PicturesMission"
                     val missionList = listOf(
-                        Mission("Bee", 3, 0, 10, "take 3 bee pictures",dateString,false),
-                        Mission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
-                        Mission("Butterfly", 3, 0, 10, "take 3 butterfly pictures", dateString,false),
-                        Mission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
-                        Mission("Chicken", 3, 0, 10, "take 3 chicken pictures", dateString,false),
-                        Mission("Cow", 3, 0, 10, "take 3 cow pictures", dateString,false),
-                        Mission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
-                        Mission("Duck", 3, 0, 10, "take 3 duck pictures", dateString,false),
-                        Mission("Gecko", 3, 0, 10, "take 3 gecko pictures", dateString,false),
-                        Mission("Goat", 3, 0, 10, "take 3 goat pictures", dateString,false),
-                        Mission("Horse", 3, 0, 10, "take 3 horse pictures", dateString,false),
-                        Mission("Lizard", 3, 0, 10, "take 3 lizard pictures", dateString,false),
-                        Mission("Peacock", 3, 0, 10, "take 3 peacock pictures", dateString,false),
-                        Mission("Pig", 3, 0, 10, "take 3 pig pictures", dateString,false),
-                        Mission("Rabbit", 3, 0, 10, "take 3 rabbit pictures", dateString,false),
-                        Mission("Sheep", 3, 0, 10, "take 3 sheep pictures", dateString,false),
-                        Mission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
+                        Mission("Bee", 3, 0, 10, "take 3 bee pictures", dateString, false),
+                        Mission("Bird", 3, 0, 10, "take 3 bird pictures", dateString, false),
+                        Mission("Butterfly", 3, 0, 10, "take 3 butterfly pictures", dateString, false),
+                        Mission("Cat", 3, 0, 10, "take 3 cat pictures", dateString, false),
+                        Mission("Chicken", 3, 0, 10, "take 3 chicken pictures", dateString, false),
+                        Mission("Cow", 3, 0, 10, "take 3 cow pictures", dateString, false),
+                        Mission("Dog", 3, 0, 10, "take 3 dog pictures", dateString, false),
+                        Mission("Duck", 3, 0, 10, "take 3 duck pictures", dateString, false),
+                        Mission("Gecko", 3, 0, 10, "take 3 gecko pictures", dateString, false),
+                        Mission("Goat", 3, 0, 10, "take 3 goat pictures", dateString, false),
+                        Mission("Horse", 3, 0, 10, "take 3 horse pictures", dateString, false),
+                        Mission("Lizard", 3, 0, 10, "take 3 lizard pictures", dateString, false),
+                        Mission("Peacock", 3, 0, 10, "take 3 peacock pictures", dateString, false),
+                        Mission("Pig", 3, 0, 10, "take 3 pig pictures", dateString, false),
+                        Mission("Rabbit", 3, 0, 10, "take 3 rabbit pictures", dateString, false),
+                        Mission("Sheep", 3, 0, 10, "take 3 sheep pictures", dateString, false),
+                        Mission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString, false)
                     )
 
-                    // Add each mission under the "Missions" node with a custom key
-                    for ((index, mission) in missionList.withIndex()) {
+                    // Shuffle the missionList excluding "10PicturesMission" and take the first 4 missions
+                    val shuffledMissions = missionList.filter { it != missionList.last() }.shuffled().take(4)
+
+                    // Add "10PicturesMission" to the end of the list
+                    val finalMissions = shuffledMissions + missionList.last()
+
+                    // Add each mission to the "DailyMissions" node with a custom key
+                    for ((index, mission) in finalMissions.withIndex()) {
                         missionsReference.child("DailyMission${index + 1}").setValue(mission)
                     }
                 }
@@ -554,34 +561,40 @@ class MainActivity : ComponentActivity() {
         })
     }
 
-    // refreshes the 4 daily missions
-    private fun refreshDailyMissions(thisUserRef: DatabaseReference,dateString: String) {
+    // refreshes the 5 daily missions
+    private fun refreshDailyMissions(thisUserRef: DatabaseReference, dateString: String) {
         // Reference to the "Missions" node
         val missionsReference = thisUserRef.child("DailyMissions")
 
-        // Create and store specific daily missions with the same naming convention
-        val newMissionList = listOf(
-            Mission("Bee", 3, 0, 10, "take 3 bee pictures",dateString,false),
-            Mission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
-            Mission("Butterfly", 3, 0, 10, "take 3 butterfly pictures", dateString,false),
-            Mission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
-            Mission("Chicken", 3, 0, 10, "take 3 chicken pictures", dateString,false),
-            Mission("Cow", 3, 0, 10, "take 3 cow pictures", dateString,false),
-            Mission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
-            Mission("Duck", 3, 0, 10, "take 3 duck pictures", dateString,false),
-            Mission("Gecko", 3, 0, 10, "take 3 gecko pictures", dateString,false),
-            Mission("Goat", 3, 0, 10, "take 3 goat pictures", dateString,false),
-            Mission("Horse", 3, 0, 10, "take 3 horse pictures", dateString,false),
-            Mission("Lizard", 3, 0, 10, "take 3 lizard pictures", dateString,false),
-            Mission("Peacock", 3, 0, 10, "take 3 peacock pictures", dateString,false),
-            Mission("Pig", 3, 0, 10, "take 3 pig pictures", dateString,false),
-            Mission("Rabbit", 3, 0, 10, "take 3 rabbit pictures", dateString,false),
-            Mission("Sheep", 3, 0, 10, "take 3 sheep pictures", dateString,false),
-            Mission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
+        // Define the missionList excluding the "10PicturesMission"
+        val missionList = listOf(
+            Mission("Bee", 3, 0, 10, "take 3 bee pictures", dateString, false),
+            Mission("Bird", 3, 0, 10, "take 3 bird pictures", dateString, false),
+            Mission("Butterfly", 3, 0, 10, "take 3 butterfly pictures", dateString, false),
+            Mission("Cat", 3, 0, 10, "take 3 cat pictures", dateString, false),
+            Mission("Chicken", 3, 0, 10, "take 3 chicken pictures", dateString, false),
+            Mission("Cow", 3, 0, 10, "take 3 cow pictures", dateString, false),
+            Mission("Dog", 3, 0, 10, "take 3 dog pictures", dateString, false),
+            Mission("Duck", 3, 0, 10, "take 3 duck pictures", dateString, false),
+            Mission("Gecko", 3, 0, 10, "take 3 gecko pictures", dateString, false),
+            Mission("Goat", 3, 0, 10, "take 3 goat pictures", dateString, false),
+            Mission("Horse", 3, 0, 10, "take 3 horse pictures", dateString, false),
+            Mission("Lizard", 3, 0, 10, "take 3 lizard pictures", dateString, false),
+            Mission("Peacock", 3, 0, 10, "take 3 peacock pictures", dateString, false),
+            Mission("Pig", 3, 0, 10, "take 3 pig pictures", dateString, false),
+            Mission("Rabbit", 3, 0, 10, "take 3 rabbit pictures", dateString, false),
+            Mission("Sheep", 3, 0, 10, "take 3 sheep pictures", dateString, false),
+            Mission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString, false)
         )
 
+        // Shuffle the missionList excluding "10PicturesMission" and take the first 4 missions
+        val shuffledMissions = missionList.filter { it != missionList.last() }.shuffled().take(4)
+
+        // Add "10PicturesMission" to the end of the list
+        val finalMissions = shuffledMissions + missionList.last()
+
         // Replace existing missions with the new ones
-        for ((index, mission) in newMissionList.withIndex()) {
+        for ((index, mission) in finalMissions.withIndex()) {
             missionsReference.child("DailyMission${index + 1}").setValue(mission)
         }
     }
