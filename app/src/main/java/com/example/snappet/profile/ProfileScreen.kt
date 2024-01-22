@@ -1,6 +1,13 @@
 package com.example.snappet.profile
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,10 +46,16 @@ import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.sign_In.UserData
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.example.snappet.LocationService
 import com.example.snappet.data.Trophy
 import com.example.snappet.navigation.Screens
 import com.example.snappet.screens.RaritySquare
+import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
@@ -50,8 +63,6 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostController,
                   userData: UserData?,
-    //queremos ter um lambeda quando ele fizer sign out
-    //ele recebe esta função como paramentro de entrada
                   onSignOut: () -> Unit
                           ) {
     val userDataState by profileViewModel.userData.observeAsState()
@@ -77,12 +88,15 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
 fun ProfileScreenComposable(
     final: UserData?,
     userData: UserData?,
-    //queremos ter um lambeda quando ele fizer sign out
-    //ele recebe esta função como paramentro de entrada
     onSignOut: () -> Unit,
     navController: NavController,
     trophy: Trophy?,
 ) {
+    var permissions = arrayOf(
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+    )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,24 +114,11 @@ fun ProfileScreenComposable(
 
             Spacer(modifier = Modifier.height(50.dp))
 
-
-            /*Text(
-                text = "Profile Image",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                style = TextStyle(fontSize = 20.sp)
-            )*/
-            //Texto para o username
-            //se o userData não tiver um user name que seja nulo
             if(userData?.username != null) {
                 Text(
-                    //mostra o username
                     text = userData.username,
-                    //o texto vai ser centrado
                     textAlign = TextAlign.Center,
-                    //tamanho do texto
                     fontSize = 20.sp,
-                    //por negrito no texto
                     fontWeight = FontWeight.SemiBold
                 )
 
@@ -126,28 +127,24 @@ fun ProfileScreenComposable(
                         final.snaPoints?.let { updateTrophy(userData.userId, it.toInt()) }
                     }
                     Text(
-                        //mostra os pontos
                         text = "SnapPoints: "+final.snaPoints,
-                        //o texto vai ser centrado
                         textAlign = TextAlign.Center,
-                        //tamanho do texto
                         fontSize = 20.sp,
-                        //por negrito no texto
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                //espacinho depois do username
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
             Spacer(modifier = Modifier.height(15.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // User profile picture
                 if (userData?.profilePictureUrl != null) {
                     AsyncImage(
                         model = userData.profilePictureUrl,
@@ -158,8 +155,21 @@ fun ProfileScreenComposable(
                         contentScale = ContentScale.Crop
                     )
                 }
+                var permissionsGranted by remember { mutableStateOf(false)}
+                val requestMultiplePermissionsLauncher =
+                    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                        permissionsGranted = !permissions.containsValue(false)
+                        Log.d(TAG,"permissions were granted? : $permissionsGranted")
+                    }
 
-                // Buttons (Update and Logout)
+                val context = LocalContext.current
+                var text by remember {
+                    mutableStateOf("Start")
+                }
+                var on by remember {
+                    mutableStateOf(false)
+                }
+
                 Column(
                     modifier = Modifier
                         .padding(start = 16.dp),
@@ -167,12 +177,42 @@ fun ProfileScreenComposable(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = { /* Ação do botão Update */ },
+                        onClick = {
+                            if(on){
+                                Intent(context,LocationService::class.java).apply {
+                                    action = LocationService.ACTION_STOP
+                                    context.startService(this)
+                                }
+                                on = false
+                                text = "Start"
+                            } else{
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                    permissions += Manifest.permission.POST_NOTIFICATIONS
+                                }
+                                val permissionStatus = permissions.map {
+                                    it to (context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED)
+                                }.toMap()
+
+                                if (permissionStatus.containsValue(false)) {
+                                    requestMultiplePermissionsLauncher.launch(permissions)
+                                } else {
+                                    // All permissions already granted
+                                    text = "STOP"
+                                    permissionsGranted = true
+                                    Intent(context,LocationService::class.java).apply {
+                                        action = LocationService.ACTION_START
+                                        context.startService(this)
+                                    }
+                                    on = true
+                                }
+                            }
+
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp) // Adjust the spacing between buttons
                     ) {
-                        Text(text = "Update")
+                        Text(text = text)
                     }
 
                     Button(
