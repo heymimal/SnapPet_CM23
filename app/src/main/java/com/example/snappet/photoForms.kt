@@ -104,9 +104,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
     //var navController = rememberNavController()
 
-    Log.d(TAG, "URI");
-    Log.d(TAG, uri.toString());
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -222,9 +219,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         radioButton { selectedOption ->
             contextPhotoType = selectedOption
         }
-
-        Log.d(TAG, "TESTE DO CONTEXTO");
-        Log.d(TAG, contextPhotoType!!);
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -734,8 +728,7 @@ private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File):
         contentResolver.openOutputStream(imageUri)?.use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
-            Log.d(TAG, "VAMOS TESTAR");
-            Log.d(TAG, imageUri.toString())
+
         }
 
         return imageUri

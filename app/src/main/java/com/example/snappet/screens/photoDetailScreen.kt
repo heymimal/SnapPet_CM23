@@ -234,9 +234,6 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
 
             var isLikeEnabled by remember { mutableStateOf(!check) }
 
-            Log.d(TAG, "Check -> " + check)
-            Log.d(TAG, "isLikeEnabled -> " + isLikeEnabled)
-
             Spacer(modifier = Modifier.height(20.dp))
 
 
@@ -263,9 +260,6 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                                 })
 
                                 isLikeEnabled = false
-
-                                Log.d(TAG, "photo id: " + photo.id)
-                                Log.d(TAG, "photo likes: " + photo.likes)
                             }
                     )
                 }
@@ -358,7 +352,6 @@ fun updateUserLikes(
                 val currentLikedPhotos = snapshot.children.mapNotNull { it.value as? String }
 
                 for (c in currentLikedPhotos){
-                    Log.d(TAG, "photo -> " + c)
                 }
 
                 // If not, add it
