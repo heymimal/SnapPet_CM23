@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -24,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -238,6 +240,19 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
                 }){
                 Text("Click to Like")
             }
+            Button(
+                onClick = {Log.d(TAG,"click!")},
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        //modifier = Modifier.background(Color.White),
+                //modifier = Modifier.size(width = 200.dp, height = 70.dp),
+                content = {
+                Image(painterResource(R.drawable.heart),
+                    modifier = Modifier.size(40.dp),
+                    contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing
+                //Text("Like!", fontSize = 15.sp)
+            }
+            )
             /*Image(
                 painter = painterResource(R.drawable.heart),
                 contentDescription = "Like",
