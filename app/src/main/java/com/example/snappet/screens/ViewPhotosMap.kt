@@ -1,11 +1,14 @@
 package com.example.snappet.screens
 
+import android.content.ContentValues
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +20,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,20 +36,28 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.example.snappet.R
 import com.example.snappet.data.Photo
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun ClusterViewPhotos(clusterPhotos : List<Photo>){
+fun ClusterViewPhotos(clusterPhotos : List<Photo>, reference: DatabaseReference){
     var expandedCardIndex by remember {
         mutableStateOf(-1)
     }
@@ -55,7 +71,7 @@ fun ClusterViewPhotos(clusterPhotos : List<Photo>){
                 ) {
                     clusterPhotos.forEach { photo ->
                         item {
-                            PhotoDetailCard(photo)
+                            PhotoDetailCard(photo, reference)
                         }
                     }
                 }
@@ -66,7 +82,50 @@ fun ClusterViewPhotos(clusterPhotos : List<Photo>){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PhotoDetailCard(photo: Photo) {
+fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
+
+    val likePhotoMessage = remember{ mutableStateOf(false) }
+
+    if(likePhotoMessage.value){
+        AlertDialog(
+            onDismissRequest = { likePhotoMessage.value = false },
+            title = {Text(text = "Thank you!")},
+            text = {Text (
+                text = "You like the photo!",
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            )},
+            confirmButton = {
+                Button(
+                    onClick = {likePhotoMessage.value = false},
+                    colors = ButtonDefaults.buttonColors(Color.Black)
+                ){
+                    Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    }
+
+    val alreadyLikedPhotoMessage = remember{ mutableStateOf(false) }
+
+    if(alreadyLikedPhotoMessage.value){
+        AlertDialog(
+            onDismissRequest = { alreadyLikedPhotoMessage.value = false },
+            title = {Text(text = "Warning!")},
+            text = {Text (
+                text = "You have already liked the photo, can't like it again!",
+                modifier = Modifier.verticalScroll(rememberScrollState())
+            )},
+            confirmButton = {
+                Button(
+                    onClick = {alreadyLikedPhotoMessage.value = false},
+                    colors = ButtonDefaults.buttonColors(Color.Black)
+                ){
+                    Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    }
+
     var expanded by remember { mutableStateOf(false) }
     val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {
         photo.downloadUrl
@@ -80,6 +139,21 @@ fun PhotoDetailCard(photo: Photo) {
     val smallHeight = 150.dp
     val largeWidth = configuration.screenWidthDp.dp
     val largeHeight = 450.dp
+
+    var receivedValue by remember {
+        mutableStateOf(false)
+    }
+
+    var isLiked by remember {
+        mutableStateOf(false)
+    }
+
+    isAlreadyInFolder(reference, photo) { isAlreadyLiked ->
+        Log.d(ContentValues.TAG, "Is photo already liked: $isAlreadyLiked")
+
+        isLiked =isAlreadyLiked
+        receivedValue = true
+    }
 
     var width by remember {
         mutableStateOf(smallWidth)
@@ -149,84 +223,57 @@ fun PhotoDetailCard(photo: Photo) {
             fontSize = (10*amp).sp,
             modifier = Modifier.padding(start = 4.dp)
         )
+        if(expanded && receivedValue){
+            var isLikeEnabled by remember { mutableStateOf(!isLiked) }
+
+            // TODO try to put the button with an image!
+            Button(enabled = isLikeEnabled,
+                onClick = {
+                    likePhotoMessage.value = true
+                    photo.likes +=1
+                    updateUserLikes(photo, photo.id, onFailure = { exception ->
+                        Log.e(ContentValues.TAG, "failed to update liked photos", exception)
+                    })
+                    isLikeEnabled = false
+                }){
+                Text("Click to Like")
+            }
+            /*Image(
+                painter = painterResource(R.drawable.heart),
+                contentDescription = "Like",
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .background(color = Color.White)
+                    .clickable(enabled = !isLikeEnabled) {
+                        likePhotoMessage.value = true
+                        photo.likes +=1
+                        updateUserLikes(photo, photo.id, onFailure = { exception ->
+                            Log.e(ContentValues.TAG, "failed to update liked photos", exception)
+                        })
+                        isLikeEnabled = false
+                    }
+            )*/
+        }
     }
 }
+fun isAlreadyInFolder(
+    reference: DatabaseReference,
+    photo: Photo,
+    callback: (Boolean) -> Unit
+) {
+    reference.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val currentLikedPhotos = snapshot.children.mapNotNull { it.value as? String }
 
-@Composable
-fun LargeCard(photo: Photo, imageUrl: String){
-    val modifier = 3
-    Spacer(modifier = Modifier.height(3.dp))
-    Image(
-        painter = rememberImagePainter(imageUrl),
-        contentDescription = null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height((75 * 3).dp)
-            .clip(MaterialTheme.shapes.medium)
-    )
+            val isPhotoAlreadyLiked = currentLikedPhotos.contains(photo.id)
+            callback(isPhotoAlreadyLiked)
 
-    // Add some space between the photo and the text information
-    Spacer(modifier = Modifier.height(3.dp))
-    Row(){
-        Text(
-            text = "Animal:",
-            fontWeight = FontWeight.Bold,
-            fontSize = 10.sp
-        )
-        Text(
-            text = " ${photo.animalType}",
-            fontSize = 10.sp
-        )
-    }
-    Spacer(modifier = Modifier.height(3.dp))
-    Text(
-        text = "Description: ",
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.sp
-    )
-    Spacer(modifier = Modifier.height(3.dp))
-    // Display the description
-    Text(
-        text = "${photo.description}",
-        fontSize = 10.sp
-    )
-}
+        }
 
-@Composable
-fun smallCard(photo: Photo,imageUrl: String){
-    Spacer(modifier = Modifier.height(3.dp))
-    Log.d(TAG,"hello?")
-    Image(
-        painter = rememberImagePainter(imageUrl),
-        contentDescription = null,
-        modifier = Modifier
-            .height(75.dp)
-            .clip(MaterialTheme.shapes.medium)
-    )
-
-    // Add some space between the photo and the text information
-    Spacer(modifier = Modifier.height(3.dp))
-    Row(){
-        Text(
-            text = "Animal:",
-            fontWeight = FontWeight.Bold,
-            fontSize = 10.sp
-        )
-        Text(
-            text = " ${photo.animalType}",
-            fontSize = 10.sp
-        )
-    }
-    Spacer(modifier = Modifier.height(3.dp))
-    Text(
-        text = "Description: ",
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.sp
-    )
-    Spacer(modifier = Modifier.height(3.dp))
-    // Display the description
-    Text(
-        text = "${photo.description}",
-        fontSize = 10.sp
-    )
+        override fun onCancelled(error: DatabaseError) {
+            // Handle the onCancelled case appropriately
+            callback(false)
+        }
+    })
 }

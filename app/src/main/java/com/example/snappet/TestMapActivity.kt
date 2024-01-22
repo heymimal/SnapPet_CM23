@@ -44,6 +44,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -148,6 +151,12 @@ class TestMapActivity : ComponentActivity() {
 @Composable
 fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: CameraPositionState){
     var photon = Photo(latitude = 190.0, longitude = 190.0,likes = 0)
+    val user = Firebase.auth.currentUser
+    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+
+    var reference = database.reference.child("Users (Quim)").child(user!!.uid).child("likedPhotos")
+
+
     var clickSinglePoint by remember {
         mutableStateOf(false)
     }
@@ -203,14 +212,14 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
         Column {
             //Text("Clicked!")
             Log.d(TAG,"photo info: $photo")
-            PhotoDetailCard(photo)
+            PhotoDetailCard(photo,reference)
             Button(onClick = { clickSinglePoint = false}) {
                 Text(text = "click me")
             }
         }
     }
     if(clickOnCluster){
-        ClusterViewPhotos(photos)
+        ClusterViewPhotos(photos, reference)
     }
 
 }
