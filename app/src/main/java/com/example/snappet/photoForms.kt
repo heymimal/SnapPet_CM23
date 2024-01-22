@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -121,7 +120,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             modifier = Modifier
                 .align(alignment = Alignment.CenterHorizontally)
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         Box(
             modifier = Modifier
@@ -140,7 +139,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -155,7 +154,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             modifier = Modifier
                 .align(alignment = Alignment.Start)
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -200,17 +199,11 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                             )
                     }
 
-                    Log.d(TAG, "ANIMAL SELECIONADO -> " + photoType)
                 }
             }
-
-            Log.d(TAG, "ANIMAL SELECIONADO1 -> " + photoType)
-
-
-
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -227,14 +220,13 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         )
 
         radioButton { selectedOption ->
-            // Atualizar a variável contextPhotoType com a opção selecionada
             contextPhotoType = selectedOption
         }
 
         Log.d(TAG, "TESTE DO CONTEXTO");
         Log.d(TAG, contextPhotoType!!);
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -248,7 +240,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             color = Color.Black,
             modifier = Modifier.align(alignment = Alignment.Start)
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         var ttext by remember { mutableStateOf<String?>("") }
 
@@ -291,13 +283,10 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 },
                 label = { Text("Description") }
             )
-
-
-
             descriptionPhoto = ttext
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Text(
             text = "(Options selected with * are mandatory to fill in!)",
@@ -316,7 +305,7 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
         var latitude = 190.0
         var longitude = 190.0
 
-        var isLocationChecked = SwitchOption()
+        var isLocationChecked = false
 
         val showAlertMessage = remember{ mutableStateOf(false) }
 
@@ -337,6 +326,13 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                     }
                 }
             )
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+        ){
+            isLocationChecked = SwitchOption()
         }
 
 
@@ -374,11 +370,8 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(Color.Black),
             modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 246.dp,
-                    y = 740.dp
-                )
+                .align(alignment = Alignment.BottomEnd)
+                .padding(end = 30.dp, bottom = 30.dp)
                 .height(50.dp)
                 .width(150.dp)
         )
@@ -407,7 +400,8 @@ fun SwitchOption(): Boolean{
         }else null
 
     Column(
-        modifier = Modifier.offset(y = 720.dp).padding(20.dp)
+        modifier = Modifier
+            .padding(20.dp)
     ){
         Text(
             text = "Share Location",

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -64,7 +63,6 @@ import com.google.firebase.ktx.Firebase
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean) {
-    // Use a Column to arrange the information vertically
 
     Scaffold(
         topBar = {
@@ -107,8 +105,6 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                     .size(400.dp)
                     .clip(MaterialTheme.shapes.medium)
             )
-
-            // Add some space between the photo and the text information
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -134,12 +130,6 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                     )
                 }
 
-                /*Text(
-                    text = "Animal Type: ${photo.animalType}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )*/
-
                 Row(
                     modifier = Modifier.weight(1f),//.padding(end = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -160,12 +150,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                         modifier = Modifier.padding(end = 35.dp)
                     )
                 }
-
-
-
             }
-
-
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -178,11 +163,6 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                     fontStyle = FontStyle.Italic,
                     fontSize = 20.sp
                 )
-
-                /*Text(
-                    text = photo.description,
-                    fontSize = 20.sp
-                )*/
             }
 
             Text(
@@ -191,12 +171,6 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
             )
 
             Spacer(modifier = Modifier.height(140.dp))
-
-            /*Text(
-                text = "Uploaded by: ${photo.senderName}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )*/
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -265,42 +239,38 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+
+
+            Column (
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                verticalArrangement = Arrangement.Bottom
             ){
-
-                Column (
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-                    verticalArrangement = Arrangement.Bottom
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ){
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ){
-                        Image(
-                            painter = painterResource(R.drawable.heart),
-                            contentDescription = "Like",
-                            modifier = Modifier
-                                .size(75.dp)
-                                .clickable(enabled = isLikeEnabled) {
-                                    likePhotoMessage.value = true
-                                    photo.likes += 1
+                    Image(
+                        painter = painterResource(R.drawable.heart),
+                        contentDescription = "Like",
+                        modifier = Modifier
+                            .size(75.dp)
+                            .clickable(enabled = isLikeEnabled) {
+                                likePhotoMessage.value = true
+                                photo.likes += 1
 
-                                    updateUserLikes(photo, photo.id, onFailure = { exception ->
-                                        Log.e(TAG, "failed to update liked photos", exception)
-                                    })
+                                updateUserLikes(photo, photo.id, onFailure = { exception ->
+                                    Log.e(TAG, "failed to update liked photos", exception)
+                                })
 
-                                    isLikeEnabled = false
+                                isLikeEnabled = false
 
-                                    Log.d(TAG, "photo id: " + photo.id)
-                                    Log.d(TAG, "photo likes: " + photo.likes)
-                                }
-                        )
-                    }
+                                Log.d(TAG, "photo id: " + photo.id)
+                                Log.d(TAG, "photo likes: " + photo.likes)
+                            }
+                    )
                 }
             }
+
         }
     }
 
