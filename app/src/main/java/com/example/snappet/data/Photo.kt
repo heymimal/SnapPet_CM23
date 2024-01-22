@@ -15,9 +15,5 @@ data class Photo(
     var latitude: Double,
     var longitude: Double,
     var likes: Int,
-    //var description:String  = "",
-    //var localSrc: String = "",
-    //var remoteSrc: String = "",
-    //var location: String = "",
     // to change
     )

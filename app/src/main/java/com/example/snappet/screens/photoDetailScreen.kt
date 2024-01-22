@@ -42,6 +42,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
+
+
+//meter nome do utilizador
 @Composable
 fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean) {
     // Use a Column to arrange the information vertically
