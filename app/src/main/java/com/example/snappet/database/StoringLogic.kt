@@ -40,18 +40,12 @@ import java.io.File
 
 fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo: Photo, userData: UserData){
     val storage = Firebase.storage
-    val storageRef: StorageReference = storage.reference.child(fileName)
 
     var photosViewModel = PhotosViewModel()
     photosViewModel.fetchAllPhotos()
 
     val currentUser = Firebase.auth.currentUser
     val userUid = currentUser?.uid
-
-    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    val databaseReference: DatabaseReference = database.reference.child("urlTest")
-
-    var downloadUrl = ""
 
     if(userUid!= null){
         val userFolderRef = storage.reference.child("user_images_storage/$userUid")
@@ -78,19 +72,20 @@ fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo: Phot
             // Image upload success, you can retrieve the download URL if needed
             var downloadUrlFirebase = ""
             val downloadUrlReal = taskSnapshot.storage.downloadUrl;
-            downloadUrlReal.addOnSuccessListener { uri ->
+            downloadUrlReal.addOnSuccessListener { url ->
                 run {
-                    var imageUrl = uri.toString()
+                    var imageUrl = url.toString()
                     downloadUrlFirebase = imageUrl
                     uploadPhotoToDatabase(photo, downloadUrlFirebase, userData, photosViewModel)
                 }
             }
         }.addOnFailureListener { exception ->
             // Handle the failure case, e.g., show an error message
-            Log.e(Logger.TAG, "Error uploading image to Firebase Storage: ${exception.message}")
+            Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
         }
     }
 }
+
 
 //ja mete as fotos com o mesmo id em folders diferentes
 fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData, photosViewModel: PhotosViewModel) {
@@ -126,7 +121,8 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
                 "sender" to it.uid,
                 "latitude" to photo.latitude,
                 "longitude" to photo.longitude,
-                "likes" to photo.likes
+                "likes" to photo.likes,
+                "senderName" to userName
             )
 
             // each user folder
@@ -136,9 +132,9 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
                         updateDailyMissions(userData, photo.animalType!!)
                         updateMonthlyMissions(userData, photo.animalType!!)
                         checkForGeofence(photo, photosViewModel.photos.value)
-                        Log.d(Logger.TAG, "Photo data uploaded to user-specific folder.")
+                        Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
-                        Log.e(Logger.TAG, "Failed to upload photo data to user-specific folder", task.exception)
+                        Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
                     }
                 }
 
@@ -146,9 +142,9 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
             allImagesDatabasePath.child(key).setValue(data)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(Logger.TAG, "Photo data uploaded to shared folder.")
+                        Log.d(TAG, "Photo data uploaded to shared folder.")
                     } else {
-                        Log.e(Logger.TAG, "Failed to upload photo data to shared folder", task.exception)
+                        Log.e(TAG, "Failed to upload photo data to shared folder", task.exception)
                     }
                 }
         }
@@ -176,8 +172,8 @@ fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File): Uri? {
         contentResolver.openOutputStream(imageUri)?.use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
-            Log.d(Logger.TAG, "VAMOS TESTAR");
-            Log.d(Logger.TAG, imageUri.toString())
+            Log.d(TAG, "VAMOS TESTAR");
+            Log.d(TAG, imageUri.toString())
         }
 
         return imageUri

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -179,7 +180,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                 fontSize = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(140.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -242,77 +243,89 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
             }
 
             var isLikeEnabled by remember { mutableStateOf(!check) }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-
-
-            Column (
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
-                verticalArrangement = Arrangement.Bottom
-            ){
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+            if(photo.longitude != 190.0){
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom
                 ){
-                    Image(
-                        painter = painterResource(R.drawable.heart),
-                        contentDescription = "Like",
-                        modifier = Modifier
-                            .size(75.dp)
-                            .clickable(enabled = isLikeEnabled) {
-                                likePhotoMessage.value = true
-                                photo.likes += 1
-
-                                updateUserLikes(photo, photo.id, onFailure = { exception ->
-                                    Log.e(TAG, "failed to update liked photos", exception)
-                                })
-
-                                isLikeEnabled = false
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        //horizontalArrangement = Arrangement.End
+                    ){
+                        Column {
+                            val positionL = LatLng(photo.latitude,photo.longitude)
+                            CameraPositionState(CameraPosition.fromLatLngZoom(positionL,10f))
+                            Text(
+                                text = "Location: ",
+                                fontWeight = FontWeight.Bold,
+                                fontStyle = FontStyle.Italic,
+                                fontSize = 20.sp
+                            )
+                            val positionState = MarkerState(position = positionL)
+                            GoogleMap (
+                                cameraPositionState = CameraPositionState(CameraPosition.fromLatLngZoom(positionL,14f)),
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .height(120.dp)
+                                    .padding(end = 4.dp)
+                            ) {
+                                Marker(
+                                    state = positionState,
+                                    title = photo.description
+                                )
                             }
-                    )
+                        }
+                        Image(
+                            painter = painterResource(R.drawable.heart),
+                            contentDescription = "Like",
+                            alignment = Alignment.BottomCenter,
+                            modifier = Modifier
+                                .size(75.dp)
+                                .clickable(enabled = isLikeEnabled) {
+                                    likePhotoMessage.value = true
+                                    photo.likes += 1
+
+                                    updateUserLikes(photo, photo.id, onFailure = { exception ->
+                                        Log.e(TAG, "failed to update liked photos", exception)
+                                    })
+
+                                    isLikeEnabled = false
+                                }
+                        )
+                    }
                 }
+            } else {
+                Column (
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    verticalArrangement = Arrangement.Bottom
+                ){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ){
+                        Image(
+                            painter = painterResource(R.drawable.heart),
+                            contentDescription = "Like",
+                            modifier = Modifier
+                                .size(75.dp)
+                                .clickable(enabled = isLikeEnabled) {
+                                    likePhotoMessage.value = true
+                                    photo.likes += 1
+
+                                    updateUserLikes(photo, photo.id, onFailure = { exception ->
+                                        Log.e(TAG, "failed to update liked photos", exception)
+                                    })
+
+                                    isLikeEnabled = false
+                                }
+                        )
+                    }
+                }
+
             }
-
-        if(photo.longitude != 190.0){
-            val positionL = LatLng(photo.latitude,photo.longitude)
-            var cameraPositionState = rememberCameraPositionState{
-                position = CameraPosition.fromLatLngZoom(positionL,10f)
-            }
-            CameraPositionState(CameraPosition.fromLatLngZoom(positionL,10f))
-
-            val positionState = MarkerState(position = positionL)
-
-            var uiSettings = MapUiSettings(
-                zoomControlsEnabled = false,
-                scrollGesturesEnabled = false,
-                scrollGesturesEnabledDuringRotateOrZoom = false,
-                tiltGesturesEnabled = false,
-                mapToolbarEnabled = false,
-            )
-            GoogleMap (
-                cameraPositionState = CameraPositionState(CameraPosition.fromLatLngZoom(positionL,14f)),
-                modifier = Modifier.fillMaxWidth()
-                    .height(150.dp)
-            ) {
-                Marker(
-                    state = positionState,
-                    title = photo.description
-                )
-            }
-
         }
-
-        Button(
-            onClick = {navController.navigate(Screens.Home.route) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text(text = "Back")
-        }
-    }
-
     }
 }
 

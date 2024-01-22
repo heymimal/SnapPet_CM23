@@ -193,8 +193,6 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                                 photoType = if (selectedOptionText != null) selectedOptionText else null
 
                             },
-
-
                             )
                     }
 
@@ -337,10 +335,10 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
 
                 if(isLocationChecked){
                     var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude, 0)
-                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
+                    uploadImageToStorage(uri.toString(), imageBitmap, photo, userData);
                 }else{
                     var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,190.0,190.0, 0)
-                    uploadImageToStorage(fileName, imageBitmap, photo, userData);
+                    uploadImageToStorage(uri.toString(), imageBitmap, photo, userData);
                 }
                     if (contextPhotoType == "Needs Help") {
                         Toast.makeText(
@@ -580,152 +578,6 @@ private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, 
     })
 }
 
-
-private fun uploadImageToStorage(fileName: String, imageBitmap: ImageBitmap, photo:Photo, userData: UserData){
-    val storage = Firebase.storage
-    val storageRef: StorageReference = storage.reference.child(fileName)
-
-    val currentUser = Firebase.auth.currentUser
-    val userUid = currentUser?.uid
-
-    val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    val databaseReference: DatabaseReference = database.reference.child("urlTest")
-
-    var downloadUrl = ""
-
-    if(userUid!= null){
-        val userFolderRef = storage.reference.child("user_images_storage/$userUid")
-
-        // Create a unique filename for the image in the user's folder
-        val filePath = "$fileName.jpg"
-        val imageRef = userFolderRef.child(filePath)
-
-        // Convert ImageBitmap to byte array
-        val byteArrayOutputStream = ByteArrayOutputStream()
-
-        // Convert ImageBitmap to Bitmap (asAndroidBitmap)
-        val androidBitmap = imageBitmap.asAndroidBitmap()
-
-        // Encode the Bitmap as JPEG
-        androidBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream)
-
-        val data = byteArrayOutputStream.toByteArray()
-
-        // Upload the image to Firebase Storage
-        val uploadTask: UploadTask = imageRef.putBytes(data)
-
-        uploadTask.addOnSuccessListener { taskSnapshot ->
-            // Image upload success, you can retrieve the download URL if needed
-            var downloadUrlFirebase = ""
-            val downloadUrlReal = taskSnapshot.storage.downloadUrl;
-            downloadUrlReal.addOnSuccessListener { uri ->
-                run {
-                    var imageUrl = uri.toString()
-                    downloadUrlFirebase = imageUrl
-                    uploadPhotoToDatabase(photo, downloadUrlFirebase, userData)
-                }
-            }
-        }.addOnFailureListener { exception ->
-            // Handle the failure case, e.g., show an error message
-            Log.e(TAG, "Error uploading image to Firebase Storage: ${exception.message}")
-        }
-    }
-}
-
-//ja mete as fotos com o mesmo id em folders diferentes
-private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData) {
-    val currentUser = Firebase.auth.currentUser
-    val database = Firebase.database
-    val databaseReference = database.reference
-
-    var post1 = false
-    var post2 = false
-
-    currentUser?.let {
-        val userId = it.uid
-        val userName = it.displayName
-
-        val folderName = if (!userName.isNullOrBlank()) userName else userId
-        val allFolder = "allImages"
-        val imagePath = "imagesTest/$folderName/"
-        val allImagesPath = "imagesTest/$allFolder/"
-
-        val databasePath = databaseReference.child(imagePath)
-        val allImagesDatabasePath = databaseReference.child(allImagesPath)
-
-        val sharedKey = databasePath.push().key
-        sharedKey?.let { key ->
-            photo.id = key
-            val data = hashMapOf(
-                "imageUrl" to photo.imageUri.toString(),
-                "animal" to photo.animalType,
-                "context" to photo.contextPhoto,
-                "description" to photo.description,
-                "id" to photo.id,
-                "downloadUrl" to downloadUrl,
-                "sender" to it.uid,
-                "latitude" to photo.latitude,
-                "longitude" to photo.longitude,
-                "likes" to photo.likes,
-                "senderName" to userName
-            )
-
-            // each user folder
-            databasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        updateDailyMissions(userData, photo.animalType!!)
-                        updateMonthlyMissions(userData, photo.animalType!!)
-                        Log.d(TAG, "Photo data uploaded to user-specific folder.")
-                    } else {
-                        Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
-                    }
-                }
-
-            // all images folder
-            allImagesDatabasePath.child(key).setValue(data)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "Photo data uploaded to shared folder.")
-                    } else {
-                        Log.e(TAG, "Failed to upload photo data to shared folder", task.exception)
-                    }
-                }
-        }
-    }
-}
-
-
-
-private fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File): Uri? {
-    val folderName = "Snappet"
-
-    val contentValues = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, "${file.name}")
-        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.WIDTH, bitmap.width)
-        put(MediaStore.Images.Media.HEIGHT, bitmap.height)
-        put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000)
-        put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
-        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + folderName)
-    }
-
-    val contentResolver = context.contentResolver
-    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-
-    uri?.let { imageUri ->
-        contentResolver.openOutputStream(imageUri)?.use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-            Toast.makeText(context, "Image saved to $folderName folder", Toast.LENGTH_SHORT).show()
-
-        }
-
-        return imageUri
-    }
-
-    return null
-
-}
 
 @Composable
 fun radioButton(onOptionSelected: (String) -> Unit) {
