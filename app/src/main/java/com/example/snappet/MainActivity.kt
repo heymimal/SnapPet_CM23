@@ -45,7 +45,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.example.snappet.data.DailyMission
+import com.example.snappet.data.Mission
 import com.example.snappet.data.Trophy
 import com.example.snappet.data.Photo
 import com.example.snappet.screens.DayInfo
@@ -58,7 +58,6 @@ import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.viewModels.ThrophiesViewModel
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.getValue
 import com.jakewharton.threetenabp.AndroidThreeTen
 import java.time.LocalDate
 import java.time.ZoneId
@@ -243,6 +242,7 @@ class MainActivity : ComponentActivity() {
                                             //thisUserRef.child("LastLogin").setValue("1 1 1990")
                                             createDailyMissions(thisUserRef)
                                             createMonthlyMissions(thisUserRef)
+                                            createFullTimeMissions(thisUserRef)
 
                                         }
                                     }
@@ -370,15 +370,17 @@ class MainActivity : ComponentActivity() {
                                 if (userData != null) {
                                     throphiesViewModel.fetchDailyMissions(userData.userId)
                                     throphiesViewModel.fetchMonthlyMissions(userData.userId)
+                                    throphiesViewModel.fetchFullTimeMissions(userData.userId)
                                 }
                             }
 
-                            // Observe changes in daily and monthly missions separately
-                            val dailyMissions by throphiesViewModel.dailyMissionsData.observeAsState(emptyList())
+                            // Observe changes in daily, monthly, and full-time missions separately
+                            val dailyMissions by throphiesViewModel.missionsData.observeAsState(emptyList())
                             val monthlyMissions by throphiesViewModel.monthlyMissionsData.observeAsState(emptyList())
+                            val fullTimeMissions by throphiesViewModel.fullTimeMissionsData.observeAsState(emptyList())
 
-                            // Pass both daily and monthly missions as parameters to TrophiesNav
-                            TrophiesNav(navController, dailyMissions ?: emptyList(), monthlyMissions ?: emptyList())
+                            // Pass all missions as parameters to TrophiesNav
+                            TrophiesNav(navController, dailyMissions ?: emptyList(), monthlyMissions ?: emptyList(), fullTimeMissions ?: emptyList())
                         }
 
                         composable(route = Screens.TrophiesInfo.route) {
@@ -507,10 +509,23 @@ class MainActivity : ComponentActivity() {
                 if (!dataSnapshot.exists()) {
                     // Create and store specific daily missions
                     val missionList = listOf(
-                        DailyMission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
-                        DailyMission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
-                        DailyMission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
-                        DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
+                        Mission("Bee", 3, 0, 10, "take 3 bee pictures",dateString,false),
+                        Mission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
+                        Mission("Butterfly", 3, 0, 10, "take 3 butterfly pictures", dateString,false),
+                        Mission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
+                        Mission("Chicken", 3, 0, 10, "take 3 chicken pictures", dateString,false),
+                        Mission("Cow", 3, 0, 10, "take 3 cow pictures", dateString,false),
+                        Mission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
+                        Mission("Duck", 3, 0, 10, "take 3 duck pictures", dateString,false),
+                        Mission("Gecko", 3, 0, 10, "take 3 gecko pictures", dateString,false),
+                        Mission("Goat", 3, 0, 10, "take 3 goat pictures", dateString,false),
+                        Mission("Horse", 3, 0, 10, "take 3 horse pictures", dateString,false),
+                        Mission("Lizard", 3, 0, 10, "take 3 lizard pictures", dateString,false),
+                        Mission("Peacock", 3, 0, 10, "take 3 peacock pictures", dateString,false),
+                        Mission("Pig", 3, 0, 10, "take 3 pig pictures", dateString,false),
+                        Mission("Rabbit", 3, 0, 10, "take 3 rabbit pictures", dateString,false),
+                        Mission("Sheep", 3, 0, 10, "take 3 sheep pictures", dateString,false),
+                        Mission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
                     )
 
                     // Add each mission under the "Missions" node with a custom key
@@ -533,10 +548,23 @@ class MainActivity : ComponentActivity() {
 
         // Create and store specific daily missions with the same naming convention
         val newMissionList = listOf(
-            DailyMission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
-            DailyMission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
-            DailyMission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
-            DailyMission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
+            Mission("Bee", 3, 0, 10, "take 3 bee pictures",dateString,false),
+            Mission("Bird", 3, 0, 10, "take 3 bird pictures", dateString,false),
+            Mission("Butterfly", 3, 0, 10, "take 3 butterfly pictures", dateString,false),
+            Mission("Cat", 3, 0, 10, "take 3 cat pictures", dateString,false),
+            Mission("Chicken", 3, 0, 10, "take 3 chicken pictures", dateString,false),
+            Mission("Cow", 3, 0, 10, "take 3 cow pictures", dateString,false),
+            Mission("Dog", 3, 0, 10, "take 3 dog pictures",dateString,false),
+            Mission("Duck", 3, 0, 10, "take 3 duck pictures", dateString,false),
+            Mission("Gecko", 3, 0, 10, "take 3 gecko pictures", dateString,false),
+            Mission("Goat", 3, 0, 10, "take 3 goat pictures", dateString,false),
+            Mission("Horse", 3, 0, 10, "take 3 horse pictures", dateString,false),
+            Mission("Lizard", 3, 0, 10, "take 3 lizard pictures", dateString,false),
+            Mission("Peacock", 3, 0, 10, "take 3 peacock pictures", dateString,false),
+            Mission("Pig", 3, 0, 10, "take 3 pig pictures", dateString,false),
+            Mission("Rabbit", 3, 0, 10, "take 3 rabbit pictures", dateString,false),
+            Mission("Sheep", 3, 0, 10, "take 3 sheep pictures", dateString,false),
+            Mission("10PicturesMission", 10, 0, 40, "take 10 pictures", dateString,false)
         )
 
         // Replace existing missions with the new ones
@@ -558,10 +586,23 @@ class MainActivity : ComponentActivity() {
                 if (!dataSnapshot.exists()) {
                     // Create and store specific monthly missions
                     val missionList = listOf(
-                        DailyMission("Dog", 30, 0, 40, "take 30 dog pictures", dateString, false),
-                        DailyMission("Cat", 30, 0, 40, "take 30 cat pictures", dateString, false),
-                        DailyMission("Bird", 30, 0, 40, "take 30 bird pictures", dateString, false),
-                        DailyMission("100PicturesMission", 100, 0, 120, "take 100 pictures", dateString, false)
+                        Mission("Bee", 30, 0, 40, "take 30 bee pictures",dateString,false),
+                        Mission("Bird", 30, 0, 40, "take 30 bird pictures", dateString,false),
+                        Mission("Butterfly", 30, 0, 40, "take 30 butterfly pictures", dateString,false),
+                        Mission("Cat", 30, 0, 40, "take 30 cat pictures", dateString,false),
+                        Mission("Chicken", 30, 0, 40, "take 30 chicken pictures", dateString,false),
+                        Mission("Cow", 30, 0, 40, "take 30 cow pictures", dateString,false),
+                        Mission("Dog", 30, 0, 40, "take 30 dog pictures",dateString,false),
+                        Mission("Duck", 30, 0, 40, "take 30 duck pictures", dateString,false),
+                        Mission("Gecko", 30, 0, 40, "take 30 gecko pictures", dateString,false),
+                        Mission("Goat", 30, 0, 40, "take 30 goat pictures", dateString,false),
+                        Mission("Horse", 30, 0, 40, "take 30 horse pictures", dateString,false),
+                        Mission("Lizard", 30, 0, 40, "take 30 lizard pictures", dateString,false),
+                        Mission("Peacock", 30, 0, 40, "take 30 peacock pictures", dateString,false),
+                        Mission("Pig", 30, 0, 40, "take 30 pig pictures", dateString,false),
+                        Mission("Rabbit", 30, 0, 40, "take 30 rabbit pictures", dateString,false),
+                        Mission("Sheep", 30, 0, 40, "take 30 sheep pictures", dateString,false),
+                        Mission("100PicturesMission", 100, 0, 120, "take 100 pictures", dateString,false)
                     )
 
                     // Add each mission under the "Missions" node with a custom key
@@ -584,16 +625,74 @@ class MainActivity : ComponentActivity() {
 
         // Create and store specific monthly missions with the same naming convention
         val newMissionList = listOf(
-            DailyMission("Dog", 30, 0, 40, "take 30 dog pictures", dateString, false),
-            DailyMission("Cat", 30, 0, 40, "take 30 cat pictures", dateString, false),
-            DailyMission("Bird", 30, 0, 40, "take 30 bird pictures", dateString, false),
-            DailyMission("100PicturesMission", 100, 0, 120, "take 100 pictures", dateString, false)
+            Mission("Bee", 30, 0, 40, "take 30 bee pictures",dateString,false),
+            Mission("Bird", 30, 0, 40, "take 30 bird pictures", dateString,false),
+            Mission("Butterfly", 30, 0, 40, "take 30 butterfly pictures", dateString,false),
+            Mission("Cat", 30, 0, 40, "take 30 cat pictures", dateString,false),
+            Mission("Chicken", 30, 0, 40, "take 30 chicken pictures", dateString,false),
+            Mission("Cow", 30, 0, 40, "take 30 cow pictures", dateString,false),
+            Mission("Dog", 30, 0, 40, "take 30 dog pictures",dateString,false),
+            Mission("Duck", 30, 0, 40, "take 30 duck pictures", dateString,false),
+            Mission("Gecko", 30, 0, 40, "take 30 gecko pictures", dateString,false),
+            Mission("Goat", 30, 0, 40, "take 30 goat pictures", dateString,false),
+            Mission("Horse", 30, 0, 40, "take 30 horse pictures", dateString,false),
+            Mission("Lizard", 30, 0, 40, "take 30 lizard pictures", dateString,false),
+            Mission("Peacock", 30, 0, 40, "take 30 peacock pictures", dateString,false),
+            Mission("Pig", 30, 0, 40, "take 30 pig pictures", dateString,false),
+            Mission("Rabbit", 30, 0, 40, "take 30 rabbit pictures", dateString,false),
+            Mission("Sheep", 30, 0, 40, "take 30 sheep pictures", dateString,false),
+            Mission("100PicturesMission", 100, 0, 120, "take 100 pictures", dateString,false)
         )
 
         // Replace existing missions with the new ones
         for ((index, mission) in newMissionList.withIndex()) {
             missionsReference.child("MonthlyMission${index + 1}").setValue(mission)
         }
+    }
+
+    private fun createFullTimeMissions(thisUserRef: DatabaseReference) {
+        val currentDate = LocalDate.now(ZoneId.systemDefault())
+        val dayOfMonth = currentDate.dayOfMonth
+        val monthValue = currentDate.monthValue
+        val year = currentDate.year
+        val dateString = "$dayOfMonth $monthValue $year"
+        thisUserRef.child("LastLogin").setValue(dateString)
+        val missionsReference = thisUserRef.child("FullTimeMissions")
+        missionsReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    // Create and store specific daily missions
+                    val missionList = listOf(
+                        Mission("Bee", 300, 0, 500, "take 300 bee pictures",dateString,false),
+                        Mission("Bird", 300, 0, 500, "take 300 bird pictures", dateString,false),
+                        Mission("Butterfly", 300, 0, 500, "take 300 butterfly pictures", dateString,false),
+                        Mission("Cat", 300, 0, 500, "take 300 cat pictures", dateString,false),
+                        Mission("Chicken", 300, 0, 500, "take 300 chicken pictures", dateString,false),
+                        Mission("Cow", 300, 0, 500, "take 300 cow pictures", dateString,false),
+                        Mission("Dog", 300, 0, 500, "take 300 dog pictures",dateString,false),
+                        Mission("Duck", 300, 0, 500, "take 300 duck pictures", dateString,false),
+                        Mission("Gecko", 300, 0, 500, "take 300 gecko pictures", dateString,false),
+                        Mission("Goat", 300, 0, 500, "take 300 goat pictures", dateString,false),
+                        Mission("Horse", 300, 0, 500, "take 300 horse pictures", dateString,false),
+                        Mission("Lizard", 300, 0, 500, "take 300 lizard pictures", dateString,false),
+                        Mission("Peacock", 300, 0, 500, "take 300 peacock pictures", dateString,false),
+                        Mission("Pig", 300, 0, 500, "take 300 pig pictures", dateString,false),
+                        Mission("Rabbit", 300, 0, 500, "take 300 rabbit pictures", dateString,false),
+                        Mission("Sheep", 300, 0, 500, "take 300 sheep pictures", dateString,false),
+                        Mission("1000PicturesMission", 1000, 0, 1500, "take 1000 pictures", dateString,false)
+                    )
+
+                    // Add each mission under the "Missions" node with a custom key
+                    for ((index, mission) in missionList.withIndex()) {
+                        missionsReference.child("DailyMission${index + 1}").setValue(mission)
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle errors
+            }
+        })
     }
 }
 

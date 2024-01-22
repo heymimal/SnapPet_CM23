@@ -349,16 +349,17 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                 }else{
                     showAlertMessage.value = false
                     var savedUri = saveImageToMediaStore(takenPicture,context,file)
-
+                    Log.e(TAG, "$loc")
                 if(loc!=null){
                     latitude = loc.latitude
                     longitude = loc.longitude
                 }
-
+                    Log.e(TAG, "Longitude: ${latitude} Latitude:${longitude}")
                 if(isLocationChecked){
                     var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,latitude,longitude, 0)
                     uploadImageToStorage(fileName, imageBitmap, photo, userData);
                 }else{
+                    println("AAA")
                     var photo = Photo(savedUri!!, photoType!!, contextPhotoType!!, descriptionPhoto!!, "", "",userId!!,190.0,190.0, 0)
                     uploadImageToStorage(fileName, imageBitmap, photo, userData);
                 }
@@ -582,6 +583,83 @@ fun updateMonthlyMissions(userData: UserData?, animalType: String) {
     }
 }
 
+fun updateFullTimeMissions(userData: UserData?, animalType: String) {
+    val database = Firebase.database
+    val myReference = database.getReference("Users (Quim)")
+
+    if (userData != null) {
+        // Get reference to the user's MonthlyMissions
+        val thisUserRef = myReference.child(userData.userId)
+        val missionsReference = thisUserRef.child("FullTimeMissions")
+
+        // Query the missions with missionType as "10PicturesMission" or specific animalType
+        missionsReference.orderByChild("missionType")
+            .equalTo("1000PicturesMission")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (missionSnapshot in dataSnapshot.children) {
+                        // Check if the mission is not completed
+                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                        if (!completed) {
+                            // Update the userProgress property
+                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                            missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
+
+                            // Check if userProgress equals the goal
+                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                            if (userProgress + 1 == goal) {
+                                // Fetch the mission points and add to user's snaPoints
+                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                updateSnaPoints(userData, myReference, missionPoints)
+
+                                // Set completed to true
+                                missionSnapshot.ref.child("completed").setValue(true)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle errors
+                }
+            })
+
+        // If the animalType is specified, also update the userProgress for that animalType
+        if (animalType.isNotEmpty()) {
+            missionsReference.orderByChild("missionType")
+                .equalTo(animalType)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        for (missionSnapshot in dataSnapshot.children) {
+                            // Check if the mission is not completed
+                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                            if (!completed) {
+                                // Update the userProgress property
+                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                                missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
+
+                                // Check if userProgress equals the goal
+                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                                if (userProgress + 1 == goal) {
+                                    // Fetch the mission points and add to user's snaPoints
+                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                    updateSnaPoints(userData, myReference, missionPoints)
+
+                                    // Set completed to true
+                                    missionSnapshot.ref.child("completed").setValue(true)
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        // Handle errors
+                    }
+                })
+        }
+    }
+}
+
 //updates users snaPoints
 private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, missionPoints: Int) {
     // Fetch the current snaPoints
@@ -698,6 +776,7 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: U
                     if (task.isSuccessful) {
                         updateDailyMissions(userData, photo.animalType!!)
                         updateMonthlyMissions(userData, photo.animalType!!)
+                        updateFullTimeMissions(userData, photo.animalType!!)
                         Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
                         Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)
