@@ -189,31 +189,84 @@ fun saveImageToMediaStore(bitmap: Bitmap, context: Context, file: File): Uri? {
 
 
 fun checkForGeofence(photo: Photo, photos : List<Photo>?){
-    //val geofenceRef = FirebaseDatabase.getInstance().getReference("geofences")
-    //geofenceRef.child("geofence1").child("createGeofence").setValue(true)
-
     Log.d(TAG,"here")
-    val thresholdDistance = 1500.0
-    val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().reference
-        .child("imagesTest").child("allImages")
-    isNewPhotoNearby(photo,photos!!,thresholdDistance)
+    val thresholdDistance = 1500.0 // fotos a 1500 metros
+    val count = isNewPhotoNearby(photo,photos!!,thresholdDistance)
+    Log.d(TAG, count.toString())
+    val geofenceRef = FirebaseDatabase.getInstance().getReference("geofences")
+    if(count > 2) { // count would be 10, but for testing purposes
+        //check if any geopoint is in the range of the photo
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.exists()){
+                    var exists = false
+                    for(snap in snapshot.children){
+                        val geofenceKey = snap.key
+                        val animalType = snap.child("animalType").getValue(String::class.java)
+                        var radius = snap.child("radius").getValue(Double::class.java)
+                        var latitude = snap.child("latitude").getValue(Double::class.java)
+                        var longitude = snap.child("longitude").getValue(Double::class.java)
+
+                        val isInGeoPoint = haversine(photo.latitude,photo.longitude,latitude!!,longitude!!)
+                        if(animalType == photo.animalType && isInGeoPoint <= thresholdDistance){
+                            Log.d(TAG,"Already exists one!")
+                            exists = true
+                            break
+                        }
+                    }
+                    if(!exists){
+                        Log.d(TAG,"Adding to the database")
+                        val newGeofenceKey = geofenceRef.push().key
+                        val newGeofenceData = hashMapOf(
+                            "animalType" to photo.animalType,
+                            "radius" to 1500.0,
+                            "latitude" to photo.latitude,
+                            "longitude" to photo.longitude,
+                        )
+                        if (newGeofenceKey != null) {
+                            geofenceRef.child(newGeofenceKey).setValue(newGeofenceData)
+                            Log.d(TAG, "Added a new geofence to the database")
+                        }
+                    }
+                } else {
+                    Log.d(TAG,"Adding to the database")
+                    val newGeofenceKey = geofenceRef.push().key
+                    val newGeofenceData = hashMapOf(
+                        "animalType" to photo.animalType,
+                        "radius" to 1500.0,
+                        "latitude" to photo.latitude,
+                        "longitude" to photo.longitude,
+                    )
+                    if (newGeofenceKey != null) {
+                        geofenceRef.child(newGeofenceKey).setValue(newGeofenceData)
+                        Log.d(TAG, "Added a new geofence to the database")
+                    }
+                }
+
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle errors
+                println("Error: ${databaseError.message}")
+            }
+        }
+        geofenceRef.addListenerForSingleValueEvent(valueEventListener)
+    }
 
 }
 
-fun isNewPhotoNearby(newPhoto: Photo, existingPhotos: List<Photo>, thresholdDistance: Double) {
+fun isNewPhotoNearby(newPhoto: Photo, existingPhotos: List<Photo>, thresholdDistance: Double) : Int{
     var c = 0
     Log.d(TAG,"My photo is in latitude: ${newPhoto.latitude} and on longitude: ${newPhoto.longitude}")
     for (photo in existingPhotos) {
         if(photo.latitude != 190.0 && photo.id != newPhoto.id && photo.animalType == newPhoto.animalType){
-            //Log.d(TAG,"Existing photo is in latitude: ${photo.latitude} and on longitude: ${photo.longitude}")
             val distance = haversine(newPhoto.latitude,newPhoto.longitude,photo.latitude,photo.longitude)
-            //Log.d(TAG,"Distance between photos is : " + distance)
             if (distance <= thresholdDistance) {
                 c++;
             }
         }
     }
     Log.d(TAG,"Photos nearby: $c")
+    return c
 }
 
 fun haversine(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
