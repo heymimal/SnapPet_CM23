@@ -27,7 +27,7 @@ fun leaderboardNav(navController: NavHostController, leaderboardData: List<Leade
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Navigation(navController = navController)
+            Navigation(navController = navController, 4)
         }
     ) { paddingValues ->
         Box(

@@ -33,7 +33,7 @@ fun TrophiesInfoNav(navController: NavHostController) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                Navigation(navController = navController)
+                Navigation(navController = navController,3)
             }
         ) { paddingValues ->
             LazyColumn(

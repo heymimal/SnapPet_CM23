@@ -63,7 +63,7 @@ fun HomeMenu(navController: NavHostController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Navigation(navController =navController)
+            Navigation(navController =navController,0)
         }) {paddingValues ->
         Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
         ThreeByThreeGrid1(navController)

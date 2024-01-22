@@ -28,24 +28,8 @@ import com.example.snappet.R
 import com.example.snappet.TestMapActivity
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar() {
-    val navController = rememberNavController()
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-                Navigation(navController =navController)
-        }) {paddingValues ->
-        Text(text = "SnapPet Menu", modifier = Modifier.padding(paddingValues = paddingValues))
-
-        //Text(text = "Hello")
-    }
-}
-
-@Composable
-fun Navigation(navController: NavHostController){
-    var selectedItem by remember { mutableIntStateOf(0) }
+fun Navigation(navController: NavHostController, selectedItem : Int){
     val items = listOf("Home","Map","Camera","Trophy","Profile")
 
     val context = LocalContext.current
@@ -57,7 +41,7 @@ fun Navigation(navController: NavHostController){
     ) {
         NavigationBarItem(
             selected = selectedItem == 0,
-            onClick = { selectedItem = 0
+            onClick = {
                 navController.navigate(Screens.Home.route)
                       },
             label = {
@@ -72,10 +56,7 @@ fun Navigation(navController: NavHostController){
         )
         NavigationBarItem(
             selected = selectedItem == 1,
-            onClick = { selectedItem = 1
-                      //navController.navigate(Screens.Map.route)
-                    /*val intent = Intent(context, MapActivity::class.java)
-                    context.startActivity(intent)*/
+            onClick = {
                     context.startActivity(Intent(context, TestMapActivity::class.java))
                       },
             label = {
@@ -90,9 +71,7 @@ fun Navigation(navController: NavHostController){
         )
         NavigationBarItem(
             selected = selectedItem == 2,
-            onClick = { selectedItem = 2
-                        //val intent = Intent(context, CameraActivity::class.java)
-                        //context.startActivity(intent)
+            onClick = {
                 navController.navigate("Camera")
                       },
             label = {
@@ -107,7 +86,7 @@ fun Navigation(navController: NavHostController){
         )
         NavigationBarItem(
             selected = selectedItem == 3,
-            onClick = { selectedItem = 3
+            onClick = {
                 navController.navigate(Screens.Trophies.route)},
             label = {
                 Text("Trophy")
@@ -121,7 +100,7 @@ fun Navigation(navController: NavHostController){
         )
         NavigationBarItem(
             selected = selectedItem == 4,
-            onClick = { selectedItem = 4
+            onClick = {
                 //acrescentei isto para navegar para o profile
                 navController.navigate(Screens.Profile.route)},
             label = {

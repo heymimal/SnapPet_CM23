@@ -42,7 +42,7 @@ fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMissi
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             bottomBar = {
-                Navigation(navController = navController)
+                Navigation(navController = navController,3)
             }
         ) { paddingValues ->
             Column(

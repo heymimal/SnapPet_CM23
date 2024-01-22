@@ -7,11 +7,13 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.location.Location
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -55,6 +57,7 @@ fun CameraClass(navController: NavController, userData: UserData) {
     val locationPermissions = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
+        //Manifest.permission.ACCESS_BACKGROUND_LOCATION,
         Manifest.permission.CAMERA)
 
     val authority = "com.example.snappet.provider"

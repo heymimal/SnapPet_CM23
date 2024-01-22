@@ -72,7 +72,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            Navigation(navController =navController)
+            Navigation(navController =navController,4)
         }) {paddingValues ->
         Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
         ProfileScreenComposable(userDataState, userData, onSignOut,navController,trophy)
@@ -93,8 +93,8 @@ fun ProfileScreenComposable(
     trophy: Trophy?,
 ) {
     var permissions = arrayOf(
-        android.Manifest.permission.ACCESS_FINE_LOCATION,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
     )
 
         Column(
@@ -197,7 +197,7 @@ fun ProfileScreenComposable(
                                     requestMultiplePermissionsLauncher.launch(permissions)
                                 } else {
                                     // All permissions already granted
-                                    text = "STOP"
+                                    text = "Stop"
                                     permissionsGranted = true
                                     Intent(context,LocationService::class.java).apply {
                                         action = LocationService.ACTION_START
