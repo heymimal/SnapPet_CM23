@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,14 +50,14 @@ fun loginStreakNav(
             .padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
+        Spacer(modifier = Modifier.height(30.dp))
         Text(
-            //text = "Login Streak+LOGINSTREAK:$testeLoginStreak-PONTOS:$updatedPoints",
-            text = "Login Streak:",
-            color = Color.Black,
-            style = TextStyle(fontSize = 25.sp),
+            text = "Login Streak",
+            style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
             modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .offset(y = 29.dp)
+                .padding(bottom = 16.dp)
+                .fillMaxWidth()
+                .wrapContentSize(align = Alignment.Center)
         )
 
         // Days and points
@@ -69,7 +71,7 @@ fun loginStreakNav(
             DayInfo("Day: 7", 25)
         )
 
-        Spacer(modifier = Modifier.height(200.dp))
+        Spacer(modifier = Modifier.height(150.dp))
 
         // Group days into separate lists
         val groupedDays = daysInfo.chunked(3)
@@ -125,7 +127,7 @@ fun loginStreakNav(
     ) {
         Button(
             onClick = {
-                navController.navigate(route = Screens.Home.route)
+                navController.navigate(route = Screens.MonthAnimal.route)
                       },
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),

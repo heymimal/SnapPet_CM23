@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.snappet.data.MonthAnimal
 import com.example.snappet.data.Photo
 import com.google.android.gms.maps.model.LatLng
 import com.example.snappet.sign_In.UserData
@@ -777,6 +778,18 @@ private fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: U
                         updateDailyMissions(userData, photo.animalType!!)
                         updateMonthlyMissions(userData, photo.animalType!!)
                         updateFullTimeMissions(userData, photo.animalType!!)
+
+                        val monthAnimal = MonthAnimal()
+                        val presentMonthAnimal = monthAnimal.getAnimalForPresentMonth()
+                        val database = Firebase.database
+                        val myReference = database.getReference("Users (Quim)")
+                        if(photo.animalType == presentMonthAnimal){
+                            updateSnaPoints(userData, myReference, 5)
+                        }else{
+                            updateSnaPoints(userData, myReference, 1)
+                        }
+
+
                         Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
                         Log.e(TAG, "Failed to upload photo data to user-specific folder", task.exception)

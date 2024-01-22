@@ -48,7 +48,10 @@ import androidx.compose.runtime.setValue
 import com.example.snappet.data.Mission
 import com.example.snappet.data.Trophy
 import com.example.snappet.data.Photo
+import com.example.snappet.data.MonthAnimal
 import com.example.snappet.screens.DayInfo
+import com.example.snappet.screens.FirstScreenNav
+import com.example.snappet.screens.MonthAnimalNav
 import com.example.snappet.screens.TrophiesInfoNav
 import com.example.snappet.screens.PhotoDetailScreen
 import com.example.snappet.screens.leaderboardNav
@@ -165,7 +168,7 @@ class MainActivity : ComponentActivity() {
                     //vai ospedar todos os nossos ecrãns diferentes
                     //recebe o navController e o "sign_in" routh
                     //tal como no navGraph que o Ricardo fez
-                    NavHost(navController = navController, startDestination = "sign_in") {
+                    NavHost(navController = navController, startDestination = Screens.FirstScreen.route) {
                         //este é o composable mostrado no sign in screen
                         //temos que dar a routh ao composable
                         composable("sign_in") {
@@ -385,6 +388,16 @@ class MainActivity : ComponentActivity() {
 
                         composable(route = Screens.TrophiesInfo.route) {
                             TrophiesInfoNav(navController)
+                        }
+
+                        composable(route = Screens.MonthAnimal.route) {
+                            val monthAnimal = MonthAnimal()
+                            val presentMonthAnimal = monthAnimal.getAnimalForPresentMonth()
+                            MonthAnimalNav(navController,presentMonthAnimal)
+                        }
+
+                        composable(route = Screens.FirstScreen.route) {
+                            FirstScreenNav(navController)
                         }
 
                         composable("${Screens.PhotoDetail.route}{photoId}") { backStackEntry ->

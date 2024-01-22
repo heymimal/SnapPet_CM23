@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snappet.R
@@ -69,19 +71,20 @@ fun LoginScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
+        Spacer(modifier = Modifier.height(30.dp))
         Text(
             text = "Login",
-            color = Color.Black,
-            style = TextStyle(fontSize = 25.sp),
+            style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
             modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .offset(y = 29.dp)
+                .padding(bottom = 16.dp)
+                .fillMaxWidth()
+                .wrapContentSize(align = Alignment.Center)
         )
 
-        Spacer(modifier = Modifier.height(150.dp))
+        Spacer(modifier = Modifier.height(200.dp))
 
-        OptionsButton(text = "Sign In With Email", imageId = R.drawable.email_icon)
-Spacer(modifier = Modifier.height(16.dp))
+        //OptionsButton(text = "Sign In With Email", imageId = R.drawable.email_icon)
+        Spacer(modifier = Modifier.height(16.dp))
 
         //Botão do Google login
         //Substitui isto:
@@ -125,7 +128,7 @@ Spacer(modifier = Modifier.height(16.dp))
 Box(
 modifier = Modifier.fillMaxSize()
 ){
-    Button(
+    /*Button(
         onClick = { /*TODO*/ },
         shape = RoundedCornerShape(50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
@@ -141,7 +144,7 @@ modifier = Modifier.fillMaxSize()
     )
     {
         Text(text = "Back", style = TextStyle(fontSize = 20.sp))
-    }
+    }*/
 }
 }
 

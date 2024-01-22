@@ -12,6 +12,10 @@ sealed class Screens(val route:String){
 
     object TrophiesInfo: Screens("trophiesInfo_route")
 
+    object MonthAnimal: Screens("monthAnimal_route")
+
+    object FirstScreen: Screens("firstScreen_route")
+
     object Camera: Screens("camera")
 
     object PhotoDetail: Screens("photo_detail/{photoId}")
