@@ -1,6 +1,7 @@
 package com.example.snappet.profile
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -71,160 +73,145 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
 
 }
 
-@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenComposable(
     final: UserData?,
     userData: UserData?,
-    //queremos ter um lambeda quando ele fizer sign out
-    //ele recebe esta função como paramentro de entrada
     onSignOut: () -> Unit,
     navController: NavController,
     trophy: Trophy?,
 ) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top
         ) {
             Text(
                 text = "Edit Profile",
-                color = Color.White, // Change to Color.White for white text
+                color = Color.White,
                 style = TextStyle(fontSize = 25.sp),
                 modifier = Modifier
                     .align(alignment = Alignment.CenterHorizontally)
                     .offset(y = 29.dp)
             )
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(100.dp)) // Add space between "Edit Profile" and profile photo
 
-
-            /*Text(
-                text = "Profile Image",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                style = TextStyle(fontSize = 20.sp)
-            )*/
-            //Texto para o username
-            //se o userData não tiver um user name que seja nulo
             if(userData?.username != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .align(Alignment.CenterHorizontally), // Center the Row horizontally
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (userData?.profilePictureUrl != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .wrapContentSize(align = Alignment.Center)
+                        ) {
+                            AsyncImage(
+                                model = userData.profilePictureUrl,
+                                contentDescription = "Profile picture",
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
+                }
                 Text(
-                    //mostra o username
                     text = userData.username,
-                    //o texto vai ser centrado
                     textAlign = TextAlign.Center,
-                    //tamanho do texto
                     fontSize = 20.sp,
-                    //por negrito no texto
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .align(alignment = Alignment.CenterHorizontally)
+                        .offset(y = 29.dp)
                 )
 
                 if (final != null) {
+                    Text(
+                        text = "SnapPoints: "+final.snaPoints,
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .align(alignment = Alignment.CenterHorizontally)
+                            .offset(y = 29.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
                     if (trophy != null) {
                         final.snaPoints?.let { updateTrophy(userData.userId, it.toInt()) }
                     }
-                    Text(
-                        //mostra os pontos
-                        text = "SnapPoints: "+final.snaPoints,
-                        //o texto vai ser centrado
-                        textAlign = TextAlign.Center,
-                        //tamanho do texto
-                        fontSize = 20.sp,
-                        //por negrito no texto
-                        fontWeight = FontWeight.SemiBold
-                    )
                 }
-                //espacinho depois do username
-                Spacer(modifier = Modifier.height(16.dp))
+
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Buttons
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                // User profile picture
-                if (userData?.profilePictureUrl != null) {
-                    AsyncImage(
-                        model = userData.profilePictureUrl,
-                        contentDescription = "Profile picture",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                // Buttons (Update and Logout)
                 Column(
                     modifier = Modifier
-                        .padding(start = 16.dp),
-
-                    verticalArrangement = Arrangement.Center
+                        .align(Alignment.Center)
                 ) {
                     Button(
                         onClick = { /* Ação do botão Update */ },
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp) // Adjust the spacing between buttons
+                            .height(50.dp)
+                            .width(170.dp)
                     ) {
-                        Text(text = "Update")
+                        Text(text = "Update", style = TextStyle(fontSize = 20.sp))
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp)) // Add space between buttons
 
                     Button(
                         onClick = onSignOut,
-                        modifier = Modifier.fillMaxWidth()
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(170.dp)
                     ) {
-                        Text(text = "Logout")
+                        Text(text = "Logout", style = TextStyle(fontSize = 20.sp))
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp)) // Add space between buttons
+
+                    Button(
+                        onClick = {
+                            navController.navigate(route = Screens.Leaderboard.route)
+                        },
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(170.dp)
+                    ) {
+                        Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
+                    }
+                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            TextField(
-                value = "",
-                onValueChange = {/*TODO*/},
-                label = {Text("Username")},
-                modifier = Modifier.fillMaxWidth())
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            TextField(
-                value = "",
-                onValueChange = {/*TODO*/},
-                label = {Text("Password")},
-                modifier = Modifier.fillMaxWidth())
-
         }
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ){
-            Button(
-                onClick = {
-                    navController.navigate(route = Screens.Leaderboard.route)
-                },
-                shape = RoundedCornerShape(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
-                modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 200.dp,
-                        y = 680.dp
-                    )
-                    .height(50.dp)
-                    .width(170.dp)
-
-            )
-            {
-                Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
-            }
-        }
+    }
 }
 
 // Function to determine the trophy based on points
@@ -260,5 +247,17 @@ fun updateTrophy(userId: String, points: Int) {
     val trophy = determineTrophy(points)
     val userRef = Firebase.database.getReference("Users (Quim)").child(userId)
     userRef.child("Trophy").setValue(trophy)
-    RaritySquare(text = trophy.text, trophyType = trophy.trophyType)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 140.dp), // Adjust horizontal padding as needed
+        contentAlignment = Alignment.Center
+    ) {
+        RaritySquare(
+            text = trophy.text,
+            trophyType = trophy.trophyType,
+            modifier = Modifier
+                .padding(start = 0.dp, bottom = 0.dp)
+        )
+    }
 }
