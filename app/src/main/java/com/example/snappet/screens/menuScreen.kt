@@ -269,7 +269,17 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Bees", fontWeight = FontWeight.Bold)
                 LazyRow {
+                    recentPhotos.forEach { photo ->
+                        if(photo.animalType == "Bee"){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
+                            }
+                            }
+                        }
+                    }
                 }
             }
         }
