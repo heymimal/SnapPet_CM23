@@ -60,9 +60,6 @@ import com.google.firebase.ktx.Firebase
 
 @Composable
 fun ClusterViewPhotos(clusterPhotos : List<Photo>, reference: DatabaseReference){
-    var expandedCardIndex by remember {
-        mutableStateOf(-1)
-    }
     LazyColumn(
         modifier = Modifier
     ) {

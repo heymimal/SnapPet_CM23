@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,7 +42,11 @@ import com.example.snappet.screens.PhotoDetailCard
 import com.example.snappet.screens.ClusterViewPhotos
 import com.example.snappet.viewModels.PhotosViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
@@ -53,20 +58,22 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
+import java.util.concurrent.TimeUnit
+
 //import com.google.maps.android.compose.theme.MapsComposeSampleTheme
 
 private const val TAG = "BasicMapActivity"
 
 val singapore = LatLng(1.3588227, 103.8742114)
-val singapore2 = LatLng(1.40, 103.77)
-val singapore3 = LatLng(1.45, 103.77)
-val singapore4 = LatLng(1.50, 103.77)
-val defaultCameraPosition = CameraPosition.fromLatLngZoom(singapore, 11f)
 
 
 class TestMapActivity : ComponentActivity() {
 
     lateinit var mFusedLocationClient: FusedLocationProviderClient
+
+    lateinit var locationRequest : LocationRequest
+
+    lateinit var  locationCallback: LocationCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +82,25 @@ class TestMapActivity : ComponentActivity() {
             var isMapLoaded by remember { mutableStateOf(false) }
             var locationPoint by remember { mutableStateOf<Location?>(null) }
             var photosViewModel by remember { mutableStateOf(PhotosViewModel()) }
+
+            locationRequest = LocationRequest.create().apply {
+                interval = TimeUnit.SECONDS.toMillis(60)
+                fastestInterval = TimeUnit.SECONDS.toMillis(30)
+                maxWaitTime = TimeUnit.MINUTES.toMillis(2)
+                priority = Priority.PRIORITY_HIGH_ACCURACY
+            }
+            locationCallback = object : LocationCallback(){
+                override fun onLocationResult(locationResult: LocationResult) {
+                    super.onLocationResult(locationResult)
+                    Log.d(TAG,"callback")
+                    if(locationResult.lastLocation  != null){
+                        Log.d(TAG, "${LatLng(locationResult.lastLocation!!.latitude,
+                                locationResult.lastLocation!!.longitude)}")
+                    }
+
+                }
+            }
+
 
 
             val locationPermissionsAlreadyGranted = ContextCompat.checkSelfPermission(
@@ -115,14 +141,21 @@ class TestMapActivity : ComponentActivity() {
             }
             val photosState by photosViewModel.photos.observeAsState()
 
+
             // Conditional rendering of the map based on location permission
             if (isMapLoaded) {
 
                 var itemsCheck by remember { mutableStateOf(false) }
 
                 val current = LatLng(locationPoint!!.latitude,locationPoint!!.longitude)
+                var currentL by remember { mutableStateOf(current) }
+
+
+                mFusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,
+                    Looper.getMainLooper())
+
                 val cameraPositionState = rememberCameraPositionState {
-                    position = CameraPosition.fromLatLngZoom(current, 15f)
+                    position = CameraPosition.fromLatLngZoom(currentL, 15f)
                 }
                 photosState?.let { photos ->
                     val items = remember { mutableStateListOf<MyPhotoCluster>()}
@@ -140,7 +173,6 @@ class TestMapActivity : ComponentActivity() {
                     }
                 }
             } else {
-                // Map is not loaded yet, you can show a loading indicator or handle it accordingly
                 Text("Loading Map...") // CHANGE FOR SOMETHING BETTER !
             }
         }

@@ -20,10 +20,6 @@ class PhotosViewModel : ViewModel() {
     private val _photo = MutableLiveData<Photo>()
     val photo : LiveData<Photo> get() = _photo
 
-    fun fetchOnePhoto(photoID : String){
-        //TODO
-    }
-
     fun fetchAllPhotos(){
         val databaseReference: DatabaseReference = Firebase.database.reference.child("imagesTest")
             .child("allImages")

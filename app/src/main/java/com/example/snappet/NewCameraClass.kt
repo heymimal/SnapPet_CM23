@@ -88,7 +88,7 @@ fun CameraClass(navController: NavController, userData: UserData) {
 
                 takenPicture = BitmapFactory.decodeFile(currentImagePath)
                 val picture = takenPicture
-                takenPicture = Bitmap.createBitmap(
+                /*takenPicture = Bitmap.createBitmap(
                     picture!!,
                     0,
                     0,
@@ -96,7 +96,7 @@ fun CameraClass(navController: NavController, userData: UserData) {
                     picture.height,
                     matrix,
                     true
-                )
+                )*/
 
             }
         }
