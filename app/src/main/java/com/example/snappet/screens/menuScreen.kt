@@ -1,11 +1,11 @@
 package com.example.snappet.screens
 
-import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -72,7 +73,7 @@ fun HomeMenu(navController: NavHostController) {
 
 
 @Composable
-fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoClick: () -> Unit) {
+fun CardWithImageAndText(photo: Photo, text: String, onPhotoClick: () -> Unit) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -86,8 +87,10 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
+
+            Log.d("ImageURL", photo.imageUri.toString())
 
             // Use downloadUrl if sender is not the current user
             val imageUrl = if (photo.sender != Firebase.auth.currentUser?.uid) {
@@ -100,11 +103,12 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
                 painter = rememberImagePainter(imageUrl),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(100.dp)
                     .clip(shape = MaterialTheme.shapes.medium)
+                    .align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
             Text(
                 text = text,
@@ -114,23 +118,28 @@ fun CardWithImageAndText(photo: Photo, imageUrl: String, text: String, onPhotoCl
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
-            /*Button(
-                onClick = {},
-                modifier = Modifier.height(20.dp).align(alignment = Alignment.End)
+            Row(
+                modifier = Modifier.fillMaxWidth()
             ){
-                Text(text = "Like")
-            }*/
+                Text(
+                    text = photo.likes.toString(),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(end = 4.dp, start = 31.dp)
+                )
+                Image(
+                    painter = painterResource(R.drawable.heart),
+                    contentDescription = "Like",
+                    modifier = Modifier
+                        .size(25.dp)
 
-            Image(
-                painter = painterResource(R.drawable.heart),
-                contentDescription = "Like",
-                modifier = Modifier
-                    .size(25.dp)
-                    .clickable {}
-                    //.align(alignment = Alignment.BottomEnd)
-            )
+                )
+
+
+            }
+
+
         }
     }
 }
@@ -216,11 +225,13 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                 LazyRow {
                     recentPhotos.forEach { photo ->
 
-                        item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
-                            text = photo.animalType, onPhotoClick = {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+                        item { CardWithImageAndText(
+                            photo = photo, text = photo.animalType
+                        ) {
+                            navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
-                            })}
+                        }
+                        }
                     }
                 }
             }
@@ -234,11 +245,13 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                 LazyRow {
                     recentPhotos.forEach { photo ->
                         if(photo.animalType == "Dog"){
-                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
-                                text = photo.animalType, onPhotoClick = {
-                                    navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
-                                })}
+                            }
+                            }
                         }
                     }
                 }
@@ -251,27 +264,13 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                 LazyRow {
                     recentPhotos.forEach { photo ->
                         if(photo.animalType == "Cat"){
-                            if(photo.sender == userId){
-                                Log.d(TAG, "SOU EU!!!!!!!!!!")
-                                item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
-                                    text = photo.animalType, onPhotoClick = {
-                                        navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
-                                    })}
-                            }else{
-                                Log.d(TAG, " NAO SOU EU!!!!!!!!!!")
-                                Log.d(TAG, "id do sender -> " + photo.sender)
-                                Log.d(TAG, "id do user -> " + userId)
-                                item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
-                                    text = photo.animalType, onPhotoClick = {
-                                        navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
-                                    })}
                             }
-
-                            //}else{
-                                //forma com o download url
-                            //}
+                            }
 
 
                         }
@@ -286,11 +285,13 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                 LazyRow {
                     recentPhotos.forEach { photo ->
                         if(photo.animalType == "Bird"){
-                            item { CardWithImageAndText(photo = photo, photo.imageUri.toString(),
-                                text = photo.animalType, onPhotoClick = {
-                                    navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
 
-                                })}
+                            }
+                            }
                         }
                     }
                 }

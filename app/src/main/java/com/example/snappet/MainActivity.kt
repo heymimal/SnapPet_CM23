@@ -52,10 +52,12 @@ import com.example.snappet.screens.DayInfo
 import com.example.snappet.screens.TrophiesInfoNav
 import com.example.snappet.screens.PhotoDetailScreen
 import com.example.snappet.screens.leaderboardNav
+import com.example.snappet.screens.updatePhotoLikes
 import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
 import com.example.snappet.viewModels.ProfileViewModel
 import com.example.snappet.viewModels.ThrophiesViewModel
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.getValue
@@ -394,6 +396,9 @@ class MainActivity : ComponentActivity() {
                                 "allImages"
                             )
 
+                            val user = Firebase.auth.currentUser
+                            val reference = database.reference.child("Users (Quim)").child(user!!.uid).child("likedPhotos")
+
                             var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 
 
@@ -401,11 +406,41 @@ class MainActivity : ComponentActivity() {
 
                             val catPhotosr = recentPhotos.filter { it.id == photoId}
 
+
+                            var receivedValue by remember {
+                                mutableStateOf(false)
+                            }
+
+                            var isLiked by remember {
+                                mutableStateOf(false)
+                            }
+
                             catPhotosr.forEach { catPhoto ->
                                 if(catPhoto.id == photoId){
-                                    Log.d(TAG, "Sao iguais!")
                                 }
-                                PhotoDetailScreen(catPhoto, navController)
+
+
+
+
+                                //PhotoDetailScreen(photo, navController, true)
+
+                                isAlreadyInFolder(reference, catPhoto) { isAlreadyLiked ->
+                                    Log.d(TAG, "Is photo already liked: $isAlreadyLiked")
+
+                                    isLiked =isAlreadyLiked
+                                    receivedValue = true
+
+                                    // Continue with your logic here, now that you know the result
+                                }
+
+                                if(receivedValue){
+                                    PhotoDetailScreen(catPhoto, navController, isLiked)
+                                }
+
+
+
+
+
                             }
                         }
 
@@ -414,6 +449,30 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    fun isAlreadyInFolder(
+        reference: DatabaseReference,
+        photo: Photo,
+        callback: (Boolean) -> Unit
+    ) {
+        reference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val currentLikedPhotos = snapshot.children.mapNotNull { it.value as? String }
+
+                val isPhotoAlreadyLiked = currentLikedPhotos.contains(photo.id)
+                callback(isPhotoAlreadyLiked)
+
+                if (isPhotoAlreadyLiked) {
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle the onCancelled case appropriately
+                callback(false)
+            }
+        })
+    }
+
 
     @Composable
     fun getPhotos(databaseReference: DatabaseReference): List<Photo>{
