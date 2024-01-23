@@ -173,13 +173,6 @@ class LocationService : Service() {
                         c++
                     }
                 }
-
-                val lat = location.latitude.toString()
-                val long = location.longitude.toString()
-                val updatedNotification = notification.setContentText(
-                    "Location: ($lat,$long)"
-                )
-                notificationManager.notify(1,updatedNotification.build())
             }
             .launchIn(serviceScope)
         startForeground(1,notification.build())

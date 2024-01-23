@@ -100,9 +100,6 @@ class Map : ComponentActivity() {
 
                 }
             }
-
-
-
             val locationPermissionsAlreadyGranted = ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -220,17 +217,18 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
               false
           },
           onClusterItemClick = {
-              Log.d(TAG, "Cluster item clicked! $it")
-              false
-          },
-          onClusterItemInfoWindowClick = {
               clickSinglePoint = false
               clickOnCluster = false
               photo = it.photoInfo
               clickSinglePoint = true
               Log.d(TAG, "Cluster item info window clicked! $it")
+              false
+          },
+          onClusterItemInfoWindowClick = {
+
           },
           clusterContent = { cluster ->
+              Log.d(TAG,"Cluster: $cluster")
               CircleContent(
                   modifier = Modifier.size(40.dp),
                   text = "%,d".format(cluster.size),
@@ -242,19 +240,49 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
     }
     if(clickSinglePoint)   {
         Column {
-            //Text("Clicked!")
             Log.d(TAG,"photo info: $photo")
             PhotoDetailCard(photo,reference)
             Button(onClick = { clickSinglePoint = false}) {
-                Text(text = "click me")
+                Text(text = "close")
             }
         }
     }
     if(clickOnCluster){
-        ClusterViewPhotos(photos, reference)
+        Column {
+            ClusterViewPhotos(photos, reference)
+            Button(onClick = { clickOnCluster = false}) {
+                Text(text = "close")
+            }
+        }
     }
-
 }
+
+@Composable
+private fun SingleMarkerContent(photo: Photo) {
+    // You can customize this function to create your custom marker for single item clusters
+    // For example, you can use an Image, Icon, or any other composable to represent the marker.
+    // Here's a simple example using a CircleShape and Text:
+
+    Box(
+        modifier = Modifier.size(40.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+            Surface(
+                shape = CircleShape,
+                contentColor = Color.White,
+                border = BorderStroke(1.dp, Color.White)
+            ) {
+            Text(
+                text = "1",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Black,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
 
 
 @Composable
