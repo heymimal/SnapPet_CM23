@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -66,9 +68,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
                   onSignOut: () -> Unit
                           ) {
     val userDataState by profileViewModel.userData.observeAsState()
-    // Observe trophy data
     val trophy by profileViewModel.trophyData.observeAsState()
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -76,14 +76,9 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
         }) {paddingValues ->
         Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
         ProfileScreenComposable(userDataState, userData, onSignOut,navController,trophy)
-
-        //Text(text = "Hello")
     }
-
 }
 
-@SuppressLint("SuspiciousIndentation")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenComposable(
     final: UserData?,
@@ -97,63 +92,51 @@ fun ProfileScreenComposable(
         Manifest.permission.ACCESS_COARSE_LOCATION,
     )
 
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top
         ) {
             Text(
                 text = "Edit Profile",
-                color = Color.White, // Change to Color.White for white text
+                color = Color.White,
                 style = TextStyle(fontSize = 25.sp),
                 modifier = Modifier
                     .align(alignment = Alignment.CenterHorizontally)
                     .offset(y = 29.dp)
             )
-
-            Spacer(modifier = Modifier.height(50.dp))
-
+            Spacer(modifier = Modifier.height(100.dp))
             if(userData?.username != null) {
-                Text(
-                    text = userData.username,
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                if (final != null) {
-                    if (trophy != null) {
-                        final.snaPoints?.let { updateTrophy(userData.userId, it.toInt()) }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    if (userData?.profilePictureUrl != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .wrapContentSize(align = Alignment.Center)
+                        ) {
+                            AsyncImage(
+                                model = userData.profilePictureUrl,
+                                contentDescription = "Profile picture",
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
-                    Text(
-                        text = "SnapPoints: "+final.snaPoints,
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                if (userData?.profilePictureUrl != null) {
-                    AsyncImage(
-                        model = userData.profilePictureUrl,
-                        contentDescription = "Profile picture",
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
                 }
                 var permissionsGranted by remember { mutableStateOf(false)}
                 val requestMultiplePermissionsLauncher =
@@ -170,102 +153,79 @@ fun ProfileScreenComposable(
                     mutableStateOf(false)
                 }
 
-                Column(
+                Text(
+                    text = userData.username,
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
-                        .padding(start = 16.dp),
-
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            if(on){
-                                Intent(context,LocationService::class.java).apply {
-                                    action = LocationService.ACTION_STOP
-                                    context.startService(this)
-                                }
-                                on = false
-                                text = "Start"
-                            } else{
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    permissions += Manifest.permission.POST_NOTIFICATIONS
-                                }
-                                val permissionStatus = permissions.map {
-                                    it to (context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED)
-                                }.toMap()
-
-                                if (permissionStatus.containsValue(false)) {
-                                    requestMultiplePermissionsLauncher.launch(permissions)
-                                } else {
-
-                                    // All permissions already granted
-                                    text = "Stop"
-                                    permissionsGranted = true
-                                    Intent(context,LocationService::class.java).apply {
-                                        action = LocationService.ACTION_START
-                                        context.startService(this)
-                                    }
-                                    on = true
-                                }
-                            }
-
-                        },
+                        .align(alignment = Alignment.CenterHorizontally)
+                        .offset(y = 29.dp)
+                )
+                if (final != null) {
+                    Text(
+                        text = "SnapPoints: "+final.snaPoints,
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp) // Adjust the spacing between buttons
-                    ) {
-                        Text(text = text)
-                    }
-
-                    Button(
-                        onClick = onSignOut,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Logout")
+                            .align(alignment = Alignment.CenterHorizontally)
+                            .offset(y = 29.dp)
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+                    if (trophy != null) {
+                        final.snaPoints?.let { updateTrophy(userData.userId, it.toInt()) }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            TextField(
-                value = "",
-                onValueChange = {/*TODO*/},
-                label = {Text("Username")},
-                modifier = Modifier.fillMaxWidth())
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            TextField(
-                value = "",
-                onValueChange = {/*TODO*/},
-                label = {Text("Password")},
-                modifier = Modifier.fillMaxWidth())
-
-        }
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ){
-            Button(
-                onClick = {
-                    navController.navigate(route = Screens.Leaderboard.route)
-                },
-                shape = RoundedCornerShape(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+            Box(//buttons
                 modifier = Modifier
-                    .align(alignment = Alignment.TopStart)
-                    .offset(
-                        x = 200.dp,
-                        y = 680.dp
-                    )
-                    .height(50.dp)
-                    .width(170.dp)
-
-            )
-            {
-                Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                ) {
+                    Button(
+                        onClick = { /* Ação do botão Update */ },
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(170.dp)
+                    ) {
+                        Text(text = "Update", style = TextStyle(fontSize = 20.sp))
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = onSignOut,
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(170.dp)
+                    ) {
+                        Text(text = "Logout", style = TextStyle(fontSize = 20.sp))
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            navController.navigate(route = Screens.Leaderboard.route)
+                        },
+                        shape = RoundedCornerShape(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .width(170.dp)
+                    ) {
+                        Text(text = "Leaderboard", style = TextStyle(fontSize = 20.sp))
+                    }
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
+    }
 }
 
 // Function to determine the trophy based on points
@@ -301,5 +261,17 @@ fun updateTrophy(userId: String, points: Int) {
     val trophy = determineTrophy(points)
     val userRef = Firebase.database.getReference("Users (Quim)").child(userId)
     userRef.child("Trophy").setValue(trophy)
-    RaritySquare(text = trophy.text, trophyType = trophy.trophyType)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 140.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        RaritySquare(
+            text = trophy.text,
+            trophyType = trophy.trophyType,
+            modifier = Modifier
+                .padding(start = 0.dp, bottom = 0.dp)
+        )
+    }
 }

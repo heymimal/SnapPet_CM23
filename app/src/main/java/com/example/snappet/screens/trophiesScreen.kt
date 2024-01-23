@@ -29,13 +29,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.snappet.data.DailyMission
+import com.example.snappet.data.Mission
 import com.example.snappet.navigation.Navigation
 import com.example.snappet.navigation.Screens
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMission>, monthlyMissions: List<DailyMission>) {
+fun TrophiesNav(
+    navController: NavHostController,
+    missions: List<Mission>,
+    monthlyMissions: List<Mission>,
+    fullTimeMissions: List<Mission>
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -58,45 +63,7 @@ fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMissi
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 )
-
                 LazyColumn {
-                    // Sticky header for daily missions
-                    stickyHeader {
-                        Text(
-                            text = "Daily Missions",
-                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = Color.Gray)
-                                .padding(8.dp)
-                        )
-                    }
-
-                    // Display daily missions
-                    itemsIndexed(dailyMissions) { index, mission ->
-                        MissionCard(mission = mission)
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-
-                    // Sticky header for monthly missions
-                    stickyHeader {
-                        Text(
-                            text = "Monthly Missions",
-                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = Color.Gray)
-                                .padding(8.dp)
-                        )
-                    }
-
-                    // Display monthly missions
-                    itemsIndexed(monthlyMissions) { index, mission ->
-                        MissionCard(mission = mission)
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-
-                    // Throphies Info button placed after missions
                     item {
                         Button(
                             onClick = {
@@ -111,6 +78,48 @@ fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMissi
                             Text(text = "Throphies Info", style = TextStyle(fontSize = 20.sp))
                         }
                     }
+                    stickyHeader {
+                        Text(
+                            text = "Daily Missions",
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.Gray)
+                                .padding(8.dp)
+                        )
+                    }
+                    itemsIndexed(missions) { index, mission ->
+                        MissionCard(mission = mission)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    stickyHeader {
+                        Text(
+                            text = "Monthly Missions",
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.Gray)
+                                .padding(8.dp)
+                        )
+                    }
+                    itemsIndexed(monthlyMissions) { index, mission ->
+                        MissionCard(mission = mission)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    stickyHeader {
+                        Text(
+                            text = "Full Time Missions",
+                            style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.Gray)
+                                .padding(8.dp)
+                        )
+                    }
+                    itemsIndexed(fullTimeMissions) { index, mission ->
+                        MissionCard(mission = mission)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
         }
@@ -118,7 +127,7 @@ fun TrophiesNav(navController: NavHostController, dailyMissions: List<DailyMissi
 }
 
 @Composable
-fun MissionCard(mission: DailyMission) {
+fun MissionCard(mission: Mission) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,19 +143,16 @@ fun MissionCard(mission: DailyMission) {
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Text(
                 text = "Status: ${mission.userProgress}/${mission.goal}",
                 style = TextStyle(fontSize = 14.sp),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Text(
                 text = "Points: ${mission.points}",
                 style = TextStyle(fontSize = 14.sp),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             if (mission.completed) {
                 Box(
                     modifier = Modifier

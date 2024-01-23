@@ -3,8 +3,10 @@ package com.example.snappet.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,7 +43,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                // Header item
                 item {
                     Text(
                         text = "Trophies Information",
@@ -51,7 +52,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                         textAlign = TextAlign.Center,
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     )
-
                     Text(
                         text = "Trophies can be gained through completing various challenges. " +
                                 "The highest Trophy will be shown in your profile.",
@@ -60,7 +60,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .padding(16.dp)
                             .align(Alignment.Start)
                     )
-
                     Text(
                         text = "Trophies differ in rarity:",
                         style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
@@ -69,51 +68,47 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
-                    RaritySquare(text = "Bronze Trophies", trophyType = "bronze")
+                    RaritySquare(text = "Bronze Trophies", trophyType = "bronze", modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Common and fairly easy to obtain.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
-                    RaritySquare(text = "Silver Trophies", trophyType = "silver")
+                    RaritySquare(text = "Silver Trophies", trophyType = "silver", modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Moderate effort to obtain, these require some time.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)  // Set vertical padding to 0.dp
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
-                    RaritySquare(text = "Gold Trophies", trophyType = "gold")
+                    RaritySquare(text = "Gold Trophies", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Hard to obtain, these require a lot of time and effort.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
-                    RaritySquare(text = "Legendary Trophies", trophyType = "legendary")
+                    RaritySquare(text = "Legendary Trophies", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Truly exceptional and extremely rare.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
+                    Spacer(modifier = Modifier.height(30.dp))
                 }
-
                 item {
                     Text(
                         text = "Trophy List",
@@ -123,218 +118,217 @@ fun TrophiesInfoNav(navController: NavHostController) {
                         textAlign = TextAlign.Center,
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     )
+                    Spacer(modifier = Modifier.height(30.dp))
                 }
-                //Bronze
                 item {
-                    RaritySquare(text = "Snappy Snapper", trophyType = "bronze")
+                    RaritySquare(text = "Snappy Snapper", trophyType = "bronze",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 50 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Animal Explorer", trophyType = "bronze")
+                    RaritySquare(text = "Animal Explorer", trophyType = "bronze",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 100 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Pet Paparazzo", trophyType = "bronze")
+                    RaritySquare(text = "Pet Paparazzo", trophyType = "bronze",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 150 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Nature Scout", trophyType = "bronze")
+                    RaritySquare(text = "Nature Scout", trophyType = "bronze",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 200 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Wildlife Rookie", trophyType = "bronze")
+                    RaritySquare(text = "Wildlife Rookie", trophyType = "bronze",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 250 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
-                //Silver
                 item {
-                    RaritySquare(text = "Silver Safari Scout", trophyType = "silver")
+                    RaritySquare(text = "Silver Safari Scout", trophyType = "silver",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 300 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Lens Warrior", trophyType = "silver")
+                    RaritySquare(text = "Lens Warrior", trophyType = "silver",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 350 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Animal Whisperer", trophyType = "silver")
+                    RaritySquare(text = "Animal Whisperer", trophyType = "silver",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 400 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Nature Enthusiast", trophyType = "silver")
+                    RaritySquare(text = "Nature Enthusiast", trophyType = "silver",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 450 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Silver Snapshot Master", trophyType = "silver")
+                    RaritySquare(text = "Silver Snapshot Master", trophyType = "silver",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 500 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
-                //Gold
                 item {
-                    RaritySquare(text = "Gold Wilderness Conquerer", trophyType = "gold")
+                    RaritySquare(text = "Gold Wilderness Conquerer", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 550 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Shutter Champion", trophyType = "gold")
+                    RaritySquare(text = "Shutter Champion", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 600 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Creature Adventurer", trophyType = "gold")
+                    RaritySquare(text = "Creature Adventurer", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 650 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Gold Wildlife Expert", trophyType = "gold")
+                    RaritySquare(text = "Gold Wildlife Expert", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 700 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Gold Photo Virtuoso", trophyType = "gold")
+                    RaritySquare(text = "Gold Photo Virtuoso", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 750 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
-                //Legendary
                 item {
-                    RaritySquare(text = "Legendary Nature Maestro", trophyType = "legendary")
+                    RaritySquare(text = "Legendary Nature Maestro", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 800 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Platinum Safari Maestro", trophyType = "legendary")
+                    RaritySquare(text = "Platinum Safari Maestro", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 850 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "Supreme Wildlife Photographer", trophyType = "legendary")
+                    RaritySquare(text = "Supreme Wildlife Photographer", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 900 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "SnaPet Virtuoso", trophyType = "legendary")
+                    RaritySquare(text = "SnaPet Virtuoso", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 950 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
                 }
                 item {
-                    RaritySquare(text = "SnaPet Master", trophyType = "legendary")
+                    RaritySquare(text = "SnaPet Master", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
                         text = "Receive 1000 SnaPoints or more.",
                         style = TextStyle(fontSize = 16.sp),
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 0.dp)
                             .align(Alignment.Start)
                     )
+                    Spacer(modifier = Modifier.height(30.dp))
                 }
             }
         }
     }
 }
 
+//how a trophy is presented (colour and text)
 @Composable
-fun RaritySquare(text: String, trophyType: String) {
+fun RaritySquare(text: String, trophyType: String, modifier: Modifier = Modifier) {
     val squareColor = when (trophyType) {
         "bronze" -> Color(0xFFCD7F32)
         "silver" -> Color.Gray
@@ -342,11 +336,9 @@ fun RaritySquare(text: String, trophyType: String) {
         "legendary" -> Color(0xFFE2590B)
         else -> Color.Black
     }
-
     val textColor = if (trophyType == "gold") Color.Black else Color.White
-
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {

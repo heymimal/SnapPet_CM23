@@ -1,6 +1,6 @@
 package com.example.snappet.data
 
-data class DailyMission(
+data class Mission(
     val missionType: String = "",
     val goal: Int = 0,
     var userProgress: Int = 0,

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,9 +40,7 @@ fun loginStreakNav(
     updatedPoints: Int,
     testeLoginStreak: Int
 ){
-    //val loginStreakDataState by loginStreakViewModel.loginStreakData.observeAsState()
     val loginStreakDataState = testeLoginStreak
-    val snaPointsDataState by loginStreakViewModel.snaPointsData.observeAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,18 +48,16 @@ fun loginStreakNav(
             .padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
+        Spacer(modifier = Modifier.height(30.dp))
         Text(
-            //text = "Login Streak+LOGINSTREAK:$testeLoginStreak-PONTOS:$updatedPoints",
-            text = "Login Streak:",
-            color = Color.Black,
-            style = TextStyle(fontSize = 25.sp),
+            text = "Login Streak",
+            style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
             modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .offset(y = 29.dp)
+                .padding(bottom = 16.dp)
+                .fillMaxWidth()
+                .wrapContentSize(align = Alignment.Center)
         )
-
-        // Days and points
-        val daysInfo = listOf(
+        val daysInfo = listOf(// Days and points
             DayInfo("Day: 1", 5),
             DayInfo("Day: 2", 5),
             DayInfo("Day: 3", 5),
@@ -68,14 +66,9 @@ fun loginStreakNav(
             DayInfo("Day: 6", 10),
             DayInfo("Day: 7", 25)
         )
-
-        Spacer(modifier = Modifier.height(200.dp))
-
-        // Group days into separate lists
+        Spacer(modifier = Modifier.height(150.dp))
         val groupedDays = daysInfo.chunked(3)
-
-        // Display days in rows
-        groupedDays.forEach { days ->
+        groupedDays.forEach { days ->// Display days in rows
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -87,12 +80,9 @@ fun loginStreakNav(
                         dayInfo.day.substringAfter(":").trim().toIntOrNull() ?: 0 < loginStreakDataState ?: 0 -> Color.Yellow // Yellow for lower values
                         else -> Color.Gray // Gray for higher values or when loginStreakDataState is null
                     }
-
                     val blue = Color(0xFF0077FF)
                     val lighterOrange = Color(0xFFFFAA80)
                     val orange = Color(0xFFFF8800)
-
-                    // Inside the Box composable
                     Box(
                         modifier = Modifier
                             .padding(8.dp)
@@ -103,7 +93,7 @@ fun loginStreakNav(
                                     dayInfo.day.substringAfter(":").trim().toIntOrNull() ?: 0 < loginStreakDataState ?: 0 -> lighterOrange
                                     else -> Color.Gray
                                 },
-                                shape = RoundedCornerShape(8.dp) // Adjust the corner radius as needed
+                                shape = RoundedCornerShape(8.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -125,7 +115,7 @@ fun loginStreakNav(
     ) {
         Button(
             onClick = {
-                navController.navigate(route = Screens.Home.route)
+                navController.navigate(route = Screens.MonthAnimal.route)
                       },
             shape = RoundedCornerShape(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
@@ -137,7 +127,6 @@ fun loginStreakNav(
                 )
                 .height(50.dp)
                 .width(100.dp)
-
         )
         {
             Text(text = "Next", style = TextStyle(fontSize = 20.sp))
@@ -146,8 +135,3 @@ fun loginStreakNav(
 }
 
 data class DayInfo(val day: String, val points: Int)
-@Preview
-@Composable
-private fun LoginPreview() {
-    //loginStreak(Modifier)
-}
