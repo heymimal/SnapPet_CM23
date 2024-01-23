@@ -199,6 +199,7 @@ fun ProfileScreenComposable(
                                       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                           permissions += Manifest.permission.POST_NOTIFICATIONS
                                       }
+                                      Log.d(TAG,"Build Version ${Build.VERSION.SDK_INT}")
                                       val permissionStatus = permissions.map {
                                           it to (context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED)
                                       }.toMap()
