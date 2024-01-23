@@ -138,20 +138,6 @@ fun ProfileScreenComposable(
                         }
                     }
                 }
-                var permissionsGranted by remember { mutableStateOf(false)}
-                val requestMultiplePermissionsLauncher =
-                    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-                        permissionsGranted = !permissions.containsValue(false)
-                        Log.d(TAG,"permissions were granted? : $permissionsGranted")
-                    }
-
-                val context = LocalContext.current
-                var text by remember {
-                    mutableStateOf("Start")
-                }
-                var on by remember {
-                    mutableStateOf(false)
-                }
 
                 Text(
                     text = userData.username,
@@ -183,19 +169,62 @@ fun ProfileScreenComposable(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
+                var permissionsGranted by remember { mutableStateOf(false)}
+                val requestMultiplePermissionsLauncher =
+                    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                        permissionsGranted = !permissions.containsValue(false)
+                        Log.d(TAG,"permissions were granted? : $permissionsGranted")
+                    }
+
+                val context = LocalContext.current
+                var text by remember {
+                    mutableStateOf("Start Tracking!")
+                }
+                var on by remember {
+                    mutableStateOf(false)
+                }
                 Column(
                     modifier = Modifier
                         .align(Alignment.Center)
                 ) {
                     Button(
-                        onClick = { /* Ação do botão Update */ },
+                        onClick = {
+                                  if(on){ Intent(context,LocationService::class.java).apply {
+                                      action = LocationService.ACTION_STOP
+                                      context.startService(this)
+                                  }
+                                      on = false
+                                      text = "Start Tracking!"
+                                  } else{
+                                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                          permissions += Manifest.permission.POST_NOTIFICATIONS
+                                      }
+                                      val permissionStatus = permissions.map {
+                                          it to (context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED)
+                                      }.toMap()
+
+                                      if (permissionStatus.containsValue(false)) {
+                                          requestMultiplePermissionsLauncher.launch(permissions)
+                                      } else {
+
+                                          // All permissions already granted
+                                          text = "Stop Tracking!"
+                                          permissionsGranted = true
+                                          Intent(context,LocationService::class.java).apply {
+                                              action = LocationService.ACTION_START
+                                              context.startService(this)
+                                          }
+                                          on = true
+                                      }
+                                  }
+                                  },
                         shape = RoundedCornerShape(50.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xffe2590b)),
                         modifier = Modifier
                             .height(50.dp)
                             .width(170.dp)
                     ) {
-                        Text(text = "Update", style = TextStyle(fontSize = 20.sp))
+                        Text(text = text, style = TextStyle(fontSize = 15.sp))
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
@@ -255,23 +284,37 @@ fun determineTrophy(points: Int): Trophy {
     }
 }
 
-// Function to update user trophy based on points
+
 @Composable
 fun updateTrophy(userId: String, points: Int) {
     val trophy = determineTrophy(points)
     val userRef = Firebase.database.getReference("Users (Quim)").child(userId)
     userRef.child("Trophy").setValue(trophy)
+    val squareColor = when (trophy.trophyType) {
+        "bronze" -> Color(0xFFCD7F32)
+        "silver" -> Color.Gray
+        "gold" -> Color(0xFFFFD700)
+        "legendary" -> Color(0xFFE2590B)
+        else -> Color.Black
+    }
+    val textColor = if (trophy.trophyType == "gold") Color.Black else Color.White
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 140.dp),
-        contentAlignment = Alignment.Center
+            .padding(8.dp)
+            .wrapContentSize(align = Alignment.Center)
+            .offset(y = (-8).dp) // Adjust the offset as needed
     ) {
-        RaritySquare(
-            text = trophy.text,
-            trophyType = trophy.trophyType,
+        Box(
             modifier = Modifier
-                .padding(start = 0.dp, bottom = 0.dp)
-        )
+                .background(squareColor, shape = RoundedCornerShape(8.dp)) // Rounded corners
+                .padding(8.dp)
+        ) {
+            Text(
+                text = trophy.text,
+                style = TextStyle(fontSize = 16.sp, color = textColor),
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
     }
 }

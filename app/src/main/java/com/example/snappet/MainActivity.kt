@@ -1,10 +1,8 @@
 package com.example.snappet
 
 
-import android.content.ContentValues.TAG
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -29,12 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.snappet.data.DailyMission
-import com.example.snappet.data.Photo
-import com.example.snappet.data.Trophy
 import com.example.snappet.navigation.Screens
 import com.example.snappet.profile.ProfileScreen
-import com.example.snappet.screens.DayInfo
 import com.example.snappet.screens.HomeMenu
 import com.example.snappet.screens.PhotoDetailScreen
 import com.example.snappet.screens.TrophiesInfoNav
@@ -45,17 +39,8 @@ import com.example.snappet.sign_In.GoogleAuthUiClient
 import com.example.snappet.sign_In.LoginScreen
 import com.example.snappet.sign_In.SignInViewModel
 import com.example.snappet.ui.theme.SnapPetTheme
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.example.snappet.data.Mission
 import com.example.snappet.data.Trophy
 import com.example.snappet.data.Photo
@@ -63,9 +48,6 @@ import com.example.snappet.data.MonthAnimal
 import com.example.snappet.screens.DayInfo
 import com.example.snappet.screens.FirstScreenNav
 import com.example.snappet.screens.MonthAnimalNav
-import com.example.snappet.screens.TrophiesInfoNav
-import com.example.snappet.screens.PhotoDetailScreen
-import com.example.snappet.screens.leaderboardNav
 import com.example.snappet.viewModels.LeaderboardViewModel
 import com.example.snappet.viewModels.LoginStreakViewModel
 import com.example.snappet.viewModels.ProfileViewModel
@@ -77,10 +59,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

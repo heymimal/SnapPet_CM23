@@ -50,7 +50,7 @@ fun FirstScreenNav(navController: NavHostController) {
         )
         Spacer(modifier = Modifier.height(30.dp))
         Text(
-            text = "Wellcome to SnaPet",
+            text = "Welcome to SnapPet",
             style = TextStyle(
                 fontSize = 40.sp,
                 color = Color(0xffe2590b), // Orange color

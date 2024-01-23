@@ -1,12 +1,7 @@
 package com.example.snappet
 
-import android.content.ContentValues
-import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Environment
-import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +62,8 @@ import com.example.snappet.sign_In.UserData
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.appcheck.internal.util.Logger.TAG
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
@@ -577,7 +574,7 @@ fun updateFullTimeMissions(userData: UserData?, animalType: String) {
 }
 
 //updates users snaPoints
-private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, missionPoints: Int) {
+ fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, missionPoints: Int) {
     val snaPointsReference = myReference.child(userData.userId).child("snaPoints")// Fetch the current snaPoints
     snaPointsReference.addListenerForSingleValueEvent(object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {

@@ -16,10 +16,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import com.example.snappet.data.MonthAnimal
 import com.example.snappet.data.Photo
 import com.example.snappet.sign_In.UserData
 import com.example.snappet.updateDailyMissions
+import com.example.snappet.updateFullTimeMissions
 import com.example.snappet.updateMonthlyMissions
+import com.example.snappet.updateSnaPoints
 import com.example.snappet.viewModels.PhotosViewModel
 import com.google.firebase.appcheck.internal.util.Logger
 import com.google.firebase.appcheck.internal.util.Logger.TAG
@@ -131,6 +134,17 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
                     if (task.isSuccessful) {
                         updateDailyMissions(userData, photo.animalType!!)
                         updateMonthlyMissions(userData, photo.animalType!!)
+                        updateFullTimeMissions(userData, photo.animalType!!)
+
+                        val monthAnimal = MonthAnimal()
+                        val presentMonthAnimal = monthAnimal.getAnimalForPresentMonth()
+                        val database = Firebase.database
+                        val myReference = database.getReference("Users (Quim)")
+                        if(photo.animalType == presentMonthAnimal){
+                            updateSnaPoints(userData, myReference, 5)
+                        }else{
+                            updateSnaPoints(userData, myReference, 1)
+                        }
                         checkForGeofence(photo, photosViewModel.photos.value)
                         Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {
