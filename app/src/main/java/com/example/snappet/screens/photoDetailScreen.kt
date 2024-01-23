@@ -51,6 +51,7 @@ import coil.compose.rememberImagePainter
 import com.example.snappet.R
 import com.example.snappet.data.Photo
 import com.example.snappet.navigation.Screens
+import com.example.snappet.updateSnaPoints
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
@@ -335,8 +336,11 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
 
 fun updatePhotoLikes(photo: Photo, photoId: String, newLikes: Int){
     val database = Firebase.database
-    val reference = database.reference.child("imagesMiguel").child("allImages")
+    val reference = database.reference.child("SnapPhoto").child("allImages")
         .child(photoId).child("likes")
+
+    val myReference = database.getReference("Users")
+    updateSnaPoints(photo.sender,myReference,1)
 
     reference.setValue(newLikes).addOnSuccessListener {
         Log.d(TAG, "LIKES UPDATED")
@@ -355,7 +359,7 @@ fun updateUserLikes(
 
     if (user != null) {
         val database = Firebase.database
-        val reference = database.reference.child("Users (Quim)").child(user.uid).child("likedPhotos")
+        val reference = database.reference.child("Users").child(user.uid).child("likedPhotos")
 
         // photo ID already in folder?
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -365,7 +369,6 @@ fun updateUserLikes(
                 for (c in currentLikedPhotos){
                 }
 
-                // If not, add it
                 if (!currentLikedPhotos.contains(photoId)) {
 
                     val likedPhotoReference = reference.push()

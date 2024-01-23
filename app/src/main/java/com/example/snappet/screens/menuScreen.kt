@@ -147,7 +147,7 @@ fun CardWithImageAndText(photo: Photo, text: String, onPhotoClick: () -> Unit) {
 fun ThreeByThreeGrid1(navController: NavHostController) {
 
     val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-    val databaseReference: DatabaseReference = database.reference.child("imagesMiguel").child("allImages")
+    val databaseReference: DatabaseReference = database.reference.child("SnapPhoto").child("allImages")
 
     var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 

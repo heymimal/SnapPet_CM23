@@ -288,7 +288,7 @@ fun determineTrophy(points: Int): Trophy {
 @Composable
 fun updateTrophy(userId: String, points: Int) {
     val trophy = determineTrophy(points)
-    val userRef = Firebase.database.getReference("Users (Quim)").child(userId)
+    val userRef = Firebase.database.getReference("Users").child(userId)
     userRef.child("Trophy").setValue(trophy)
     val squareColor = when (trophy.trophyType) {
         "bronze" -> Color(0xFFCD7F32)

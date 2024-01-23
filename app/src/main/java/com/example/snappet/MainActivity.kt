@@ -181,7 +181,7 @@ class MainActivity : ComponentActivity() {
                             var testeLoginStreak = 1
                             var usersLastLogin = ""
                             val database = Firebase.database
-                            val myReference = database.getReference("Users (Quim)")
+                            val myReference = database.getReference("Users")
                             var userData = googleAuthUiClient.getSignedInUser()
                             LaunchedEffect(Unit) {
                                 val userData = googleAuthUiClient.getSignedInUser()
@@ -338,12 +338,12 @@ class MainActivity : ComponentActivity() {
                             val rawPhotoId = backStackEntry.arguments?.getString("photoId") ?: ""
                             val photoId = "-" + rawPhotoId.substringAfter("-")
                             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-                            val databaseReference: DatabaseReference = database.reference.child("imagesMiguel").child(
+                            val databaseReference: DatabaseReference = database.reference.child("SnapPhoto").child(
                                 "allImages"
                             )
 
                             val user = Firebase.auth.currentUser
-                            val reference = database.reference.child("Users (Quim)").child(user!!.uid).child("likedPhotos")
+                            val reference = database.reference.child("Users").child(user!!.uid).child("likedPhotos")
 
                             var recentPhotos by remember { mutableStateOf(emptyList<Photo>()) }
 

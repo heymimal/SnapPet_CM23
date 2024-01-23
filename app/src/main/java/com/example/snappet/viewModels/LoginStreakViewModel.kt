@@ -17,7 +17,7 @@ class LoginStreakViewModel : ViewModel() {
     val lastLoginData: LiveData<String?> = _lastLoginData
 
     fun fetchData(userId: String) {
-        val reference = Firebase.database.getReference("Users (Quim)").child(userId)
+        val reference = Firebase.database.getReference("Users").child(userId)
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {

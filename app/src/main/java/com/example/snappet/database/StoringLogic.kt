@@ -105,8 +105,8 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
 
         val folderName = if (!userName.isNullOrBlank()) userName else userId
         val allFolder = "allImages"
-        val imagePath = "imagesMiguel/$folderName/"
-        val allImagesPath = "imagesMiguel/$allFolder/"
+        val imagePath = "SnapPhoto/$folderName/"
+        val allImagesPath = "SnapPhoto/$allFolder/"
 
         val databasePath = databaseReference.child(imagePath)
         val allImagesDatabasePath = databaseReference.child(allImagesPath)
@@ -135,16 +135,6 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
                         updateDailyMissions(userData, photo.animalType!!)
                         updateMonthlyMissions(userData, photo.animalType!!)
                         updateFullTimeMissions(userData, photo.animalType!!)
-
-                        val monthAnimal = MonthAnimal()
-                        val presentMonthAnimal = monthAnimal.getAnimalForPresentMonth()
-                        val database = Firebase.database
-                        val myReference = database.getReference("Users (Quim)")
-                        if(photo.animalType == presentMonthAnimal){
-                            updateSnaPoints(userData, myReference, 5)
-                        }else{
-                            updateSnaPoints(userData, myReference, 1)
-                        }
                         checkForGeofence(photo, photosViewModel.photos.value)
                         Log.d(TAG, "Photo data uploaded to user-specific folder.")
                     } else {

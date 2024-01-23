@@ -35,7 +35,7 @@ class ThrophiesViewModel : ViewModel() {
 
     // Generic function to fetch missions
     private fun fetchMissions(userId: String, node: String, liveData: MutableLiveData<List<Mission>>) {
-        val reference = Firebase.database.getReference("Users (Quim)").child(userId).child(node)
+        val reference = Firebase.database.getReference("Users").child(userId).child(node)
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val missions = dataSnapshot.children

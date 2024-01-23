@@ -18,7 +18,7 @@ class LeaderboardViewModel : ViewModel() {
     val leaderboardData: LiveData<List<LeaderboardUserData>> get() = _leaderboardData
 
     fun fetchLeaderboardData() {
-        val reference = Firebase.database.getReference("Users (Quim)")
+        val reference = Firebase.database.getReference("Users")
         reference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val users = mutableListOf<LeaderboardUserData>()

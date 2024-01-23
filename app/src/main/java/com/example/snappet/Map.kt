@@ -183,7 +183,7 @@ fun GoogleMapClustering(items : List<MyPhotoCluster>, cameraPositionState: Camer
     val user = Firebase.auth.currentUser
     val database: FirebaseDatabase = FirebaseDatabase.getInstance()
 
-    var reference = database.reference.child("Users (Quim)").child(user!!.uid).child("likedPhotos")
+    var reference = database.reference.child("Users").child(user!!.uid).child("likedPhotos")
 
 
     var clickSinglePoint by remember {
