@@ -40,9 +40,7 @@ fun loginStreakNav(
     updatedPoints: Int,
     testeLoginStreak: Int
 ){
-    //val loginStreakDataState by loginStreakViewModel.loginStreakData.observeAsState()
     val loginStreakDataState = testeLoginStreak
-    val snaPointsDataState by loginStreakViewModel.snaPointsData.observeAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -59,9 +57,7 @@ fun loginStreakNav(
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
-
-        // Days and points
-        val daysInfo = listOf(
+        val daysInfo = listOf(// Days and points
             DayInfo("Day: 1", 5),
             DayInfo("Day: 2", 5),
             DayInfo("Day: 3", 5),
@@ -70,14 +66,9 @@ fun loginStreakNav(
             DayInfo("Day: 6", 10),
             DayInfo("Day: 7", 25)
         )
-
         Spacer(modifier = Modifier.height(150.dp))
-
-        // Group days into separate lists
         val groupedDays = daysInfo.chunked(3)
-
-        // Display days in rows
-        groupedDays.forEach { days ->
+        groupedDays.forEach { days ->// Display days in rows
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -89,12 +80,9 @@ fun loginStreakNav(
                         dayInfo.day.substringAfter(":").trim().toIntOrNull() ?: 0 < loginStreakDataState ?: 0 -> Color.Yellow // Yellow for lower values
                         else -> Color.Gray // Gray for higher values or when loginStreakDataState is null
                     }
-
                     val blue = Color(0xFF0077FF)
                     val lighterOrange = Color(0xFFFFAA80)
                     val orange = Color(0xFFFF8800)
-
-                    // Inside the Box composable
                     Box(
                         modifier = Modifier
                             .padding(8.dp)
@@ -105,7 +93,7 @@ fun loginStreakNav(
                                     dayInfo.day.substringAfter(":").trim().toIntOrNull() ?: 0 < loginStreakDataState ?: 0 -> lighterOrange
                                     else -> Color.Gray
                                 },
-                                shape = RoundedCornerShape(8.dp) // Adjust the corner radius as needed
+                                shape = RoundedCornerShape(8.dp)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -139,7 +127,6 @@ fun loginStreakNav(
                 )
                 .height(50.dp)
                 .width(100.dp)
-
         )
         {
             Text(text = "Next", style = TextStyle(fontSize = 20.sp))
@@ -148,8 +135,3 @@ fun loginStreakNav(
 }
 
 data class DayInfo(val day: String, val points: Int)
-@Preview
-@Composable
-private fun LoginPreview() {
-    //loginStreak(Modifier)
-}

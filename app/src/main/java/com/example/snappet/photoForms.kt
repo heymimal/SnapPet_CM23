@@ -433,228 +433,170 @@ fun SwitchOption(): Boolean{
 fun updateDailyMissions(userData: UserData?, animalType: String) {
     val database = Firebase.database
     val myReference = database.getReference("Users (Quim)")
-    // Log the userID and animalType
     if (userData != null) {
-        // Get reference to the user's DailyMissions
-        val thisUserRef = myReference.child(userData.userId)
+        val thisUserRef = myReference.child(userData.userId)// Get reference to the user's DailyMissions
         val missionsReference = thisUserRef.child("DailyMissions")
-
-        // Query the missions with missionType as "10PicturesMission" or specific animalType
         missionsReference.orderByChild("missionType")
             .equalTo("10PicturesMission")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     for (missionSnapshot in dataSnapshot.children) {
-                        // Check if the mission is not completed
-                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false// Check if the mission is not completed
                         if (!completed) {
-                            // Update the userProgress property
-                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0// Update the userProgress property
                             missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
-
-                            // Check if userProgress equals the goal
-                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0// Check if userProgress equals the goal
                             if (userProgress + 1 == goal) {
-                                // Fetch the mission points and add to user's snaPoints
-                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0// Fetch the mission points and add to user's snaPoints
                                 updateSnaPoints(userData, myReference, missionPoints)
-
-                                // Set completed to true
-                                missionSnapshot.ref.child("completed").setValue(true)
+                                missionSnapshot.ref.child("completed").setValue(true) // Set completed to true
                             }
                         }
                     }
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    //Log.e(TAG, "Error fetching missions: ${databaseError.message}")
                 }
             })
 
-        // If the animalType is specified, also update the userProgress for that animalType
-        if (animalType.isNotEmpty()) {
+        if (animalType.isNotEmpty()) {// If the animalType is specified, also update the userProgress for that animalType
             missionsReference.orderByChild("missionType")
                 .equalTo(animalType)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         for (missionSnapshot in dataSnapshot.children) {
-                            // Check if the mission is not completed
-                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false// Check if the mission is not completed
                             if (!completed) {
-                                // Update the userProgress property
-                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0// Update the userProgress property
                                 missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
-
-                                // Check if userProgress equals the goal
-                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0// Check if userProgress equals the goal
                                 if (userProgress + 1 == goal) {
-                                    // Fetch the mission points and add to user's snaPoints
-                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0// Fetch the mission points and add to user's snaPoints
                                     updateSnaPoints(userData, myReference, missionPoints)
-
-                                    // Set completed to true
-                                    missionSnapshot.ref.child("completed").setValue(true)
+                                    missionSnapshot.ref.child("completed").setValue(true)// Set completed to true
                                 }
                             }
                         }
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        //Log.e(TAG, "Error fetching missions: ${databaseError.message}")
                     }
                 })
         }
     }
 }
 
+//updates the missions according with the taken photo type
 fun updateMonthlyMissions(userData: UserData?, animalType: String) {
     val database = Firebase.database
     val myReference = database.getReference("Users (Quim)")
 
     if (userData != null) {
-        // Get reference to the user's MonthlyMissions
-        val thisUserRef = myReference.child(userData.userId)
+        val thisUserRef = myReference.child(userData.userId)// Get reference to the user's MonthlyMissions
         val missionsReference = thisUserRef.child("MonthlyMissions")
-
-        // Query the missions with missionType as "10PicturesMission" or specific animalType
         missionsReference.orderByChild("missionType")
             .equalTo("100PicturesMission")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     for (missionSnapshot in dataSnapshot.children) {
-                        // Check if the mission is not completed
-                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false// Check if the mission is not completed
                         if (!completed) {
-                            // Update the userProgress property
-                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0// Update the userProgress property
                             missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
 
-                            // Check if userProgress equals the goal
-                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0// Check if userProgress equals the goal
                             if (userProgress + 1 == goal) {
-                                // Fetch the mission points and add to user's snaPoints
-                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0// Fetch the mission points and add to user's snaPoints
                                 updateSnaPoints(userData, myReference, missionPoints)
-
-                                // Set completed to true
-                                missionSnapshot.ref.child("completed").setValue(true)
+                                missionSnapshot.ref.child("completed").setValue(true)// Set completed to true
                             }
                         }
                     }
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle errors
                 }
             })
 
-        // If the animalType is specified, also update the userProgress for that animalType
-        if (animalType.isNotEmpty()) {
+        if (animalType.isNotEmpty()) {// If the animalType is specified, also update the userProgress for that animalType
             missionsReference.orderByChild("missionType")
                 .equalTo(animalType)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         for (missionSnapshot in dataSnapshot.children) {
-                            // Check if the mission is not completed
-                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false// Check if the mission is not completed
                             if (!completed) {
-                                // Update the userProgress property
-                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0// Update the userProgress property
                                 missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
 
-                                // Check if userProgress equals the goal
-                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0// Check if userProgress equals the goal
                                 if (userProgress + 1 == goal) {
-                                    // Fetch the mission points and add to user's snaPoints
-                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0// Fetch the mission points and add to user's snaPoints
                                     updateSnaPoints(userData, myReference, missionPoints)
-
-                                    // Set completed to true
-                                    missionSnapshot.ref.child("completed").setValue(true)
+                                    missionSnapshot.ref.child("completed").setValue(true)// Set completed to true
                                 }
                             }
                         }
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        // Handle errors
                     }
                 })
         }
     }
 }
 
+//updates the missions according with the taken photo type
 fun updateFullTimeMissions(userData: UserData?, animalType: String) {
     val database = Firebase.database
     val myReference = database.getReference("Users (Quim)")
-
     if (userData != null) {
-        // Get reference to the user's MonthlyMissions
         val thisUserRef = myReference.child(userData.userId)
         val missionsReference = thisUserRef.child("FullTimeMissions")
-
-        // Query the missions with missionType as "10PicturesMission" or specific animalType
         missionsReference.orderByChild("missionType")
             .equalTo("1000PicturesMission")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     for (missionSnapshot in dataSnapshot.children) {
-                        // Check if the mission is not completed
-                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                        val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false// Check if the mission is not completed
                         if (!completed) {
-                            // Update the userProgress property
-                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                            val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0// Update the userProgress property
                             missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
-
-                            // Check if userProgress equals the goal
-                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                            val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0// Check if userProgress equals the goal
                             if (userProgress + 1 == goal) {
-                                // Fetch the mission points and add to user's snaPoints
-                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0// Fetch the mission points and add to user's snaPoints
                                 updateSnaPoints(userData, myReference, missionPoints)
-
-                                // Set completed to true
-                                missionSnapshot.ref.child("completed").setValue(true)
+                                missionSnapshot.ref.child("completed").setValue(true)// Set completed to true
                             }
                         }
                     }
                 }
-
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle errors
                 }
             })
 
-        // If the animalType is specified, also update the userProgress for that animalType
-        if (animalType.isNotEmpty()) {
+        if (animalType.isNotEmpty()) { // If the animalType is specified, also update the userProgress for that animalType
             missionsReference.orderByChild("missionType")
                 .equalTo(animalType)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         for (missionSnapshot in dataSnapshot.children) {
-                            // Check if the mission is not completed
-                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false
+                            val completed = missionSnapshot.child("completed").getValue(Boolean::class.java) ?: false// Check if the mission is not completed
                             if (!completed) {
-                                // Update the userProgress property
-                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0
+                                val userProgress = missionSnapshot.child("userProgress").getValue(Int::class.java) ?: 0// Update the userProgress property
                                 missionSnapshot.ref.child("userProgress").setValue(userProgress + 1)
 
-                                // Check if userProgress equals the goal
-                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0
+                                val goal = missionSnapshot.child("goal").getValue(Int::class.java) ?: 0// Check if userProgress equals the goal
                                 if (userProgress + 1 == goal) {
-                                    // Fetch the mission points and add to user's snaPoints
-                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0
+                                    val missionPoints = missionSnapshot.child("points").getValue(Int::class.java) ?: 0// Fetch the mission points and add to user's snaPoints
                                     updateSnaPoints(userData, myReference, missionPoints)
 
-                                    // Set completed to true
-                                    missionSnapshot.ref.child("completed").setValue(true)
+                                    missionSnapshot.ref.child("completed").setValue(true)// Set completed to true
                                 }
                             }
                         }
                     }
-
                     override fun onCancelled(databaseError: DatabaseError) {
-                        // Handle errors
                     }
                 })
         }
@@ -663,21 +605,14 @@ fun updateFullTimeMissions(userData: UserData?, animalType: String) {
 
 //updates users snaPoints
 private fun updateSnaPoints(userData: UserData, myReference: DatabaseReference, missionPoints: Int) {
-    // Fetch the current snaPoints
-    val snaPointsReference = myReference.child(userData.userId).child("snaPoints")
+    val snaPointsReference = myReference.child(userData.userId).child("snaPoints")// Fetch the current snaPoints
     snaPointsReference.addListenerForSingleValueEvent(object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             val currentSnaPoints = dataSnapshot.getValue(String::class.java) ?: "0"
-
-            // Add missionPoints to the current snaPoints and update in the database
-            val newSnaPoints = (currentSnaPoints.toInt() + missionPoints).toString()
+            val newSnaPoints = (currentSnaPoints.toInt() + missionPoints).toString()// Add missionPoints to the current snaPoints and update in the database
             snaPointsReference.setValue(newSnaPoints)
-
-            //Log.d(TAG, "Updated snaPoints: $newSnaPoints")
         }
-
         override fun onCancelled(databaseError: DatabaseError) {
-            //Log.e(TAG, "Error fetching snaPoints: ${databaseError.message}")
         }
     })
 }

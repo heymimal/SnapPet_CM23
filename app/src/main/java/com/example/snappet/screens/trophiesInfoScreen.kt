@@ -43,7 +43,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                // Header item
                 item {
                     Text(
                         text = "Trophies Information",
@@ -53,7 +52,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                         textAlign = TextAlign.Center,
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     )
-
                     Text(
                         text = "Trophies can be gained through completing various challenges. " +
                                 "The highest Trophy will be shown in your profile.",
@@ -62,7 +60,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .padding(16.dp)
                             .align(Alignment.Start)
                     )
-
                     Text(
                         text = "Trophies differ in rarity:",
                         style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
@@ -71,7 +68,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
                     RaritySquare(text = "Bronze Trophies", trophyType = "bronze", modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -82,7 +78,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
                     RaritySquare(text = "Silver Trophies", trophyType = "silver", modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -93,7 +88,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
                     RaritySquare(text = "Gold Trophies", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -104,7 +98,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-
                 item {
                     RaritySquare(text = "Legendary Trophies", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -116,7 +109,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                 }
-
                 item {
                     Text(
                         text = "Trophy List",
@@ -128,7 +120,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                     )
                     Spacer(modifier = Modifier.height(30.dp))
                 }
-                //Bronze
                 item {
                     RaritySquare(text = "Snappy Snapper", trophyType = "bronze",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -179,7 +170,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-                //Silver
                 item {
                     RaritySquare(text = "Silver Safari Scout", trophyType = "silver",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -230,7 +220,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-                //Gold
                 item {
                     RaritySquare(text = "Gold Wilderness Conquerer", trophyType = "gold",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -281,7 +270,6 @@ fun TrophiesInfoNav(navController: NavHostController) {
                             .align(Alignment.Start)
                     )
                 }
-                //Legendary
                 item {
                     RaritySquare(text = "Legendary Nature Maestro", trophyType = "legendary",modifier = Modifier.padding(start = 16.dp, bottom = 0.dp))
                     Text(
@@ -338,6 +326,7 @@ fun TrophiesInfoNav(navController: NavHostController) {
     }
 }
 
+//how a trophy is presented (colour and text)
 @Composable
 fun RaritySquare(text: String, trophyType: String, modifier: Modifier = Modifier) {
     val squareColor = when (trophyType) {
@@ -347,9 +336,7 @@ fun RaritySquare(text: String, trophyType: String, modifier: Modifier = Modifier
         "legendary" -> Color(0xFFE2590B)
         else -> Color.Black
     }
-
     val textColor = if (trophyType == "gold") Color.Black else Color.White
-
     Box(
         modifier = modifier
             .fillMaxWidth()

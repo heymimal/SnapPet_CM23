@@ -2,7 +2,6 @@ package com.example.snappet.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.layout.*
@@ -10,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +21,6 @@ import com.example.snappet.navigation.Screens
 
 @Composable
 fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String) {
-    // Map the month animals to corresponding image resources
     val animalImageResources = mapOf(
         "Horse" to R.drawable.horse,
         "Lizard" to R.drawable.lizard,
@@ -38,7 +35,6 @@ fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String)
         "Dog" to R.drawable.dog,
         "Duck" to R.drawable.duck
     )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -46,7 +42,6 @@ fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String)
             .padding(32.dp)
             .wrapContentSize(align = Alignment.Center)
     ) {
-        // Title: "Month of the:"
         Text(
             text = "Month of the:",
             style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
@@ -55,10 +50,7 @@ fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String)
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
-
         Spacer(modifier = Modifier.height(30.dp))
-
-        // Image using the Image composable
         val animalImageResource = animalImageResources[presentMonthAnimal]
         if (animalImageResource != null) {
             Image(
@@ -71,8 +63,6 @@ fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String)
                     .padding(bottom = 16.dp)
             )
         }
-
-        // Text with presentMonthAnimal
         Text(
             text = presentMonthAnimal,
             style = TextStyle(fontSize = 24.sp, color = Color.Black),
@@ -81,10 +71,7 @@ fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String)
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
-
         Spacer(modifier = Modifier.height(30.dp))
-
-        // Description
         Text(
             text = "Take pictures of this animal to get a x5 points multiplier!",
             style = TextStyle(
@@ -97,10 +84,7 @@ fun MonthAnimalNav(navController: NavHostController, presentMonthAnimal: String)
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
-
         Spacer(modifier = Modifier.height(30.dp))
-
-        // Button to navigate to Trophies Info
         Button(
             onClick = {
                 navController.navigate(route = Screens.Home.route)

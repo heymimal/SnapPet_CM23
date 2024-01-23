@@ -63,9 +63,7 @@ fun TrophiesNav(
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 )
-
                 LazyColumn {
-                    // Throphies Info button placed after missions
                     item {
                         Button(
                             onClick = {
@@ -80,8 +78,6 @@ fun TrophiesNav(
                             Text(text = "Throphies Info", style = TextStyle(fontSize = 20.sp))
                         }
                     }
-
-                    // Sticky header for daily missions
                     stickyHeader {
                         Text(
                             text = "Daily Missions",
@@ -92,14 +88,10 @@ fun TrophiesNav(
                                 .padding(8.dp)
                         )
                     }
-
-                    // Display daily missions
                     itemsIndexed(missions) { index, mission ->
                         MissionCard(mission = mission)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-
-                    // Sticky header for monthly missions
                     stickyHeader {
                         Text(
                             text = "Monthly Missions",
@@ -110,13 +102,10 @@ fun TrophiesNav(
                                 .padding(8.dp)
                         )
                     }
-
-                    // Display monthly missions
                     itemsIndexed(monthlyMissions) { index, mission ->
                         MissionCard(mission = mission)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-
                     stickyHeader {
                         Text(
                             text = "Full Time Missions",
@@ -127,8 +116,6 @@ fun TrophiesNav(
                                 .padding(8.dp)
                         )
                     }
-
-                    // Display monthly missions
                     itemsIndexed(fullTimeMissions) { index, mission ->
                         MissionCard(mission = mission)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -156,19 +143,16 @@ fun MissionCard(mission: Mission) {
                 style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Text(
                 text = "Status: ${mission.userProgress}/${mission.goal}",
                 style = TextStyle(fontSize = 14.sp),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Text(
                 text = "Points: ${mission.points}",
                 style = TextStyle(fontSize = 14.sp),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             if (mission.completed) {
                 Box(
                     modifier = Modifier

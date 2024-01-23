@@ -52,14 +52,10 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostController,
                   userData: UserData?,
-    //queremos ter um lambeda quando ele fizer sign out
-    //ele recebe esta função como paramentro de entrada
-                  onSignOut: () -> Unit
+                  onSignOut: () -> Unit//lambeda
                           ) {
     val userDataState by profileViewModel.userData.observeAsState()
-    // Observe trophy data
     val trophy by profileViewModel.trophyData.observeAsState()
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -67,13 +63,9 @@ fun ProfileScreen(profileViewModel: ProfileViewModel, navController : NavHostCon
         }) {paddingValues ->
         Text(text = "", modifier = Modifier.padding(paddingValues = paddingValues))
         ProfileScreenComposable(userDataState, userData, onSignOut,navController,trophy)
-
-        //Text(text = "Hello")
     }
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenComposable(
     final: UserData?,
@@ -99,15 +91,13 @@ fun ProfileScreenComposable(
                     .align(alignment = Alignment.CenterHorizontally)
                     .offset(y = 29.dp)
             )
-
-            Spacer(modifier = Modifier.height(100.dp)) // Add space between "Edit Profile" and profile photo
-
+            Spacer(modifier = Modifier.height(100.dp))
             if(userData?.username != null) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .align(Alignment.CenterHorizontally), // Center the Row horizontally
+                        .align(Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -138,7 +128,6 @@ fun ProfileScreenComposable(
                         .align(alignment = Alignment.CenterHorizontally)
                         .offset(y = 29.dp)
                 )
-
                 if (final != null) {
                     Text(
                         text = "SnapPoints: "+final.snaPoints,
@@ -149,18 +138,13 @@ fun ProfileScreenComposable(
                             .align(alignment = Alignment.CenterHorizontally)
                             .offset(y = 29.dp)
                     )
-
                     Spacer(modifier = Modifier.height(30.dp))
-
                     if (trophy != null) {
                         final.snaPoints?.let { updateTrophy(userData.userId, it.toInt()) }
                     }
                 }
-
             }
-
-            // Buttons
-            Box(
+            Box(//buttons
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
@@ -179,9 +163,7 @@ fun ProfileScreenComposable(
                     ) {
                         Text(text = "Update", style = TextStyle(fontSize = 20.sp))
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp)) // Add space between buttons
-
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = onSignOut,
                         shape = RoundedCornerShape(50.dp),
@@ -192,9 +174,7 @@ fun ProfileScreenComposable(
                     ) {
                         Text(text = "Logout", style = TextStyle(fontSize = 20.sp))
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp)) // Add space between buttons
-
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {
                             navController.navigate(route = Screens.Leaderboard.route)
@@ -250,7 +230,7 @@ fun updateTrophy(userId: String, points: Int) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 140.dp), // Adjust horizontal padding as needed
+            .padding(horizontal = 140.dp),
         contentAlignment = Alignment.Center
     ) {
         RaritySquare(

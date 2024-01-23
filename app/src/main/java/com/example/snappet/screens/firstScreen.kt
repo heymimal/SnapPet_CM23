@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,10 +38,7 @@ fun FirstScreenNav(navController: NavHostController) {
             .padding(32.dp)
             .wrapContentSize(align = Alignment.Center)
     ) {
-        // Title: "Month of the:"
         Spacer(modifier = Modifier.height(30.dp))
-
-
         Image(
             painter = painterResource(id = R.drawable.snapet),
             contentDescription = null,
@@ -53,7 +49,6 @@ fun FirstScreenNav(navController: NavHostController) {
                 .padding(bottom = 16.dp)
         )
         Spacer(modifier = Modifier.height(30.dp))
-
         Text(
             text = "Wellcome to SnaPet",
             style = TextStyle(
@@ -71,10 +66,7 @@ fun FirstScreenNav(navController: NavHostController) {
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
-
         Spacer(modifier = Modifier.height(60.dp))
-
-        // Button to navigate to Trophies Info
         Button(
             onClick = {
                 navController.navigate(route = Screens.Login.route)

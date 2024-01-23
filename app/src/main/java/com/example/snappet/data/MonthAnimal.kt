@@ -7,10 +7,8 @@ class MonthAnimal{
         "Horse", "Lizard", "Peacock", "Pig", "Rabbit", "Sheep",
         "Bird", "Cat", "Chicken", "Cow", "Dog", "Duck"
     )
-
     fun getAnimalForPresentMonth(): String {
         val currentMonth = LocalDate.now().month.value
-        // Adjusting for 1-based index
         return monthlyAnimals[currentMonth - 1]
     }
 }
