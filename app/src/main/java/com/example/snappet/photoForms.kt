@@ -2,6 +2,7 @@ package com.example.snappet
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -337,11 +338,12 @@ fun PhotoForm(modifier: Modifier = Modifier, uri: Uri, imageBitmap: ImageBitmap,
                     uploadImageToStorage(uri.toString(), imageBitmap, photo, userData);
                 }
                     if (contextPhotoType == "Needs Help") {
-                        Toast.makeText(
+                        val toast = Toast.makeText(
                             context,
                             "Animal Shelter Entities Have Been Notified!",
-                            Toast.LENGTH_LONG
-                        ).show()
+                            Toast.LENGTH_LONG,
+                        )
+                        toast.show()
                     }
                 }
             },

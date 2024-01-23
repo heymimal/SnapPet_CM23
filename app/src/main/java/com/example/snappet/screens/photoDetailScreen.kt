@@ -207,7 +207,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                     onDismissRequest = { likePhotoMessage.value = false },
                     title = {Text(text = "Thank you!")},
                     text = {Text (
-                        text = "You like the photo!",
+                        text = "You liked the photo!",
                         modifier = Modifier.verticalScroll(rememberScrollState())
                     )},
                     confirmButton = {
