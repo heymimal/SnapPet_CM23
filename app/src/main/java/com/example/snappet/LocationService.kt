@@ -121,8 +121,8 @@ class LocationService : Service() {
     private fun start() {
 
         val notification = NotificationCompat.Builder(this,"location")
-            .setContentTitle("Tracking location ... ")
-            .setContentText("Location: null")
+            .setContentTitle("Notification ")
+            .setContentText("Now tracking location!")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setOngoing(true)
         createNotificationChannel("animal1","Animal Nearby!","not important")
@@ -135,7 +135,7 @@ class LocationService : Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
 
-        locationClient.getLocationUpdates(10000L)
+        locationClient.getLocationUpdates(30000L)
             .catch { e ->
                 e.printStackTrace()
             }.onEach {
@@ -147,6 +147,7 @@ class LocationService : Service() {
                     var c = 1;
                     for(geofence in geofences){
                         val distance = haversine(location.latitude,location.longitude,geofence.latitude,geofence.longitude)
+                        if(distance > geofence.radius) continue
                         if(c==1){
                             val animalNotif = animalNotification1.setContentText("A ${geofence.animalType} is close by!!\n${distance.toInt()} meters away...")
                                 .setContentTitle("Animal nearby!")

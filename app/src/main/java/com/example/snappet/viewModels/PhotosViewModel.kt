@@ -21,7 +21,7 @@ class PhotosViewModel : ViewModel() {
     val photo : LiveData<Photo> get() = _photo
 
     fun fetchAllPhotos(){
-        val databaseReference: DatabaseReference = Firebase.database.reference.child("imagesTest")
+        val databaseReference: DatabaseReference = Firebase.database.reference.child("imagesMiguel")
             .child("allImages")
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

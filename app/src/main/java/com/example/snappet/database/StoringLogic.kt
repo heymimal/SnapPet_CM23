@@ -102,8 +102,8 @@ fun uploadPhotoToDatabase(photo: Photo, downloadUrl: String, userData: UserData,
 
         val folderName = if (!userName.isNullOrBlank()) userName else userId
         val allFolder = "allImages"
-        val imagePath = "imagesTest/$folderName/"
-        val allImagesPath = "imagesTest/$allFolder/"
+        val imagePath = "imagesMiguel/$folderName/"
+        val allImagesPath = "imagesMiguel/$allFolder/"
 
         val databasePath = databaseReference.child(imagePath)
         val allImagesDatabasePath = databaseReference.child(allImagesPath)
@@ -190,7 +190,7 @@ fun checkForGeofence(photo: Photo, photos : List<Photo>?){
     val count = isNewPhotoNearby(photo,photos!!,thresholdDistance)
     Log.d(TAG, count.toString())
     val geofenceRef = FirebaseDatabase.getInstance().getReference("geofences")
-    if(count > 2) { // count would be 10, but for testing purposes
+    if(count > 4) { // count would be 10, but for testing purposes
         //check if any geopoint is in the range of the photo
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

@@ -335,7 +335,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
 
 fun updatePhotoLikes(photo: Photo, photoId: String, newLikes: Int){
     val database = Firebase.database
-    val reference = database.reference.child("imagesTest").child("allImages")
+    val reference = database.reference.child("imagesMiguel").child("allImages")
         .child(photoId).child("likes")
 
     reference.setValue(newLikes).addOnSuccessListener {

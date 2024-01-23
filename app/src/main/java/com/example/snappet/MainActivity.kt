@@ -388,7 +388,7 @@ class MainActivity : ComponentActivity() {
                             val rawPhotoId = backStackEntry.arguments?.getString("photoId") ?: ""
                             val photoId = "-" + rawPhotoId.substringAfter("-")
                             val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-                            val databaseReference: DatabaseReference = database.reference.child("imagesTest").child(
+                            val databaseReference: DatabaseReference = database.reference.child("imagesMiguel").child(
                                 "allImages"
                             )
 
