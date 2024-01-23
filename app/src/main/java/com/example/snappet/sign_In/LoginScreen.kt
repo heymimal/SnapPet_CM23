@@ -55,7 +55,7 @@ fun LoginScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(15.dp))
         Text(
             text = "Login",
             style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black),
@@ -64,10 +64,19 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .wrapContentSize(align = Alignment.Center)
         )
-
-        Spacer(modifier = Modifier.height(200.dp))
         Spacer(modifier = Modifier.height(16.dp))
 
+        Image(
+            painter = painterResource(id = R.drawable.snapet),
+            contentDescription = null,
+            modifier = Modifier
+                .size(200.dp) // Adjust the size as needed
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(100.dp))
         Button(
             onClick = onSignInClick,
             shape = RoundedCornerShape(16.dp),

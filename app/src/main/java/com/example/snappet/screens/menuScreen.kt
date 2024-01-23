@@ -144,6 +144,34 @@ fun CardWithImageAndText(photo: Photo, text: String, onPhotoClick: () -> Unit) {
 
 
 @Composable
+fun CardWithText(text: String) {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = Modifier
+            .width(140.dp)
+            .height(200.dp)
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+
+            Text(
+                text = text,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 fun ThreeByThreeGrid1(navController: NavHostController) {
 
     val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -155,6 +183,25 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
     val user = Firebase.auth.currentUser
     val userId = user?.uid
+
+    var hasBeePhotos = recentPhotos.any {it.animalType == "Bee"}
+    var hasBirdPhotos = recentPhotos.any {it.animalType == "Bird"}
+    var hasButterflyPhotos = recentPhotos.any {it.animalType == "Butterfly"}
+    var hasCatsPhotos = recentPhotos.any {it.animalType == "Cat"}
+    var hasChickenPhotos = recentPhotos.any {it.animalType == "Chicken"}
+    var hasCowPhotos = recentPhotos.any {it.animalType == "Cow"}
+    var hasDogPhotos = recentPhotos.any {it.animalType == "Dog"}
+    var hasDuckPhotos = recentPhotos.any {it.animalType == "Duck"}
+    var hasGeckoPhotos = recentPhotos.any {it.animalType == "Gecko"}
+    var hasGoatPhotos = recentPhotos.any {it.animalType == "Goat"}
+    var hasHorsePhotos = recentPhotos.any {it.animalType == "Horse"}
+    var hasLizardPhotos = recentPhotos.any {it.animalType == "Lizard"}
+    var hasPeacockPhotos = recentPhotos.any {it.animalType == "Peacock"}
+    var hasPigPhotos = recentPhotos.any {it.animalType == "Pig"}
+    var hasRabbitPhotos = recentPhotos.any {it.animalType == "Rabbit"}
+    var hasSheepPhotos = recentPhotos.any {it.animalType == "Sheep"}
+
+
 
     // Retrieve recent photos from the Realtime Database
     LaunchedEffect(key1 = databaseReference) {
@@ -222,7 +269,7 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                             ) {
                                 navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
                             }
-                        }
+                            }
                             c++
                         }
                     }
@@ -271,15 +318,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Bees", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Bee"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasBeePhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Bee" }.forEach { beePhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = beePhoto,
+                                    text = beePhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${beePhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No bee photos available.")
                         }
                     }
                 }
@@ -290,15 +344,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Birds", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Bird"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasBirdPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Bird" }.forEach { birdPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = birdPhoto,
+                                    text = birdPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${birdPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No birds photos available.")
                         }
                     }
                 }
@@ -309,15 +370,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Butterflies", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Butterfly"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasButterflyPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Butterfly" }.forEach { butterflyPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = butterflyPhoto,
+                                    text = butterflyPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${butterflyPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No butterflies photos available.")
                         }
                     }
                 }
@@ -328,15 +396,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Cats", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Cat"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasCatsPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Cat" }.forEach { catPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = catPhoto,
+                                    text = catPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${catPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No cat photos available.")
                         }
                     }
                 }
@@ -347,15 +422,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Chickens", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Chicken"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasChickenPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Chicken" }.forEach { chickenPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = chickenPhoto,
+                                    text = chickenPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${chickenPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No chicken photos available.")
                         }
                     }
                 }
@@ -366,15 +448,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Cows", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Cow"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasCowPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Cow" }.forEach { cowPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = cowPhoto,
+                                    text = cowPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${cowPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No cows photos available.")
                         }
                     }
                 }
@@ -385,15 +474,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Dogs", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Dog"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasDogPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Dog" }.forEach { dogPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = dogPhoto,
+                                    text = dogPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${dogPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No dogs photos available.")
                         }
                     }
                 }
@@ -404,15 +500,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Ducks", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Duck"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasDuckPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Duck" }.forEach { duckPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = duckPhoto,
+                                    text = duckPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${duckPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No ducks photos available.")
                         }
                     }
                 }
@@ -423,15 +526,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Geckos", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Gecko"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasGeckoPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Gecko" }.forEach { geckoPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = geckoPhoto,
+                                    text = geckoPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${geckoPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No geckos photos available.")
                         }
                     }
                 }
@@ -442,15 +552,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Goats", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Goat"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasGoatPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Goat" }.forEach { goatPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = goatPhoto,
+                                    text = goatPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${goatPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No goats photos available.")
                         }
                     }
                 }
@@ -461,15 +578,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Horses", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Horse"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasHorsePhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Horse" }.forEach { horsePhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = horsePhoto,
+                                    text = horsePhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${horsePhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No horses photos available.")
                         }
                     }
                 }
@@ -480,15 +604,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Lizards", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Lizard"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasLizardPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Lizard" }.forEach { lizardPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = lizardPhoto,
+                                    text = lizardPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${lizardPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No lizards photos available.")
                         }
                     }
                 }
@@ -499,15 +630,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Peacocks", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Peacock"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasPeacockPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Peacock" }.forEach { peacockPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = peacockPhoto,
+                                    text = peacockPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${peacockPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No peacocks photos available.")
                         }
                     }
                 }
@@ -518,15 +656,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Pigs", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Pig"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasPigPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Pig" }.forEach { pigPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = pigPhoto,
+                                    text = pigPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${pigPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No pigs photos available.")
                         }
                     }
                 }
@@ -537,15 +682,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Rabbits", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Rabbit"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasRabbitPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Rabbit" }.forEach { rabbitPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = rabbitPhoto,
+                                    text = rabbitPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${rabbitPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No rabbits photos available.")
                         }
                     }
                 }
@@ -556,15 +708,22 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
             Column {
                 Text("Sheeps", fontWeight = FontWeight.Bold)
                 LazyRow {
-                    recentPhotos.forEach { photo ->
-                        if(photo.animalType == "Sheep"){
-                            item { CardWithImageAndText(
-                                photo = photo, text = photo.animalType
-                            ) {
-                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                    if (hasSheepPhotos) {
+                        // Display CardWithImageAndText for each bee photo
+                        recentPhotos.filter { it.animalType == "Sheep" }.forEach { sheepPhoto ->
+                            item {
+                                CardWithImageAndText(
+                                    photo = sheepPhoto,
+                                    text = sheepPhoto.animalType
+                                ) {
+                                    navController.navigate("${Screens.PhotoDetail.route}${sheepPhoto.id}")
+                                }
                             }
-                            }
+                        }
+                    } else {
+                        // Display CardWithText if there are no bee photos
+                        item {
+                            CardWithText(text = "No sheeps photos available.")
                         }
                     }
                 }
@@ -573,8 +732,5 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
 
     }
 }
-
-
-
 
 
