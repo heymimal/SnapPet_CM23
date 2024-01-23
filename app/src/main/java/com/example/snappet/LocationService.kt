@@ -119,6 +119,7 @@ class LocationService : Service() {
     }
 
     private fun start() {
+        Log.d(TAG, "STARTED")
         val notification = NotificationCompat.Builder(this,"location")
             .setContentTitle("Tracking location ... ")
             .setContentText("Location: null")
