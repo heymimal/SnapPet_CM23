@@ -187,20 +187,16 @@ fun ProfileScreenComposable(
                                 text = "Start"
                             } else{
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    Log.d(TAG, "log permissoes ")
                                     permissions += Manifest.permission.POST_NOTIFICATIONS
                                 }
                                 val permissionStatus = permissions.map {
                                     it to (context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED)
                                 }.toMap()
 
-                                Log.d(TAG, "AQUI " + permissionStatus)
-
                                 if (permissionStatus.containsValue(false)) {
-                                    Log.d(TAG, "dentro do if")
                                     requestMultiplePermissionsLauncher.launch(permissions)
                                 } else {
-                                    Log.d(TAG, "ELSE")
+
                                     // All permissions already granted
                                     text = "Stop"
                                     permissionsGranted = true
