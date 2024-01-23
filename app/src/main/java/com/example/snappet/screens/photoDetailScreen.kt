@@ -152,9 +152,7 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                         modifier = Modifier
                             .size(25.dp)
                             .padding(end = 4.dp)
-
                     )
-
                     Text(
                         text = photo.likes.toString(),
                         textAlign = TextAlign.Center,

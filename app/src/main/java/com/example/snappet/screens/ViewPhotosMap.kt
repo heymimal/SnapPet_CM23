@@ -2,17 +2,12 @@ package com.example.snappet.screens
 
 import android.content.ContentValues
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
@@ -182,7 +178,7 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
 
         // Add some space between the photo and the text information
         Spacer(modifier = Modifier.height(3.dp))
-        Row(){
+        Row(modifier = Modifier.fillMaxWidth().height((15*amp).dp)){
             Text(
                 text = "Animal:",
                 fontWeight = FontWeight.Bold,
@@ -191,23 +187,38 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
             )
             Text(
                 text = " ${photo.animalType}",
-                fontSize = (10*amp).sp
+                fontSize = (10*amp).sp,
+                modifier = Modifier.padding(end = 4.dp)
+            )
+            Image(
+                painter = painterResource(R.drawable.heart),
+                contentDescription = "Like",
+                modifier = Modifier
+                    .size((15*amp).dp)
+                    .padding(end = 1.dp)
+            )
+            Text(
+                text = photo.likes.toString(),
+                fontSize = (10*amp).sp,
+            )
+
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(){
+            Text(
+                text = "Uploaded by: ",
+                fontWeight = FontWeight.Bold,
+                fontSize = (10*amp).sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+
+            Text(
+                text = "${photo.senderName}",
+                fontSize = (10*amp).sp,
+                modifier = Modifier.padding(start = 4.dp)
             )
         }
-        Spacer(modifier = Modifier.height(3.dp))
-        Text(
-            text = "Uploaded by: ",
-            fontWeight = FontWeight.Bold,
-            fontSize = (10*amp).sp,
-            modifier = Modifier.padding(start = 4.dp)
-        )
-        Spacer(modifier = Modifier.height(3.dp))
-
-        Text(
-            text = "${photo.senderName}",
-            fontSize = (10*amp).sp,
-            modifier = Modifier.padding(start = 4.dp)
-        )
 
         if(expanded && receivedValue){
             Spacer(modifier = Modifier.height(3.dp))
@@ -223,27 +234,29 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
             Text(
                 text = "${photo.description}",
                 fontSize = (10*amp).sp,
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier.padding(start = 4.dp, end = 4.dp)
             )
             var isLikeEnabled by remember { mutableStateOf(!isLiked) }
-
-            OutlinedButton(
-                enabled = isLikeEnabled,
-                onClick = {
-                    likePhotoMessage.value = true
-                    photo.likes +=1
-                    updateUserLikes(photo, photo.id, onFailure = { exception ->
-                        Log.e(ContentValues.TAG, "failed to update liked photos", exception)
+            Box(modifier = Modifier.fillMaxWidth().fillMaxHeight()){
+                OutlinedButton(
+                    enabled = isLikeEnabled,
+                    onClick = {
+                        likePhotoMessage.value = true
+                        photo.likes +=1
+                        updateUserLikes(photo, photo.id, onFailure = { exception ->
+                            Log.e(ContentValues.TAG, "failed to update liked photos", exception)
+                        })
+                        isLikeEnabled = false
+                    },
+                    modifier = Modifier.align(Alignment.Center),
+                    content = {
+                        Image(painterResource(R.drawable.heart),
+                            modifier = Modifier.size(60.dp),
+                            contentDescription = null) // Adjust spacing
+                        //Text("Like!", fontSize = 15.sp)
                     })
-                    isLikeEnabled = false
-                },
-                content = {
-                Image(painterResource(R.drawable.heart),
-                    modifier = Modifier.size(40.dp),
-                    contentDescription = null) // Adjust spacing
-                //Text("Like!", fontSize = 15.sp)
-            }
-            )
+                }
+
         }
     }
 }
