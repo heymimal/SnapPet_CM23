@@ -56,7 +56,7 @@ class PhotosViewModel : ViewModel() {
                         photos.add(photo)
                     }
                 }
-               _photos.value = photos
+               _photos.value = photos.reversed()
             }
             override fun onCancelled(databaseError: DatabaseError) {
                 // Handle error

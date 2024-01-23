@@ -67,7 +67,7 @@ private const val TAG = "BasicMapActivity"
 val singapore = LatLng(1.3588227, 103.8742114)
 
 
-class TestMapActivity : ComponentActivity() {
+class Map : ComponentActivity() {
 
     lateinit var mFusedLocationClient: FusedLocationProviderClient
 

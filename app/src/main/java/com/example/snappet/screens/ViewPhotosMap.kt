@@ -31,6 +31,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -90,33 +91,12 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
             onDismissRequest = { likePhotoMessage.value = false },
             title = {Text(text = "Thank you!")},
             text = {Text (
-                text = "You like the photo!",
+                text = "You liked the photo!",
                 modifier = Modifier.verticalScroll(rememberScrollState())
             )},
             confirmButton = {
                 Button(
                     onClick = {likePhotoMessage.value = false},
-                    colors = ButtonDefaults.buttonColors(Color.Black)
-                ){
-                    Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
-                }
-            }
-        )
-    }
-
-    val alreadyLikedPhotoMessage = remember{ mutableStateOf(false) }
-
-    if(alreadyLikedPhotoMessage.value){
-        AlertDialog(
-            onDismissRequest = { alreadyLikedPhotoMessage.value = false },
-            title = {Text(text = "Warning!")},
-            text = {Text (
-                text = "You have already liked the photo, can't like it again!",
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            )},
-            confirmButton = {
-                Button(
-                    onClick = {alreadyLikedPhotoMessage.value = false},
                     colors = ButtonDefaults.buttonColors(Color.Black)
                 ){
                     Text(text = "OK", color = Color.White, fontWeight = FontWeight.Bold)
@@ -133,7 +113,8 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
     }
     val configuration = LocalConfiguration.current
     val smallAmp = 1
-    val largeAmp = 3
+    val largeAmp = 2
+    val cardAmp = 3
     val smallWidth = 120.dp
     val smallHeight = 150.dp
     val largeWidth = configuration.screenWidthDp.dp
@@ -163,6 +144,10 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
     var amp by remember {
         mutableIntStateOf(smallAmp)
     }
+    var cardAmpRemember by remember {
+        mutableIntStateOf(smallAmp)
+    }
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -175,10 +160,12 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
                 width = smallWidth
                 height = smallHeight
                 amp = smallAmp
+                cardAmpRemember = smallAmp
             } else {
                 width = largeWidth
                 height = largeHeight
                 amp = largeAmp
+                cardAmpRemember = cardAmp
             }
             expanded = !expanded
         },
@@ -209,24 +196,39 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
         }
         Spacer(modifier = Modifier.height(3.dp))
         Text(
-            text = "Description: ",
+            text = "Uploaded by: ",
             fontWeight = FontWeight.Bold,
             fontSize = (10*amp).sp,
             modifier = Modifier.padding(start = 4.dp)
-
         )
         Spacer(modifier = Modifier.height(3.dp))
-        // Display the description
+
         Text(
-            text = "${photo.description}",
+            text = "${photo.senderName}",
             fontSize = (10*amp).sp,
             modifier = Modifier.padding(start = 4.dp)
         )
+
         if(expanded && receivedValue){
+            Spacer(modifier = Modifier.height(3.dp))
+            Text(
+                text = "Description: ",
+                fontWeight = FontWeight.Bold,
+                fontSize = (10*amp).sp,
+                modifier = Modifier.padding(start = 4.dp)
+
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+            // Display the description
+            Text(
+                text = "${photo.description}",
+                fontSize = (10*amp).sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
             var isLikeEnabled by remember { mutableStateOf(!isLiked) }
 
-            // TODO try to put the button with an image!
-            Button(enabled = isLikeEnabled,
+            OutlinedButton(
+                enabled = isLikeEnabled,
                 onClick = {
                     likePhotoMessage.value = true
                     photo.likes +=1
@@ -234,38 +236,14 @@ fun PhotoDetailCard(photo: Photo, reference: DatabaseReference) {
                         Log.e(ContentValues.TAG, "failed to update liked photos", exception)
                     })
                     isLikeEnabled = false
-                }){
-                Text("Click to Like")
-            }
-            Button(
-                onClick = {Log.d(TAG,"click!")},
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                        //modifier = Modifier.background(Color.White),
-                //modifier = Modifier.size(width = 200.dp, height = 70.dp),
+                },
                 content = {
                 Image(painterResource(R.drawable.heart),
                     modifier = Modifier.size(40.dp),
-                    contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp)) // Adjust spacing
+                    contentDescription = null) // Adjust spacing
                 //Text("Like!", fontSize = 15.sp)
             }
             )
-            /*Image(
-                painter = painterResource(R.drawable.heart),
-                contentDescription = "Like",
-                modifier = Modifier
-                    .size(50.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .background(color = Color.White)
-                    .clickable(enabled = !isLikeEnabled) {
-                        likePhotoMessage.value = true
-                        photo.likes +=1
-                        updateUserLikes(photo, photo.id, onFailure = { exception ->
-                            Log.e(ContentValues.TAG, "failed to update liked photos", exception)
-                        })
-                        isLikeEnabled = false
-                    }
-            )*/
         }
     }
 }

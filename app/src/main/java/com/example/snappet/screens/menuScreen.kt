@@ -214,14 +214,16 @@ fun ThreeByThreeGrid1(navController: NavHostController) {
                 Text("Recent Photos", fontWeight = FontWeight.Bold)
                 //Log.d(TAG, LoadRecentPhotos(databaseReference)?.size.toString())
                 LazyRow {
+                    var c = 0
                     recentPhotos.forEach { photo ->
-
-                        item { CardWithImageAndText(
-                            photo = photo, text = photo.animalType
-                        ) {
-                            navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
-
+                        if(c < 11){
+                            item { CardWithImageAndText(
+                                photo = photo, text = photo.animalType
+                            ) {
+                                navController.navigate("${Screens.PhotoDetail.route}${photo.id}")
+                            }
                         }
+                            c++
                         }
                     }
                 }

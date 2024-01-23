@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -277,22 +278,23 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                                 )
                             }
                         }
-                        Image(
-                            painter = painterResource(R.drawable.heart),
-                            contentDescription = "Like",
-                            alignment = Alignment.BottomCenter,
-                            modifier = Modifier
-                                .size(75.dp)
-                                .clickable(enabled = isLikeEnabled) {
-                                    likePhotoMessage.value = true
-                                    photo.likes += 1
-
-                                    updateUserLikes(photo, photo.id, onFailure = { exception ->
-                                        Log.e(TAG, "failed to update liked photos", exception)
-                                    })
-
-                                    isLikeEnabled = false
-                                }
+                        Spacer(modifier = Modifier.padding(10.dp))
+                        OutlinedButton(
+                            enabled = isLikeEnabled,
+                            onClick = {
+                                likePhotoMessage.value = true
+                                photo.likes +=1
+                                updateUserLikes(photo, photo.id, onFailure = { exception ->
+                                    Log.e(TAG, "failed to update liked photos", exception)
+                                })
+                                isLikeEnabled = false
+                            },
+                            content = {
+                                Image(painterResource(R.drawable.heart),
+                                    modifier = Modifier.size(40.dp),
+                                    contentDescription = null)
+                            },
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
                 }
@@ -305,23 +307,26 @@ fun PhotoDetailScreen(photo: Photo, navController: NavController, check: Boolean
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ){
-                        Image(
-                            painter = painterResource(R.drawable.heart),
-                            contentDescription = "Like",
-                            modifier = Modifier
-                                .size(75.dp)
-                                .clickable(enabled = isLikeEnabled) {
-                                    likePhotoMessage.value = true
-                                    photo.likes += 1
 
-                                    updateUserLikes(photo, photo.id, onFailure = { exception ->
-                                        Log.e(TAG, "failed to update liked photos", exception)
-                                    })
-
-                                    isLikeEnabled = false
-                                }
+                        OutlinedButton(
+                            enabled = isLikeEnabled,
+                            onClick = {
+                                likePhotoMessage.value = true
+                                photo.likes +=1
+                                updateUserLikes(photo, photo.id, onFailure = { exception ->
+                                    Log.e(TAG, "failed to update liked photos", exception)
+                                })
+                                isLikeEnabled = false
+                            },
+                            content = {
+                                Image(painterResource(R.drawable.heart),
+                                    modifier = Modifier.size(40.dp),
+                                    contentDescription = null) // Adjust spacing
+                                //Text("Like!", fontSize = 15.sp)
+                            }
                         )
                     }
+
                 }
 
             }
